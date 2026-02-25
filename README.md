@@ -4,6 +4,19 @@
 
 ---
 
+## Architecture
+
+```mermaid
+flowchart TB
+    A["**ME (Runner)**<br/>Run the script"] --> B["**Repo Search Step**<br/>• GitHub /search/repos<br/>• Filters created range (year)<br/>• Writes repos table"]
+    B --> C["**Builds data in memory**<br/>repos, owners, small runs"]
+    C --> D["**Owner Enrichment Step**<br/>• GitHub /users/{login}<br/>• Cache in owners table<br/>• Retry/backoff"]
+    D --> E["**Export Step**<br/>• join repos+owners<br/>• write XLSX hyperlinks<br/>• CSV fallback"]
+    E --> F["**Geocoding enricher** (Apps script)<br/>• Improve data collection<br/>owner_location, city, country"]
+```
+
+---
+
 ## What it searches
 
 **Repositories that:**
