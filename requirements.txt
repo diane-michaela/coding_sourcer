@@ -1,0 +1,8 @@
+# Core
+pandas>=2.0.0
+openpyxl>=3.1.0
+requests>=2.28.0
+python-dotenv>=1.0.0
+
+# Geocoding (Nominatim/OSM fallback in geocode_postprocess.py and lisp2.py)
+geopy>=2.4.0
