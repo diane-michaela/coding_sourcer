@@ -30,6 +30,7 @@ import re
 import json
 import time
 import random
+import uuid
 import typing as t
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -718,20 +719,48 @@ def main():
             save_geo_cache()
             print(f"Progress: {seen} repos (geocode cache saved)")
 
-    # Append to Google Sheet (dedupe by repo_full_name), then update state
-    try:
-        ws = get_gspread_worksheet()
-        header = list(rows[0].keys()) if rows else []
-        header = ensure_header(ws, header)
-        existing = load_existing_repo_full_names(ws)
-        new_rows = [r for r in rows if (r.get("repo_full_name") or "").strip() not in existing]
-        append_rows(ws, new_rows, header)
-        print(f"Sheet: appended {len(new_rows)} new rows (skipped {len(rows) - len(new_rows)} duplicates)")
-        state = load_state()
-        state["last_successful_run_utc"] = window_end.isoformat()
-        save_state(state)
-    except Exception as e:
-        print("Sheet/state update failed:", e)
+    # Prepare sheet append
+    ws = get_gspread_worksheet()
+
+    header = [
+        "run_id", "run_timestamp_utc", "window_start_utc", "window_end_utc", "query",
+        "repo_full_name", "repo_url", "description", "language", "stars", "forks", "open_issues",
+        "created_at", "updated_at", "pushed_at",
+        "owner_login", "owner_url", "owner_name", "owner_location", "owner_email",
+        "owner_blog", "owner_x", "owner_linkedin", "owner_extra_links",
+        "owner_location_norm", "owner_city", "owner_region", "owner_country", "owner_country_code",
+        "owner_lat", "owner_lon", "owner_geocode_provider", "owner_geocode_status",
+    ]
+
+    header = ensure_header(ws, header)
+    existing = load_existing_repo_full_names(ws)
+
+    run_id = uuid.uuid4().hex[:10]
+    run_ts = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+    new_rows = []
+    for r in rows:
+        k = (r.get("repo_full_name") or "").strip()
+        if not k or k in existing:
+            continue
+
+        r["run_id"] = run_id
+        r["run_timestamp_utc"] = run_ts
+        r["window_start_utc"] = window_start.isoformat()
+        r["window_end_utc"] = window_end.isoformat()
+        r["query"] = query
+
+        new_rows.append(r)
+        existing.add(k)
+
+    append_rows(ws, new_rows, header)
+    print(f"Appended {len(new_rows)} new rows to Google Sheet.")
+
+    # Save last successful run ONLY after append succeeds
+    state = load_state()
+    state["last_successful_run_utc"] = window_end.isoformat()
+    save_state(state)
+    print("Saved last_successful_run_utc:", state["last_successful_run_utc"])
 
     save_geo_cache()
     print(f"Geocode cache saved: {GEO_CACHE_FILE.resolve()}")
