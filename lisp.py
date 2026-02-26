@@ -65,6 +65,7 @@ def get_gspread_worksheet():
 
 from openpyxl import load_workbook
 from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
 from requests.exceptions import ReadTimeout, ConnectionError, HTTPError
 
 from dotenv import load_dotenv
@@ -307,11 +308,16 @@ def get(url: str) -> requests.Response:
     raise RuntimeError(f"GET failed after retries: {last_exc}")
 
 
-def build_query(window_start: datetime, window_end: datetime) -> str:
+def build_created_query(window_start: datetime, window_end: datetime) -> str:
     start_date = window_start.date().isoformat()
     end_date = window_end.date().isoformat()
-    # exclude forks by default
     return f"{BASE_QUERY.strip()} created:{start_date}..{end_date} fork:false".strip()
+
+
+def build_pushed_query(window_start: datetime, window_end: datetime) -> str:
+    start_date = window_start.date().isoformat()
+    end_date = window_end.date().isoformat()
+    return f"{BASE_QUERY.strip()} pushed:{start_date}..{end_date} fork:false".strip()
 
 
 def search_repositories(query: str) -> t.Iterable[dict]:
@@ -601,17 +607,21 @@ def save_state(state: dict) -> None:
 def compute_window() -> tuple[datetime, datetime]:
     state = load_state()
     end = datetime.now(timezone.utc).replace(microsecond=0)
-    last = state.get("last_successful_run_utc")
-
-    if last:
-        try:
-            last_dt = datetime.fromisoformat(last.replace("Z", "+00:00"))
-            start = last_dt - timedelta(hours=WINDOW_OVERLAP_HOURS)
-        except Exception:
-            start = end - timedelta(days=FIRST_RUN_LOOKBACK_DAYS)
+    created_utc = state.get("last_successful_created_scan_utc")
+    pushed_utc = state.get("last_successful_pushed_scan_utc")
+    last = None
+    if created_utc or pushed_utc:
+        for s in (created_utc, pushed_utc):
+            if s:
+                try:
+                    dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+                    last = dt if last is None else max(last, dt)
+                except Exception:
+                    pass
+    if last is not None:
+        start = last - timedelta(hours=WINDOW_OVERLAP_HOURS)
     else:
         start = end - timedelta(days=FIRST_RUN_LOOKBACK_DAYS)
-
     return start.replace(microsecond=0), end
 
 
@@ -646,81 +656,92 @@ def append_rows(ws, rows: list[dict], header: list[str]) -> None:
     ws.append_rows(values, value_input_option="RAW")
 
 
+def build_repo_row_map(ws) -> dict[str, int]:
+    """Return mapping repo_full_name -> 1-based row number (header is row 1)."""
+    header = ws.row_values(1)
+    if "repo_full_name" not in header:
+        return {}
+    col_index = header.index("repo_full_name") + 1
+    vals = ws.col_values(col_index)[1:]
+    out: dict[str, int] = {}
+    for i, v in enumerate(vals):
+        if v and v.strip():
+            out[v.strip()] = i + 2
+    return out
+
+
+def upsert_rows(ws, rows: list[dict], header: list[str]) -> tuple[int, int]:
+    """Update existing rows by repo_full_name, append new ones. Returns (num_appended, num_updated)."""
+    repo_row = build_repo_row_map(ws)
+    num_updated = 0
+    to_append: list[dict] = []
+    last_col = get_column_letter(len(header))
+    updates: list[tuple[int, list]] = []
+    for r in rows:
+        key = (r.get("repo_full_name") or "").strip()
+        if not key:
+            continue
+        values = [r.get(col, "") for col in header]
+        if key in repo_row:
+            row_num = repo_row[key]
+            updates.append((row_num, values))
+            num_updated += 1
+        else:
+            to_append.append(r)
+    if updates:
+        body = [{"range": f"A{row_num}:{last_col}{row_num}", "values": [values]} for row_num, values in updates]
+        ws.batch_update(body, value_input_option="RAW")
+    if to_append:
+        append_rows(ws, to_append, header)
+    return len(to_append), num_updated
+
+
+def _build_row_from_repo(repo: dict, query_label: str) -> dict:
+    """Build one sheet row from a GitHub repo dict and query label (created/pushed)."""
+    owner = repo.get("owner") or {}
+    owner_login = owner.get("login") or ""
+    owner_url = owner.get("html_url") or ""
+    ojson = fetch_owner(owner_login) if owner_login else {}
+    o = owner_fields(ojson) if ojson else {
+        "owner_name": "", "owner_email": "", "owner_location": "", "owner_blog": "",
+        "owner_x": "", "owner_linkedin": "", "owner_extra_links": "",
+    }
+    geo = geocode_and_normalize(o["owner_location"])
+    return {
+        "repo_full_name": repo.get("full_name", ""),
+        "repo_url": repo.get("html_url", ""),
+        "description": repo.get("description", "") or "",
+        "language": repo.get("language", "") or "",
+        "stars": repo.get("stargazers_count", 0),
+        "forks": repo.get("forks_count", 0),
+        "open_issues": repo.get("open_issues_count", 0),
+        "created_at": repo.get("created_at", ""),
+        "updated_at": repo.get("updated_at", ""),
+        "pushed_at": repo.get("pushed_at", ""),
+        "owner_login": owner_login,
+        "owner_url": owner_url,
+        "owner_name": o["owner_name"],
+        "owner_location": o["owner_location"],
+        "owner_email": o["owner_email"],
+        "owner_blog": o["owner_blog"],
+        "owner_x": o["owner_x"],
+        "owner_linkedin": o["owner_linkedin"],
+        "owner_extra_links": o["owner_extra_links"],
+        **geo,
+        "query": query_label,
+    }
+
+
 # ---------------- Main ----------------
 def main():
     _print_auth_diagnostics()
     _print_rate_limit_snapshot()
-
     load_geo_cache()
 
     window_start, window_end = compute_window()
-    query = build_query(window_start, window_end)
-    print("Query:", query)
     print("Window:", window_start.isoformat(), "->", window_end.isoformat())
     print("Geocoding provider:", GEO_PROVIDER or ("google" if GOOGLE_MAPS_API_KEY else "nominatim"))
     print("Google API key detected:", "YES" if GOOGLE_MAPS_API_KEY else "NO (will use Nominatim unless GEO_PROVIDER=google)")
-
-    rows: list[dict] = []
-    seen = 0
-
-    for repo in search_repositories(query):
-        # REMOVE the created_year_in_range filtering entirely
-        owner = repo.get("owner") or {}
-        owner_login = owner.get("login") or ""
-        owner_url = owner.get("html_url") or ""
-
-        ojson = fetch_owner(owner_login) if owner_login else {}
-        o = owner_fields(ojson) if ojson else {
-            "owner_name": "",
-            "owner_email": "",
-            "owner_location": "",
-            "owner_blog": "",
-            "owner_x": "",
-            "owner_linkedin": "",
-            "owner_extra_links": "",
-        }
-
-        geo = geocode_and_normalize(o["owner_location"])
-
-        rows.append({
-            # Repo
-            "repo_full_name": repo.get("full_name", ""),
-            "repo_url": repo.get("html_url", ""),
-            "description": repo.get("description", "") or "",
-            "language": repo.get("language", "") or "",
-            "stars": repo.get("stargazers_count", 0),
-            "forks": repo.get("forks_count", 0),
-            "open_issues": repo.get("open_issues_count", 0),
-            "created_at": repo.get("created_at", ""),
-            "updated_at": repo.get("updated_at", ""),
-            "pushed_at": repo.get("pushed_at", ""),
-
-            # Owner
-            "owner_login": owner_login,
-            "owner_url": owner_url,
-            "owner_name": o["owner_name"],
-            "owner_location": o["owner_location"],  # raw
-            "owner_email": o["owner_email"],
-            "owner_blog": o["owner_blog"],
-            "owner_x": o["owner_x"],
-            "owner_linkedin": o["owner_linkedin"],
-            "owner_extra_links": o["owner_extra_links"],
-
-            # Geocoded owner location
-            **geo,
-        })
-
-        seen += 1
-        if seen >= MAX_REPOS:
-            break
-
-        # Save cache periodically
-        if seen % 50 == 0:
-            save_geo_cache()
-            print(f"Progress: {seen} repos (geocode cache saved)")
-
-    # Prepare sheet append
-    ws = get_gspread_worksheet()
 
     header = [
         "run_id", "run_timestamp_utc", "window_start_utc", "window_end_utc", "query",
@@ -731,36 +752,59 @@ def main():
         "owner_location_norm", "owner_city", "owner_region", "owner_country", "owner_country_code",
         "owner_lat", "owner_lon", "owner_geocode_provider", "owner_geocode_status",
     ]
-
+    ws = get_gspread_worksheet()
     header = ensure_header(ws, header)
-    existing = load_existing_repo_full_names(ws)
+
+    all_rows: dict[str, dict] = {}
+
+    # Created scan
+    created_query = build_created_query(window_start, window_end)
+    print("Query (created):", created_query)
+    seen = 0
+    for repo in search_repositories(created_query):
+        row = _build_row_from_repo(repo, "created")
+        key = (row.get("repo_full_name") or "").strip()
+        if key:
+            all_rows[key] = row
+        seen += 1
+        if seen % 50 == 0:
+            save_geo_cache()
+            print(f"Progress (created): {seen} repos")
+        if seen >= MAX_REPOS:
+            break
+
+    # Pushed scan (overwrites same repo with fresher data)
+    pushed_query = build_pushed_query(window_start, window_end)
+    print("Query (pushed):", pushed_query)
+    seen2 = 0
+    for repo in search_repositories(pushed_query):
+        row = _build_row_from_repo(repo, "pushed")
+        key = (row.get("repo_full_name") or "").strip()
+        if key:
+            all_rows[key] = row
+        seen2 += 1
+        if seen2 % 50 == 0:
+            save_geo_cache()
+            print(f"Progress (pushed): {seen2} repos")
+        if seen2 >= MAX_REPOS:
+            break
 
     run_id = uuid.uuid4().hex[:10]
     run_ts = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-
-    new_rows = []
-    for r in rows:
-        k = (r.get("repo_full_name") or "").strip()
-        if not k or k in existing:
-            continue
-
+    for r in all_rows.values():
         r["run_id"] = run_id
         r["run_timestamp_utc"] = run_ts
         r["window_start_utc"] = window_start.isoformat()
         r["window_end_utc"] = window_end.isoformat()
-        r["query"] = query
 
-        new_rows.append(r)
-        existing.add(k)
+    num_appended, num_updated = upsert_rows(ws, list(all_rows.values()), header)
+    print(f"Appended {num_appended} new rows to Google Sheet. Updated {num_updated} existing rows.")
 
-    append_rows(ws, new_rows, header)
-    print(f"Appended {len(new_rows)} new rows to Google Sheet.")
-
-    # Save last successful run ONLY after append succeeds
     state = load_state()
-    state["last_successful_run_utc"] = window_end.isoformat()
+    state["last_successful_created_scan_utc"] = window_end.isoformat()
+    state["last_successful_pushed_scan_utc"] = window_end.isoformat()
     save_state(state)
-    print("Saved last_successful_run_utc:", state["last_successful_run_utc"])
+    print("Saved last_successful_created_scan_utc and last_successful_pushed_scan_utc:", window_end.isoformat())
 
     save_geo_cache()
     print(f"Geocode cache saved: {GEO_CACHE_FILE.resolve()}")
