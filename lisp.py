@@ -614,6 +614,37 @@ def compute_window() -> tuple[datetime, datetime]:
     return start.replace(microsecond=0), end
 
 
+def ensure_header(ws, header: list[str]) -> list[str]:
+    existing = ws.row_values(1)
+    if not existing:
+        ws.append_row(header)
+        return header
+
+    s = set(existing)
+    missing = [c for c in header if c not in s]
+    if missing:
+        new_header = existing + missing
+        ws.update("1:1", [new_header])
+        return new_header
+    return existing
+
+
+def load_existing_repo_full_names(ws) -> set[str]:
+    header = ws.row_values(1)
+    if "repo_full_name" not in header:
+        return set()
+    col_index = header.index("repo_full_name") + 1
+    vals = ws.col_values(col_index)[1:]
+    return set(v.strip() for v in vals if v and v.strip())
+
+
+def append_rows(ws, rows: list[dict], header: list[str]) -> None:
+    if not rows:
+        return
+    values = [[r.get(col, "") for col in header] for r in rows]
+    ws.append_rows(values, value_input_option="RAW")
+
+
 # ---------------- Main ----------------
 def main():
     _print_auth_diagnostics()
