@@ -591,6 +591,40 @@ def geocode_and_normalize(raw: str) -> dict:
     return d
 
 
+def load_state() -> dict:
+    if STATE_FILE.exists():
+        try:
+            data = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+    return {}
+
+
+def save_state(state: dict) -> None:
+    try:
+        STATE_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def compute_window() -> tuple[datetime, datetime]:
+    state = load_state()
+    end = datetime.now(timezone.utc).replace(microsecond=0)
+    last = state.get("last_successful_run_utc")
+
+    if last:
+        try:
+            last_dt = datetime.fromisoformat(last.replace("Z", "+00:00"))
+            start = last_dt - timedelta(hours=WINDOW_OVERLAP_HOURS)
+        except Exception:
+            start = end - timedelta(days=FIRST_RUN_LOOKBACK_DAYS)
+    else:
+        start = end - timedelta(days=FIRST_RUN_LOOKBACK_DAYS)
+
+    return start.replace(microsecond=0), end
+
+
 # ---------------- Main ----------------
 def main():
     _print_auth_diagnostics()
