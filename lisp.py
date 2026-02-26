@@ -84,8 +84,8 @@ STATE_FILE = Path(__file__).with_name("state.json")
 FIRST_RUN_LOOKBACK_DAYS = 62       # ~2 months
 WINDOW_OVERLAP_HOURS = 12          # safety overlap
 
-MAX_REPOS = 20  # safe first run; raise later
-PER_PAGE = 50
+PER_PAGE = 100   # GitHub Search supports up to 100
+MAX_REPOS = 200
 TIMEOUT = 20
 
 DEFAULT_XLSX = "github_repos_lisp_with_owner_details.xlsx"
