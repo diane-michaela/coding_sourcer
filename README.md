@@ -82,3 +82,15 @@ URL cells are converted into **clickable hyperlinks** with friendly labels (e.g.
 - **Freshness:** Even after search, double-checks repos’ `pushed_at` vs `2024-01-01`.
 - **Google Sheets (NLP.py):** Main output is UPSERT into one sheet (one row per repo). **NLP.py** sources repos by **keyword clusters** (inference_prod, quantization, alignment, peft_lora, vector_database)—one GitHub search query per keyword—with **created** and **pushed** rolling-window scans. Queries use `in:readme in:description` and **exclude** RAG/agent-related terms (e.g. RAG, agent, langchain, llamaindex). Each row includes **skill_cluster**, **keyword_matched**, and **query** (full query string) for traceability. Put `google_service_account.json` in the project root. State uses `last_successful_created_scan_utc` and `last_successful_pushed_scan_utc`; `upsert_rows` dedupes by `repo_full_name`. Optional columns `contributors_top` and `contributors_top_n` are filled only for **new** repos (stars >= MIN_STARS_FOR_CONTRIB; set INCLUDE_CONTRIBUTORS=false to disable).
 - **URL hygiene:** Normalizes URLs, tolerates missing schemes, and extracts links from free text.
+
+---
+
+## Fresh run trial (NLP.py)
+
+To confirm new rows are appended to the correct Google Sheet tab with a small, rate-limit–safe run:
+
+1. **Delete `state.json`** in the project root so the next run uses a full first-run window.
+2. **Temporary limits** (currently set in NLP.py for trial): `FIRST_RUN_LOOKBACK_DAYS=30`, `MAX_REPOS=80`, `MAX_REPOS_PER_QUERY=10`, `PER_PAGE=50`. Restore to production values (e.g. 62, 500, 40, 100) after the test.
+3. Run `python NLP.py`. Console prints **"Writing to worksheet: &lt;title&gt; gid: &lt;id&gt;"** so you can confirm the target tab.
+4. In the spreadsheet, search for **test_run_marker** (new column with UTC timestamps on appended rows). New rows are at the bottom; `skill_cluster` and `keyword_matched` should be populated; no duplicate `repo_full_name` rows.
+5. **Cleanup (optional):** Remove `test_run_marker` from the header and row dict in NLP.py; restore the config constants above for production.

@@ -152,12 +152,12 @@ EXCLUDE_TERMS = [
 ]
 
 STATE_FILE = Path(__file__).with_name("state.json")
-FIRST_RUN_LOOKBACK_DAYS = 62       # ~2 months
+FIRST_RUN_LOOKBACK_DAYS = 30       # trial: 30 days (restore to 62 for production)
 WINDOW_OVERLAP_HOURS = 12          # safety overlap
 
-PER_PAGE = 100   # GitHub Search supports up to 100
-MAX_REPOS = 500
-MAX_REPOS_PER_QUERY = 40   # cap per query to avoid flooding
+PER_PAGE = 50    # trial: 50 (GitHub supports up to 100)
+MAX_REPOS = 80   # trial: small cap (restore to 500 for production)
+MAX_REPOS_PER_QUERY = 10   # trial: 10 per keyword (restore to 40 for production)
 TIMEOUT = 20
 
 DEFAULT_XLSX = "github_repos_llm_engineering_with_owner_details.xlsx"
@@ -849,6 +849,7 @@ def _build_row_from_repo(
         "keyword_matched": keyword_matched,
         "query": full_query,
         "scan_type": scan_type,
+        "test_run_marker": datetime.now(timezone.utc).isoformat(),
         "contributors_top": "",
         "contributors_top_n": 0,
     }
@@ -867,7 +868,7 @@ def main():
 
     header = [
         "run_id", "run_timestamp_utc", "window_start_utc", "window_end_utc",
-        "skill_cluster", "keyword_matched", "query", "scan_type",
+        "skill_cluster", "keyword_matched", "query", "scan_type", "test_run_marker",
         "repo_full_name", "repo_url", "description", "language", "stars", "forks", "open_issues",
         "created_at", "updated_at", "pushed_at",
         "owner_login", "owner_url", "owner_name", "owner_location", "owner_email",
@@ -877,6 +878,7 @@ def main():
         "owner_lat", "owner_lon", "owner_geocode_provider", "owner_geocode_status",
     ]
     ws = get_gspread_worksheet()
+    print("Writing to worksheet:", ws.title, "gid:", ws.id)
     header = ensure_header(ws, header)
     repo_row = build_repo_row_map(ws)
 
