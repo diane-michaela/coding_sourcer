@@ -94,6 +94,13 @@ DEFAULT_XLSX = "github_repos_lisp_with_owner_details.xlsx"
 # Gentle pacing to reduce abuse detection on /search endpoints
 PAGE_SLEEP_RANGE = (0.2, 0.8)  # seconds (randomized)
 
+# Contributors (only for new repos; rate-limit safe)
+INCLUDE_CONTRIBUTORS = os.getenv("INCLUDE_CONTRIBUTORS", "true").strip().lower() in ("1", "true", "yes")
+TOP_N_CONTRIBUTORS = int(os.getenv("TOP_N_CONTRIBUTORS", "5"))
+MIN_STARS_FOR_CONTRIB = int(os.getenv("MIN_STARS_FOR_CONTRIB", "2"))
+REFRESH_CONTRIBUTORS_ON_UPDATE = os.getenv("REFRESH_CONTRIBUTORS_ON_UPDATE", "false").strip().lower() in ("1", "true", "yes")
+_CONTRIB_CACHE: dict[str, dict] = {}
+
 # Geocoding
 GEO_PROVIDER = (os.getenv("GEO_PROVIDER") or "").strip().lower()  # "google" or "nominatim" (optional)
 GOOGLE_MAPS_API_KEY = (os.getenv("GOOGLE_MAPS_API_KEY") or "").strip()
@@ -345,6 +352,28 @@ def fetch_owner(login: str) -> dict:
     data = get(f"{GITHUB_API}/users/{login}").json()
     _OWNER_CACHE[login] = data or {}
     return _OWNER_CACHE[login]
+
+
+def fetch_top_contributors(owner_login: str, repo_name: str, top_n: int) -> dict:
+    """GET repos/{owner}/{repo}/contributors?per_page={top_n}&anon=false. Returns contributors_top, contributors_top_n."""
+    cache_key = f"{owner_login}/{repo_name}:{top_n}"
+    if cache_key in _CONTRIB_CACHE:
+        return _CONTRIB_CACHE[cache_key]
+    url = f"{GITHUB_API}/repos/{owner_login}/{repo_name}/contributors?per_page={top_n}&anon=false"
+    try:
+        data = get(url).json()
+        if not isinstance(data, list):
+            result = {"contributors_top": "", "contributors_top_n": 0}
+        else:
+            logins = [str(c.get("login", "")) for c in data if c.get("login")]
+            result = {
+                "contributors_top": "; ".join(logins),
+                "contributors_top_n": len(logins),
+            }
+    except Exception:
+        result = {"contributors_top": "", "contributors_top_n": 0}
+    _CONTRIB_CACHE[cache_key] = result
+    return result
 
 
 def owner_fields(owner_json: dict) -> dict:
@@ -670,6 +699,9 @@ def build_repo_row_map(ws) -> dict[str, int]:
     return out
 
 
+CONTRIBUTOR_COLUMNS = ("contributors_top", "contributors_top_n")
+
+
 def upsert_rows(ws, rows: list[dict], header: list[str]) -> tuple[int, int]:
     """Update existing rows by repo_full_name, append new ones. Returns (num_appended, num_updated)."""
     repo_row = build_repo_row_map(ws)
@@ -684,6 +716,16 @@ def upsert_rows(ws, rows: list[dict], header: list[str]) -> tuple[int, int]:
         values = [r.get(col, "") for col in header]
         if key in repo_row:
             row_num = repo_row[key]
+            if not REFRESH_CONTRIBUTORS_ON_UPDATE:
+                try:
+                    existing = ws.row_values(row_num)
+                    for col in CONTRIBUTOR_COLUMNS:
+                        if col in header:
+                            idx = header.index(col)
+                            if idx < len(existing):
+                                values[idx] = existing[idx]
+                except Exception:
+                    pass
             updates.append((row_num, values))
             num_updated += 1
         else:
@@ -729,6 +771,8 @@ def _build_row_from_repo(repo: dict, query_label: str) -> dict:
         "owner_extra_links": o["owner_extra_links"],
         **geo,
         "query": query_label,
+        "contributors_top": "",
+        "contributors_top_n": 0,
     }
 
 
@@ -749,11 +793,13 @@ def main():
         "created_at", "updated_at", "pushed_at",
         "owner_login", "owner_url", "owner_name", "owner_location", "owner_email",
         "owner_blog", "owner_x", "owner_linkedin", "owner_extra_links",
+        "contributors_top", "contributors_top_n",
         "owner_location_norm", "owner_city", "owner_region", "owner_country", "owner_country_code",
         "owner_lat", "owner_lon", "owner_geocode_provider", "owner_geocode_status",
     ]
     ws = get_gspread_worksheet()
     header = ensure_header(ws, header)
+    repo_row = build_repo_row_map(ws)
 
     all_rows: dict[str, dict] = {}
 
@@ -788,6 +834,33 @@ def main():
             print(f"Progress (pushed): {seen2} repos")
         if seen2 >= MAX_REPOS:
             break
+
+    # Contributors: only for NEW repos (not in repo_row), subject to throttles
+    contributors_fetched_count = 0
+    contributors_skipped_low_stars = 0
+    contributors_skipped_existing_repo = 0
+    for key, r in all_rows.items():
+        if key in repo_row:
+            contributors_skipped_existing_repo += 1
+            continue
+        if not INCLUDE_CONTRIBUTORS:
+            continue
+        if (r.get("stars") or 0) < MIN_STARS_FOR_CONTRIB:
+            contributors_skipped_low_stars += 1
+            continue
+        try:
+            owner_login = r.get("owner_login", "")
+            parts = key.split("/", 1)
+            repo_name = parts[1] if len(parts) == 2 else ""
+            if owner_login and repo_name:
+                data = fetch_top_contributors(owner_login, repo_name, TOP_N_CONTRIBUTORS)
+                r["contributors_top"] = data["contributors_top"]
+                r["contributors_top_n"] = data["contributors_top_n"]
+                contributors_fetched_count += 1
+        except Exception:
+            r["contributors_top"] = ""
+            r["contributors_top_n"] = 0
+    print(f"Contributors: fetched={contributors_fetched_count}, skipped_low_stars={contributors_skipped_low_stars}, skipped_existing_repo={contributors_skipped_existing_repo}")
 
     run_id = uuid.uuid4().hex[:10]
     run_ts = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
