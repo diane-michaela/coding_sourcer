@@ -84,7 +84,7 @@ STATE_FILE = Path(__file__).with_name("state.json")
 FIRST_RUN_LOOKBACK_DAYS = 62       # ~2 months
 WINDOW_OVERLAP_HOURS = 12          # safety overlap
 
-MAX_REPOS = 500
+MAX_REPOS = 20  # safe first run; raise later
 PER_PAGE = 50
 TIMEOUT = 20
 
@@ -625,7 +625,7 @@ def ensure_header(ws, header: list[str]) -> list[str]:
     missing = [c for c in header if c not in s]
     if missing:
         new_header = existing + missing
-        ws.update("1:1", [new_header])
+        ws.update(values=[new_header], range_name="1:1")
         return new_header
     return existing
 
@@ -656,7 +656,7 @@ def main():
     window_start, window_end = compute_window()
     query = build_query(window_start, window_end)
     print("Query:", query)
-    print("Window:", window_start.isoformat(), "→", window_end.isoformat())
+    print("Window:", window_start.isoformat(), "->", window_end.isoformat())
     print("Geocoding provider:", GEO_PROVIDER or ("google" if GOOGLE_MAPS_API_KEY else "nominatim"))
     print("Google API key detected:", "YES" if GOOGLE_MAPS_API_KEY else "NO (will use Nominatim unless GEO_PROVIDER=google)")
 
