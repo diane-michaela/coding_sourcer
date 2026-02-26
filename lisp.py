@@ -80,6 +80,10 @@ GITHUB_API = "https://api.github.com"
 BASE_QUERY = "lisp"
 EXTRA_QUALIFIERS = "created:2023-01-01..2026-12-31"
 
+STATE_FILE = Path(__file__).with_name("state.json")
+FIRST_RUN_LOOKBACK_DAYS = 62       # ~2 months
+WINDOW_OVERLAP_HOURS = 12          # safety overlap
+
 MAX_REPOS = 500
 PER_PAGE = 50
 TIMEOUT = 20
