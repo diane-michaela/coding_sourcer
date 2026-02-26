@@ -76,9 +76,9 @@ URL cells are converted into **clickable hyperlinks** with friendly labels (e.g.
 ## Other important behaviors
 
 - **Rate limits:** If GitHub returns 403 with a reset time, it sleeps until reset and retries.
-- **Max results:** Stops after `MAX_REPOS` repos considered (default `500`).
+- **Max results:** Stops after `MAX_REPOS` unique repos (default `500`); each keyword query is capped at `MAX_REPOS_PER_QUERY` (e.g. 40) to avoid flooding.
 - **Requests paging:** Walks through search result pages (`per_page=100`).
 - **Auth:** Uses `GITHUB_TOKEN` env var or `token_1.py`’s `GITHUB_TOKEN_2` if present.
 - **Freshness:** Even after search, double-checks repos’ `pushed_at` vs `2024-01-01`.
-- **Google Sheets (lisp.py):** Main output is UPSERT into one sheet (one row per repo): created scan + pushed scan with same rolling window, then `upsert_rows` updates existing rows by `repo_full_name` or appends new ones. Put `google_service_account.json` in the project root. State uses `last_successful_created_scan_utc` and `last_successful_pushed_scan_utc` so the next run uses a time window after the last run. Optional columns `contributors_top` and `contributors_top_n` are filled only for **new** repos (stars >= MIN_STARS_FOR_CONTRIB; set INCLUDE_CONTRIBUTORS=false to disable).
+- **Google Sheets (NLP.py):** Main output is UPSERT into one sheet (one row per repo). **NLP.py** sources repos by **keyword clusters** (inference_prod, quantization, alignment, peft_lora, vector_database)—one GitHub search query per keyword—with **created** and **pushed** rolling-window scans. Queries use `in:readme in:description` and **exclude** RAG/agent-related terms (e.g. RAG, agent, langchain, llamaindex). Each row includes **skill_cluster**, **keyword_matched**, and **query** (full query string) for traceability. Put `google_service_account.json` in the project root. State uses `last_successful_created_scan_utc` and `last_successful_pushed_scan_utc`; `upsert_rows` dedupes by `repo_full_name`. Optional columns `contributors_top` and `contributors_top_n` are filled only for **new** repos (stars >= MIN_STARS_FOR_CONTRIB; set INCLUDE_CONTRIBUTORS=false to disable).
 - **URL hygiene:** Normalizes URLs, tolerates missing schemes, and extracts links from free text.

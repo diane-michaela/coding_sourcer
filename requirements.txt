@@ -7,6 +7,6 @@ python-dotenv>=1.0.0
 # Geocoding (Nominatim/OSM fallback in geocode_postprocess.py and lisp2.py)
 geopy>=2.4.0
 
-# Google Sheets (lisp.py)
+# Google Sheets (NLP.py)
 gspread>=6.0.0
 google-auth>=2.0.0
