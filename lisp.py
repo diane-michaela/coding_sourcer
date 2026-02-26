@@ -37,6 +37,31 @@ from urllib.parse import quote_plus, urlparse
 
 import requests
 import pandas as pd
+
+import gspread
+from google.oauth2.service_account import Credentials
+
+SPREADSHEET_ID = "1OVr2EigkJ5ZHceilXGn-Zl8xpGTGPVxp8jKIEJnOgmo"
+SHEET_GID = 1382489855
+SERVICE_ACCOUNT_FILE = "google_service_account.json"
+
+def get_gspread_worksheet():
+    scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+    creds = Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE,
+        scopes=scopes
+    )
+    client = gspread.authorize(creds)
+    sh = client.open_by_key(SPREADSHEET_ID)
+
+    # Find worksheet by gid
+    for ws in sh.worksheets():
+        if ws.id == SHEET_GID:
+            return ws
+
+    raise ValueError(f"Worksheet with gid={SHEET_GID} not found. Check the gid in your URL.")
+
+
 from openpyxl import load_workbook
 from openpyxl.styles import Font
 from requests.exceptions import ReadTimeout, ConnectionError, HTTPError
