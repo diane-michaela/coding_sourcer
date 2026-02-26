@@ -1,7 +1,7 @@
 """
 GitHub repo sourcer (LISP-only, repo-centric) + owner enrichment + location geocoding/normalization.
 
-- Searches GitHub repos for BASE_QUERY + EXTRA_QUALIFIERS (date range)
+- Searches GitHub repos for BASE_QUERY + created date range (from state/window)
 - For each repo: collects repo fields
 - For each owner: fetches profile fields (cached) and enriches with:
   owner_name, owner_email, owner_location (raw), blog/website, X, LinkedIn, extra links
@@ -78,7 +78,6 @@ print("TOKEN present:", bool(os.getenv("GITHUB_TOKEN")))
 GITHUB_API = "https://api.github.com"
 
 BASE_QUERY = "lisp"
-EXTRA_QUALIFIERS = "created:2023-01-01..2026-12-31"
 
 STATE_FILE = Path(__file__).with_name("state.json")
 FIRST_RUN_LOOKBACK_DAYS = 62       # ~2 months
@@ -220,16 +219,6 @@ def extract_first_linkedin(*fields: str) -> str:
     return ""
 
 
-def created_year_in_range(created_at: str, start_year: int = 2023, end_year: int = 2026) -> bool:
-    if not created_at:
-        return False
-    try:
-        dt = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
-        return start_year <= dt.year <= end_year
-    except Exception:
-        return False
-
-
 def write_excel_with_fallback(df: pd.DataFrame, filename: str) -> Path:
     out = safe_output_path(filename)
     try:
@@ -317,11 +306,11 @@ def get(url: str) -> requests.Response:
     raise RuntimeError(f"GET failed after retries: {last_exc}")
 
 
-def build_query() -> str:
-    q = BASE_QUERY.strip()
-    if EXTRA_QUALIFIERS.strip():
-        q = f"{q} {EXTRA_QUALIFIERS.strip()}"
-    return q
+def build_query(window_start: datetime, window_end: datetime) -> str:
+    start_date = window_start.date().isoformat()
+    end_date = window_end.date().isoformat()
+    # exclude forks by default
+    return f"{BASE_QUERY.strip()} created:{start_date}..{end_date} fork:false".strip()
 
 
 def search_repositories(query: str) -> t.Iterable[dict]:
@@ -632,7 +621,8 @@ def main():
 
     load_geo_cache()
 
-    query = build_query()
+    window_start, window_end = compute_window()
+    query = build_query(window_start, window_end)
     print("Query:", query)
     print("Geocoding provider:", GEO_PROVIDER or ("google" if GOOGLE_MAPS_API_KEY else "nominatim"))
     print("Google API key detected:", "YES" if GOOGLE_MAPS_API_KEY else "NO (will use Nominatim unless GEO_PROVIDER=google)")
@@ -641,9 +631,6 @@ def main():
     seen = 0
 
     for repo in search_repositories(query):
-        if not created_year_in_range(repo.get("created_at", "")):
-            continue
-
         owner = repo.get("owner") or {}
         owner_login = owner.get("login") or ""
         owner_url = owner.get("html_url") or ""
