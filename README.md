@@ -80,5 +80,5 @@ URL cells are converted into **clickable hyperlinks** with friendly labels (e.g.
 - **Requests paging:** Walks through search result pages (`per_page=100`).
 - **Auth:** Uses `GITHUB_TOKEN` env var or `token_1.py`’s `GITHUB_TOKEN_2` if present.
 - **Freshness:** Even after search, double-checks repos’ `pushed_at` vs `2024-01-01`.
-- **Google Sheets (lisp.py):** Optional. Put `google_service_account.json` (service account key) in the project root; `get_gspread_worksheet()` opens the configured spreadsheet by ID and worksheet by gid. Requires `gspread` and `google-auth`.
+- **Google Sheets (lisp.py):** Main output is append-to-sheet (append + dedupe by `repo_full_name`). Put `google_service_account.json` (service account key) in the project root; `get_gspread_worksheet()` opens the configured spreadsheet by ID and worksheet by gid. Requires `gspread` and `google-auth`. State is saved so the next run uses a time window after the last successful run.
 - **URL hygiene:** Normalizes URLs, tolerates missing schemes, and extracts links from free text.

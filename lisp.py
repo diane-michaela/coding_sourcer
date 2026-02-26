@@ -655,6 +655,7 @@ def main():
     window_start, window_end = compute_window()
     query = build_query(window_start, window_end)
     print("Query:", query)
+    print("Window:", window_start.isoformat(), "→", window_end.isoformat())
     print("Geocoding provider:", GEO_PROVIDER or ("google" if GOOGLE_MAPS_API_KEY else "nominatim"))
     print("Google API key detected:", "YES" if GOOGLE_MAPS_API_KEY else "NO (will use Nominatim unless GEO_PROVIDER=google)")
 
@@ -662,6 +663,7 @@ def main():
     seen = 0
 
     for repo in search_repositories(query):
+        # REMOVE the created_year_in_range filtering entirely
         owner = repo.get("owner") or {}
         owner_login = owner.get("login") or ""
         owner_url = owner.get("html_url") or ""
@@ -716,8 +718,20 @@ def main():
             save_geo_cache()
             print(f"Progress: {seen} repos (geocode cache saved)")
 
-    df = pd.DataFrame(rows).fillna("")
-    write_excel_with_fallback(df, DEFAULT_XLSX)
+    # Append to Google Sheet (dedupe by repo_full_name), then update state
+    try:
+        ws = get_gspread_worksheet()
+        header = list(rows[0].keys()) if rows else []
+        header = ensure_header(ws, header)
+        existing = load_existing_repo_full_names(ws)
+        new_rows = [r for r in rows if (r.get("repo_full_name") or "").strip() not in existing]
+        append_rows(ws, new_rows, header)
+        print(f"Sheet: appended {len(new_rows)} new rows (skipped {len(rows) - len(new_rows)} duplicates)")
+        state = load_state()
+        state["last_successful_run_utc"] = window_end.isoformat()
+        save_state(state)
+    except Exception as e:
+        print("Sheet/state update failed:", e)
 
     save_geo_cache()
     print(f"Geocode cache saved: {GEO_CACHE_FILE.resolve()}")
