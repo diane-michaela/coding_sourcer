@@ -152,7 +152,7 @@ EXCLUDE_TERMS = [
 ]
 
 STATE_FILE = Path(__file__).with_name("state.json")
-FIRST_RUN_LOOKBACK_DAYS = 30       # trial: 30 days (restore to 62 for production)
+FIRST_RUN_LOOKBACK_DAYS = 183      # last 6 months (~30 * 6)
 WINDOW_OVERLAP_HOURS = 12          # safety overlap
 
 PER_PAGE = 50    # trial: 50 (GitHub supports up to 100)
@@ -748,10 +748,12 @@ def load_existing_repo_full_names(ws) -> set[str]:
 
 
 def append_rows(ws, rows: list[dict], header: list[str]) -> None:
+    """Write new rows starting at column A of the next empty row. No append_rows(); explicit A anchor."""
     if not rows:
         return
-    values = [[r.get(col, "") for col in header] for r in rows]
-    ws.append_rows(values, value_input_option="RAW")
+    next_row = len(ws.col_values(1)) + 1
+    values_matrix = [[row.get(col, "") for col in header] for row in rows]
+    ws.update(f"A{next_row}", values_matrix, value_input_option="RAW")
 
 
 def build_repo_row_map(ws) -> dict[str, int]:
