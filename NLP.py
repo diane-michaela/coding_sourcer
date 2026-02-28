@@ -152,8 +152,7 @@ EXCLUDE_TERMS = [
 ]
 
 STATE_FILE = Path(__file__).with_name("state.json")
-FIRST_RUN_LOOKBACK_DAYS = 183      # last 6 months (~30 * 6)
-WINDOW_OVERLAP_HOURS = 12          # safety overlap
+FIRST_RUN_LOOKBACK_DAYS = 183      # fixed rolling window: always last 6 months
 
 PER_PAGE = 50    # trial: 50 (GitHub supports up to 100)
 MAX_REPOS = 80   # trial: small cap (restore to 500 for production)
@@ -703,23 +702,9 @@ def save_state(state: dict) -> None:
 
 
 def compute_window() -> tuple[datetime, datetime]:
-    state = load_state()
+    """Fixed rolling window: always the last FIRST_RUN_LOOKBACK_DAYS (e.g. 6 months). Ignores state.json."""
     end = datetime.now(timezone.utc).replace(microsecond=0)
-    created_utc = state.get("last_successful_created_scan_utc")
-    pushed_utc = state.get("last_successful_pushed_scan_utc")
-    last = None
-    if created_utc or pushed_utc:
-        for s in (created_utc, pushed_utc):
-            if s:
-                try:
-                    dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
-                    last = dt if last is None else max(last, dt)
-                except Exception:
-                    pass
-    if last is not None:
-        start = last - timedelta(hours=WINDOW_OVERLAP_HOURS)
-    else:
-        start = end - timedelta(days=FIRST_RUN_LOOKBACK_DAYS)
+    start = end - timedelta(days=FIRST_RUN_LOOKBACK_DAYS)
     return start.replace(microsecond=0), end
 
 
@@ -753,7 +738,7 @@ def append_rows(ws, rows: list[dict], header: list[str]) -> None:
         return
     next_row = len(ws.col_values(1)) + 1
     values_matrix = [[row.get(col, "") for col in header] for row in rows]
-    ws.update(f"A{next_row}", values_matrix, value_input_option="RAW")
+    ws.update(values=values_matrix, range_name=f"A{next_row}", value_input_option="RAW")
 
 
 def build_repo_row_map(ws) -> dict[str, int]:
