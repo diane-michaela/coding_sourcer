@@ -73,6 +73,7 @@ print("TOKEN present:", bool(os.getenv("GITHUB_TOKEN")))
 
 # ---------------- Config ----------------
 GITHUB_API = "https://api.github.com"
+SCRIPT_SOURCE = "NLP"  # written into the 'source' column so multiple scripts can be traced
 
 # --------------- Search budget (GitHub Search API ~30 req/hour authenticated) ---------------
 MAX_SEARCH_REQUESTS_PER_RUN = int(os.getenv("MAX_SEARCH_REQUESTS_PER_RUN", "20"))   # stop before exhausting quota
@@ -1138,6 +1139,7 @@ def main():
     print("Window:", window_start.isoformat(), "->", window_end.isoformat())
 
     header = [
+        "source",
         "run_id", "run_timestamp_utc", "window_start_utc", "window_end_utc",
         "skill_cluster", "keyword_matched", "query", "scan_type", "test_run_marker",
         "repo_full_name", "repo_url", "repo_topics", "description", "language", "stars", "forks", "open_issues",
@@ -1219,6 +1221,7 @@ def main():
     run_id = uuid.uuid4().hex[:10]
     run_ts = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     for r in all_rows.values():
+        r["source"] = SCRIPT_SOURCE
         r["run_id"] = run_id
         r["run_timestamp_utc"] = run_ts
         r["window_start_utc"] = window_start.isoformat()
