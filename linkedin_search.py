@@ -80,25 +80,20 @@ def decode_google_url(cell_value: str) -> str:
     return cell_value
 
 
-def extract_first_name(query: str) -> str:
+def extract_full_name(query: str) -> str:
     """
-    Extract the first name from the first quoted term in the query.
-    e.g. 'site:linkedin.com/in "Ryan Winter" "Wellington"'  →  'Ryan'
+    Extract the full name from the first quoted term in the query.
+    e.g. 'site:linkedin.com/in "Ryan Winter" "Wellington"'  →  'Ryan Winter'
     """
-    # Find all double-quoted groups
     quoted = re.findall(r'"([^"]+)"', query)
     if not quoted:
         return ""
-    # First quoted group is the person's name
-    full_name = quoted[0].strip()
-    # First word = first name
-    first_name = full_name.split()[0] if full_name else ""
-    return first_name
+    return quoted[0].strip()
 
 
-def build_linkedin_query(first_name: str) -> str:
-    """Build simplified LinkedIn Google search: site:linkedin.com/in "Firstname"."""
-    return f'site:linkedin.com/in "{first_name}"'
+def build_linkedin_query(full_name: str) -> str:
+    """Build LinkedIn Google search with full name: site:linkedin.com/in "Ryan Winter"."""
+    return f'site:linkedin.com/in "{full_name}"'
 
 
 # ── Google search (rate-limit aware) ─────────────────────────────────────────
@@ -161,14 +156,14 @@ def main():
             skipped += 1
             continue  # already has a result; skip
 
-        raw_query  = decode_google_url(src_val)
-        first_name = extract_first_name(raw_query)
-        if not first_name:
-            print(f"  Row {i}: could not extract first name from {raw_query!r:.60} — skip")
+        raw_query = decode_google_url(src_val)
+        full_name = extract_full_name(raw_query)
+        if not full_name:
+            print(f"  Row {i}: could not extract name from {raw_query!r:.60} — skip")
             continue
 
-        query = build_linkedin_query(first_name)
-        to_process.append((i, query, first_name))
+        query = build_linkedin_query(full_name)
+        to_process.append((i, query, full_name))
 
     print(f"Rows to process: {len(to_process)}  |  Already filled (skipped): {skipped}")
     if not to_process:
@@ -185,8 +180,8 @@ def main():
         elapsed = round(time.time() - t0, 2)
 
         icon = "✓" if status == "OK" else ("⚠" if "RATE" in status else "✗")
-        print(f"[{idx:03d}/{len(to_process)}] {icon} row {sheet_row}  {first_name!r:<15}  "
-              f"{status:<12}  {elapsed:4.1f}s  {url[:65] if url else status}")
+        print(f"[{idx:03d}/{len(to_process)}] {icon} row {sheet_row}  {first_name!r:<20}  "
+              f"{status:<12}  {elapsed:4.1f}s  {url[:60] if url else status}")
 
         # Write the result URL (or status marker) back to the sheet
         cell = f"{dest_col_letter}{sheet_row}"
