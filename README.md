@@ -1,6 +1,5 @@
 # Coding Sourcer
 
-g
 
 > Builds a sourcer list of European (or unknown-location) individual GitHub users active in 2024+ on Python repos related to transformers / NLP / RAG / agents, and exports a clean, hyperlink-rich Excel for outreach or analysis.
 
