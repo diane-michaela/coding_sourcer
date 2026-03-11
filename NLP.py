@@ -1147,6 +1147,7 @@ def main():
 
     header = [
         "source",
+        "execution_timestamp",
         "run_id", "run_timestamp_utc", "window_start_utc", "window_end_utc",
         "skill_cluster", "keyword_matched", "query", "scan_type", "test_run_marker",
         "repo_full_name", "repo_url", "repo_topics", "description", "language", "stars", "forks", "open_issues",
@@ -1229,6 +1230,7 @@ def main():
     run_ts = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     for r in all_rows.values():
         r["source"] = SCRIPT_SOURCE
+        r["execution_timestamp"] = datetime.now(timezone.utc).strftime("%d/%m/%y")
         r["run_id"] = run_id
         r["run_timestamp_utc"] = run_ts
         r["window_start_utc"] = window_start.isoformat()
