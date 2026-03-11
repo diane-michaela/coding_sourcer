@@ -872,10 +872,17 @@ def load_existing_repo_full_names(ws) -> set[str]:
 
 
 def append_rows(ws, rows: list[dict], header: list[str]) -> None:
-    """Write new rows starting at column A of the next empty row. No append_rows(); explicit A anchor."""
+    """Write new rows anchored at column A of the next empty row. Auto-expands the sheet if needed."""
     if not rows:
         return
     next_row = len(ws.col_values(1)) + 1
+    needed = next_row + len(rows) - 1  # last row we will write
+    current_rows = ws.row_count
+    if needed > current_rows:
+        # Expand the sheet in chunks of 1000 to avoid constant resizing
+        new_size = max(needed + 1000, current_rows + 1000)
+        ws.add_rows(new_size - current_rows)
+        print(f"Expanded sheet '{ws.title}' from {current_rows} to {new_size} rows.")
     values_matrix = [[row.get(col, "") for col in header] for row in rows]
     ws.update(values=values_matrix, range_name=f"A{next_row}", value_input_option="RAW")
 
