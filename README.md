@@ -104,25 +104,29 @@ python find_teamtailor_companies.py
 
 ```mermaid
 flowchart TD
-    A["Google Dork Queries<br/>(site:teamtailor.com, Powered by Teamtailor, etc.)"] --> B["Candidate URL List"]
-    C["Seed companies<br/>(20 known Teamtailor users)"] --> B
-    B --> D["HTTP Fingerprint Verification<br/>(checks data-controller=careersite--ready)"]
-    D --> E{"/people page exists?"}
-    E -- Yes --> F["✓ Ready to scrape"]
-    E -- No  --> G["~ Teamtailor (no /people)"]
-    F --> H["teamtailor_companies.csv"]
-    G --> H
+    A["crt.sh Certificate Transparency<br/>%.teamtailor.com → 500-2000+ subdomains"] --> D
+    B["DuckDuckGo Search<br/>'Powered by Teamtailor' queries<br/>(finds custom-domain sites)"] --> D
+    C["Seed list<br/>(12 confirmed custom-domain sites)"] --> D
+    D["Merged candidate list"] --> E["HTTP Fingerprint Verification<br/>careersite--ready in HTML"]
+    E --> F{"/people page exists?"}
+    F -- Yes --> G["✓ Ready to scrape"]
+    F -- No  --> H["✗ JS-rendered or migrated"]
+    G --> I["teamtailor_companies.csv"]
+    H --> I
 ```
 
 Outputs **`teamtailor_companies.csv`** with columns:
 `company_name`, `base_url`, `people_url`, `source`, `is_teamtailor`, `has_people_page`, `checked_at`
 
 **Discovery sources used:**
-| Source | Free? | Coverage |
-|--------|-------|----------|
-| Google dorks (`site:teamtailor.com`, `"Powered by Teamtailor"`, etc.) | Yes | Good for tech-sector companies |
-| 20 known seed companies (hardcoded) | Yes | Instant baseline |
-| [BuiltWith](https://builtwith.com/teamtailor) | Paid for full list | Thousands of companies |
+| Source | Free? | Coverage | What it finds |
+|--------|-------|----------|---------------|
+| [crt.sh](https://crt.sh/?q=%.teamtailor.com&output=json) | Yes | 500–2000+ companies | Native `*.teamtailor.com` subdomains |
+| DuckDuckGo HTML search | Yes | Dozens | Custom domains (`careers.company.com`) |
+| 12 seed companies (hardcoded) | Yes | Instant baseline | Known custom domains |
+| [BuiltWith](https://builtwith.com/teamtailor) | Paid for full list | Thousands | Both native and custom |
+
+> **Note:** Companies marked ✗ may use JavaScript rendering. They're real Teamtailor sites but `requests` can't see the fingerprint in static HTML — open them in a browser to verify manually.
 
 ### Step 2 — Scrape a company's team (`scrap-career-page.py`)
 

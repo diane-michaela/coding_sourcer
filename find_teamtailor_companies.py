@@ -7,51 +7,55 @@ same platform as careers.phantombuster.com — then verifies each one has a
 
 How it works
 ────────────
-Step 1  Google Dorks
-        Run a set of Teamtailor-fingerprint queries through the existing
-        googlesearch-python library to surface candidate URLs.
+Step 1  Certificate Transparency  (crt.sh)
+        Query crt.sh for every SSL cert ever issued to *.teamtailor.com.
+        This surfaces ALL native company.teamtailor.com subdomains — free,
+        no rate-limit issues, typically returns 500-2000+ entries.
 
-Step 2  BuiltWith free lookup  (optional, no key required for single sites)
-        The free BuiltWith endpoint only checks *known* domains; it cannot
-        enumerate all Teamtailor sites. We use it to cross-validate hits.
+Step 2  DuckDuckGo search  (secondary, finds custom domains)
+        Custom-domain Teamtailor sites (careers.company.com) don't appear in
+        the crt.sh wildcard query.  DuckDuckGo is used to find these via
+        searches for "Powered by Teamtailor" and related fingerprints.
 
-Step 3  Verification
-        For each candidate domain, fetch the root career URL and confirm
-        the Teamtailor fingerprint (data-controller="careersite--ready")
-        exists in the HTML. Then check for the /people path.
+Step 3  Seed companies
+        20 known Teamtailor users merged in as a baseline.
 
-Step 4  Output
-        Write a CSV with: company_name, base_url, people_url, source,
-        verified (bool), people_page_exists (bool).
+Step 4  Verification
+        For each candidate, fetch the career root page and confirm the
+        Teamtailor fingerprint (data-controller="careersite--ready") in the
+        HTML, then check the /people sub-path.
+
+Step 5  Output
+        CSV: company_name, base_url, people_url, source,
+             is_teamtailor, has_people_page, checked_at
 
 Usage
 ─────
     python find_teamtailor_companies.py
 
-Env vars (optional)
-───────────────────
-    GOOGLE_SEARCH_DELAY_SEC   base delay between Google queries  (default 5)
-    MAX_GOOGLE_RESULTS        results per Google query            (default 10)
-    VERIFY_TIMEOUT_SEC        per-site HTTP timeout               (default 15)
+Optional env vars
+─────────────────
+    VERIFY_TIMEOUT_SEC   per-site HTTP timeout    (default 15)
+    MAX_VERIFY           max candidates to verify (default 300, 0 = all)
+    SKIP_VERIFY          set to "1" to skip verification and just dump URLs
 """
 
 import os
 import re
 import csv
 import time
+import json
 import random
 import urllib.parse
 from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
-from bs4 import BeautifulSoup
-from googlesearch import search as _gsearch
 
 # ── Config ───────────────────────────────────────────────────────────────────
-BASE_DELAY_SEC      = float(os.getenv("GOOGLE_SEARCH_DELAY_SEC", "5"))
-MAX_GOOGLE_RESULTS  = int(os.getenv("MAX_GOOGLE_RESULTS", "10"))
-VERIFY_TIMEOUT_SEC  = int(os.getenv("VERIFY_TIMEOUT_SEC", "15"))
+VERIFY_TIMEOUT_SEC = int(os.getenv("VERIFY_TIMEOUT_SEC", "15"))
+MAX_VERIFY         = int(os.getenv("MAX_VERIFY", "300"))   # 0 = no limit
+SKIP_VERIFY        = os.getenv("SKIP_VERIFY", "0") == "1"
 
 OUTPUT_DIR  = Path(__file__).parent
 OUTPUT_FILE = OUTPUT_DIR / "teamtailor_companies.csv"
@@ -61,78 +65,57 @@ HEADERS = {
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/124.0.0.0 Safari/537.36"
-    )
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
 }
 
-# ── Teamtailor HTML fingerprint ───────────────────────────────────────────────
-# Present in every Teamtailor-powered career site's <body> tag
-TEAMTAILOR_FINGERPRINT = 'data-controller="careersite--ready'
-
-# ── Google dork queries ───────────────────────────────────────────────────────
-# Each query is designed to surface Teamtailor-hosted career pages.
-# Mix of: native *.teamtailor.com subdomains + custom "careers.*" domains.
-DORK_QUERIES = [
-    # Native Teamtailor subdomains (company.teamtailor.com)
-    'site:teamtailor.com inurl:/people',
-    'site:teamtailor.com "Our team" technology',
-    'site:teamtailor.com "Our team" software',
-    'site:teamtailor.com "Our team" startup',
-    'site:teamtailor.com "Our team" SaaS',
-    'site:teamtailor.com "Meet the team" engineering',
-    # Custom career domains using Teamtailor
-    'inurl:"/people" "careersite-button" technology company',
-    'inurl:"/people" "careersite-button" software startup',
-    '"Powered by Teamtailor" technology',
-    '"Powered by Teamtailor" software engineering',
-    '"Powered by Teamtailor" SaaS startup',
-    '"Powered by Teamtailor" AI machine learning',
-    '"Powered by Teamtailor" fintech',
-    '"Powered by Teamtailor" data platform',
-    # Specific HTML fingerprint (works when Google has cached raw HTML)
-    '"careersite--ready" "careersite--referrer-cookie" tech',
-    '"careersite--ready" site:careers.*',
-]
-
-# ── Known seed companies (verified Teamtailor users) ─────────────────────────
-# Bootstraps the list; script will add more from Google results.
-SEED_COMPANIES = [
-    ("PhantomBuster",  "https://careers.phantombuster.com"),
-    ("Teamtailor",     "https://careers.teamtailor.com"),
-    ("Mentimeter",     "https://careers.mentimeter.com"),
-    ("Klarna",         "https://careers.klarna.com"),
-    ("Trustpilot",     "https://careers.trustpilot.com"),
-    ("Epidemic Sound", "https://careers.epidemicsound.com"),
-    ("Kry",            "https://careers.kry.se"),
-    ("Acast",          "https://careers.acast.com"),
-    ("Hemnet",         "https://careers.hemnet.se"),
-    ("Voi",            "https://careers.voiscooters.com"),
-    ("Einride",        "https://careers.einride.com"),
-    ("Northvolt",      "https://career.northvolt.com"),
-    ("Peltarion",      "https://peltarion.teamtailor.com"),
-    ("Lookback",       "https://lookback.teamtailor.com"),
-    ("Funnel.io",      "https://careers.funnel.io"),
-    ("Quinyx",         "https://careers.quinyx.com"),
-    ("Anyfin",         "https://careers.anyfin.com"),
-    ("Lana",           "https://lanagroup.teamtailor.com"),
-    ("Detectify",      "https://careers.detectify.com"),
-    ("Cint",           "https://careers.cint.com"),
-]
+TEAMTAILOR_FINGERPRINT = 'careersite--ready'
 
 FIELDNAMES = [
     "company_name",
     "base_url",
     "people_url",
     "source",
-    "is_teamtailor",   # fingerprint confirmed in HTML
-    "has_people_page", # /people route exists and returns 200
+    "is_teamtailor",
+    "has_people_page",
     "checked_at",
+]
+
+
+# ── Known seed companies (verified Teamtailor users — custom domains) ─────────
+# These use custom domains so they don't appear in *.teamtailor.com certs.
+# Only include ones confirmed still on Teamtailor.
+SEED_COMPANIES = [
+    ("PhantomBuster", "https://careers.phantombuster.com"),
+    ("Acast",         "https://careers.acast.com"),
+    ("Quinyx",        "https://careers.quinyx.com"),
+    ("Detectify",     "https://careers.detectify.com"),
+    ("Funnel.io",     "https://careers.funnel.io"),
+    ("Epidemic Sound","https://careers.epidemicsound.com"),
+    ("Hemnet",        "https://careers.hemnet.se"),
+    ("Cint",          "https://careers.cint.com"),
+    ("Mentimeter",    "https://careers.mentimeter.com"),
+    ("Kry",           "https://careers.kry.se"),
+    ("Einride",       "https://careers.einride.com"),
+    ("Anyfin",        "https://careers.anyfin.com"),
+]
+
+# ── DuckDuckGo queries (finds custom-domain Teamtailor sites) ─────────────────
+# Uses the unofficial DDG HTML search — no API key, less prone to blocking.
+DDG_QUERIES = [
+    '"Powered by Teamtailor" technology',
+    '"Powered by Teamtailor" software',
+    '"Powered by Teamtailor" SaaS',
+    '"Powered by Teamtailor" startup',
+    '"Powered by Teamtailor" AI',
+    '"Powered by Teamtailor" fintech',
 ]
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def normalise_base_url(url: str) -> str | None:
-    """Return scheme+netloc only, or None if the URL looks invalid."""
     try:
         p = urllib.parse.urlparse(url)
         if p.scheme not in ("http", "https") or not p.netloc:
@@ -142,16 +125,11 @@ def normalise_base_url(url: str) -> str | None:
         return None
 
 
-def is_teamtailor_domain(netloc: str) -> bool:
-    """True if this is a native *.teamtailor.com subdomain."""
-    return netloc.endswith(".teamtailor.com")
-
-
-def extract_company_name_from_url(url: str) -> str:
-    """Best-effort: strip known prefixes to get a human-readable name."""
+def extract_company_name(url: str) -> str:
     netloc = urllib.parse.urlparse(url).netloc
-    name = re.sub(r"\.(teamtailor|com|se|io|co|org|net|uk|de|fr|es|no|fi|dk).*$", "", netloc)
-    name = re.sub(r"^(careers?|jobs?|work)\.", "", name)
+    name = re.sub(r"\.(teamtailor|com|se|io|co|org|net|uk|de|fr|es|no|fi|dk).*$",
+                  "", netloc, flags=re.I)
+    name = re.sub(r"^(careers?|jobs?|work|join)\.", "", name, flags=re.I)
     return name.replace("-", " ").replace("_", " ").title()
 
 
@@ -169,145 +147,222 @@ def fetch_html(url: str, timeout: int = VERIFY_TIMEOUT_SEC) -> str | None:
 def verify_teamtailor(base_url: str) -> tuple[bool, bool]:
     """
     Returns (is_teamtailor, has_people_page).
-    - is_teamtailor : Teamtailor fingerprint found on the base career page
-    - has_people_page: /people sub-path returns 200 with the fingerprint
+    Checks for the Teamtailor fingerprint in static HTML.
+    Sites that rely on JS rendering will appear as ✗ — they can't be
+    scraped with requests/BeautifulSoup anyway.
     """
     html = fetch_html(base_url)
     if html is None:
         return False, False
 
     is_tt = TEAMTAILOR_FINGERPRINT in html
-
     if not is_tt:
         return False, False
 
-    # Check /people
-    people_url = base_url.rstrip("/") + "/people"
-    people_html = fetch_html(people_url)
+    people_html = fetch_html(base_url.rstrip("/") + "/people")
     has_people = bool(people_html and TEAMTAILOR_FINGERPRINT in people_html)
     return True, has_people
 
 
-def google_dork_urls(query: str, n: int = MAX_GOOGLE_RESULTS) -> list[str]:
-    """Run a single Google dork and return raw result URLs."""
+# ── Step 1: crt.sh Certificate Transparency ──────────────────────────────────
+
+def discover_via_crtsh() -> set[str]:
+    """
+    Query crt.sh for all SSL certs issued to *.teamtailor.com.
+    Returns normalised https://subdomain.teamtailor.com base URLs.
+    """
+    print("\n[Step 1] Querying crt.sh for *.teamtailor.com certificates …")
+    crt_url = "https://crt.sh/?q=%.teamtailor.com&output=json"
+
     try:
-        return list(_gsearch(query, num_results=n, sleep_interval=0))
+        resp = requests.get(crt_url, headers={"User-Agent": HEADERS["User-Agent"]},
+                            timeout=30)
+        resp.raise_for_status()
+        entries = resp.json()
     except Exception as e:
-        print(f"  [Google] Error for '{query[:60]}': {e}")
-        return []
+        print(f"  [crt.sh] Error: {e}")
+        return set()
+
+    found: set[str] = set()
+    for entry in entries:
+        raw = entry.get("name_value", "")
+        # name_value can contain multiple names separated by newlines
+        for name in raw.splitlines():
+            name = name.strip().lstrip("*.")
+            if not name.endswith(".teamtailor.com"):
+                continue
+            # skip wildcards and bare teamtailor.com itself
+            if name == "teamtailor.com" or name.startswith("*."):
+                continue
+            url = f"https://{name}"
+            found.add(url)
+
+    print(f"  -> {len(found)} unique *.teamtailor.com subdomains found")
+    return found
 
 
-def polite_sleep(base: float = BASE_DELAY_SEC):
-    t = base + random.uniform(1.0, 3.0)
-    time.sleep(t)
+# ── Step 2: DuckDuckGo (custom-domain Teamtailor sites) ──────────────────────
+
+def _ddg_search(query: str, max_results: int = 10) -> list[str]:
+    """
+    Hits the DuckDuckGo HTML endpoint and extracts result URLs.
+    No API key required.  Returns a list of raw result URLs.
+    """
+    urls = []
+    try:
+        params = {"q": query, "kl": "us-en", "kp": "-1"}
+        resp = requests.get("https://html.duckduckgo.com/html/",
+                            params=params, headers=HEADERS, timeout=20)
+        if resp.status_code != 200:
+            return []
+        # DDG HTML embeds result URLs in <a class="result__url"> or as
+        # redirect links like //duckduckgo.com/l/?uddg=<encoded_url>
+        for match in re.finditer(r'uddg=([^&"]+)', resp.text):
+            decoded = urllib.parse.unquote(match.group(1))
+            if decoded.startswith("http"):
+                urls.append(decoded)
+                if len(urls) >= max_results:
+                    break
+    except Exception as e:
+        print(f"  [DDG] Error: {e}")
+    return urls
 
 
-# ── Step 1: Google Dork Discovery ────────────────────────────────────────────
-
-def discover_via_google() -> set[str]:
-    """Return a set of normalised base URLs found via Google dorks."""
+def discover_via_duckduckgo() -> set[str]:
+    """
+    Run DuckDuckGo queries to surface custom-domain Teamtailor sites.
+    Returns normalised base URLs.
+    """
+    print(f"\n[Step 2] Running {len(DDG_QUERIES)} DuckDuckGo queries …")
     found: set[str] = set()
 
-    print(f"\n[Step 1] Running {len(DORK_QUERIES)} Google dork queries "
-          f"(up to {MAX_GOOGLE_RESULTS} results each) …")
-
-    for i, query in enumerate(DORK_QUERIES, 1):
-        print(f"  [{i:02d}/{len(DORK_QUERIES)}] {query[:80]}")
-        urls = google_dork_urls(query)
-
-        for raw_url in urls:
+    for i, query in enumerate(DDG_QUERIES, 1):
+        print(f"  [{i:02d}/{len(DDG_QUERIES)}] {query}")
+        for raw_url in _ddg_search(query, max_results=10):
+            # Skip native teamtailor.com subdomains (already caught by crt.sh)
+            if "teamtailor.com" in raw_url:
+                continue
             base = normalise_base_url(raw_url)
             if base:
                 found.add(base)
                 print(f"           + {base}")
+        # Polite delay between queries
+        time.sleep(3 + random.uniform(0, 2))
 
-        if i < len(DORK_QUERIES):
-            polite_sleep()
-
-    print(f"\n  -> {len(found)} unique base URLs discovered via Google")
+    print(f"  -> {len(found)} unique custom-domain candidates from DDG")
     return found
 
 
-# ── Step 2: Merge seeds + Google results ─────────────────────────────────────
+# ── Step 3: Merge all sources ─────────────────────────────────────────────────
 
-def build_candidate_list(google_urls: set[str]) -> list[dict]:
-    """
-    Merge seed companies with Google-discovered URLs.
-    Returns list of dicts with company_name, base_url, source.
-    """
+def build_candidate_list(crt_urls: set[str], ddg_urls: set[str]) -> list[dict]:
     seen: dict[str, dict] = {}
 
-    # Seeds first
     for name, url in SEED_COMPANIES:
         base = normalise_base_url(url)
         if base:
             seen[base] = {"company_name": name, "base_url": base, "source": "seed"}
 
-    # Google results
-    for url in google_urls:
+    for url in crt_urls:
         if url not in seen:
-            name = extract_company_name_from_url(url)
-            seen[url] = {"company_name": name, "base_url": url, "source": "google_dork"}
+            seen[url] = {
+                "company_name": extract_company_name(url),
+                "base_url": url,
+                "source": "crt.sh",
+            }
 
-    return list(seen.values())
+    for url in ddg_urls:
+        if url not in seen:
+            seen[url] = {
+                "company_name": extract_company_name(url),
+                "base_url": url,
+                "source": "duckduckgo",
+            }
+
+    candidates = list(seen.values())
+    print(f"\n[Step 3] Total unique candidates: {len(candidates)}")
+    return candidates
 
 
-# ── Step 3: Verify each candidate ────────────────────────────────────────────
+# ── Step 4: Verify ────────────────────────────────────────────────────────────
 
 def verify_candidates(candidates: list[dict]) -> list[dict]:
-    print(f"\n[Step 3] Verifying {len(candidates)} candidate sites …")
+    if SKIP_VERIFY:
+        print("\n[Step 4] Skipping verification (SKIP_VERIFY=1).")
+        checked_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+        return [{**c, "people_url": "", "is_teamtailor": None,
+                 "has_people_page": None, "checked_at": checked_at}
+                for c in candidates]
+
+    limit = MAX_VERIFY if MAX_VERIFY > 0 else len(candidates)
+    batch = candidates[:limit]
+
+    print(f"\n[Step 4] Verifying {len(batch)} of {len(candidates)} candidates "
+          f"(MAX_VERIFY={MAX_VERIFY if MAX_VERIFY > 0 else 'all'}) …")
+    if len(batch) < len(candidates):
+        print(f"  (set MAX_VERIFY=0 to verify all {len(candidates)})")
+
     checked_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     results = []
 
-    for i, c in enumerate(candidates, 1):
+    for i, c in enumerate(batch, 1):
         base = c["base_url"]
-        print(f"  [{i:03d}/{len(candidates)}] {base}", end="", flush=True)
+        print(f"  [{i:03d}/{len(batch)}] {base}", end="", flush=True)
 
         is_tt, has_people = verify_teamtailor(base)
         people_url = (base.rstrip("/") + "/people") if has_people else ""
 
-        status = "✓ Teamtailor + /people" if has_people else (
-                 "~ Teamtailor (no /people)" if is_tt else "✗ Not Teamtailor")
-        print(f"  {status}")
+        label = ("✓ Teamtailor + /people" if has_people
+                 else ("~ Teamtailor (no /people)" if is_tt
+                       else "✗ Not Teamtailor / JS-rendered"))
+        print(f"  {label}")
 
         results.append({
             **c,
-            "people_url":    people_url,
-            "is_teamtailor": is_tt,
+            "people_url":      people_url,
+            "is_teamtailor":   is_tt,
             "has_people_page": has_people,
-            "checked_at":    checked_at,
+            "checked_at":      checked_at,
         })
 
-        # Be polite; no need to hammer sites back-to-back
-        if i < len(candidates):
-            time.sleep(0.8 + random.uniform(0, 0.5))
+        if i < len(batch):
+            time.sleep(0.6 + random.uniform(0, 0.4))
+
+    # Append unverified remainder
+    for c in candidates[limit:]:
+        results.append({**c, "people_url": "", "is_teamtailor": None,
+                        "has_people_page": None, "checked_at": checked_at})
 
     return results
 
 
-# ── Step 4: Save output ───────────────────────────────────────────────────────
+# ── Step 5: Output ────────────────────────────────────────────────────────────
 
 def save_csv(rows: list[dict]) -> None:
     with OUTPUT_FILE.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
         writer.writeheader()
         writer.writerows(rows)
-    print(f"\nSaved {len(rows)} rows to {OUTPUT_FILE.resolve()}")
+    print(f"\nSaved {len(rows)} rows → {OUTPUT_FILE.resolve()}")
 
 
 def print_summary(rows: list[dict]) -> None:
     tt_count     = sum(1 for r in rows if r["is_teamtailor"])
     people_count = sum(1 for r in rows if r["has_people_page"])
     print("\n" + "─" * 70)
-    print(f"Total candidates checked : {len(rows)}")
-    print(f"Confirmed Teamtailor     : {tt_count}")
-    print(f"Have /people page        : {people_count}  ← ready for scrap-career-page.py")
+    print(f"Total candidates  : {len(rows)}")
+    print(f"Confirmed Teamtailor (SSR) : {tt_count}")
+    print(f"Have /people page : {people_count}  ← ready for scrap-career-page.py")
     print("─" * 70)
     if people_count:
         print("\nCompanies with /people pages:")
         for r in rows:
             if r["has_people_page"]:
-                print(f"  {r['company_name']:<30}  {r['people_url']}")
+                print(f"  {r['company_name']:<35}  {r['people_url']}")
+    print(
+        "\nTip: companies marked ✗ may use JS rendering — open them in a browser"
+        "\n     to check manually; if they have /people, add them as seeds."
+    )
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -315,24 +370,19 @@ def print_summary(rows: list[dict]) -> None:
 def main():
     print("=" * 70)
     print("Teamtailor Company Finder")
+    print("Discovery: crt.sh  +  DuckDuckGo  +  seed list")
     print("=" * 70)
 
-    # Step 1: Google dorks
-    google_urls = discover_via_google()
-
-    # Step 2: Merge with seeds
-    candidates = build_candidate_list(google_urls)
-
-    # Step 3: Verify
+    crt_urls = discover_via_crtsh()
+    ddg_urls = discover_via_duckduckgo()
+    candidates = build_candidate_list(crt_urls, ddg_urls)
     results = verify_candidates(candidates)
-
-    # Step 4: Save
     save_csv(results)
     print_summary(results)
 
     print(
-        "\nNext step: copy any 'people_url' into LIST_URL in scrap-career-page.py"
-        " to scrape that company's team."
+        "\nNext step:\n"
+        "  python scrap-career-page.py <people_url_from_csv>"
     )
 
 
