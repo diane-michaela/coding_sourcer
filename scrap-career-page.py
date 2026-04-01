@@ -13,7 +13,7 @@ import urllib.parse
 # Pass a Teamtailor career base URL as a CLI argument, e.g.:
 #   python scrap-career-page.py https://careers.mentimeter.com
 # Defaults to PhantomBuster when run without arguments.
-_DEFAULT_BASE = "https://careers.phantombuster.com"
+_DEFAULT_BASE = "https://careers.THECOMPANY.com"
 _BASE_URL     = sys.argv[1].rstrip("/") if len(sys.argv) > 1 else _DEFAULT_BASE
 LIST_URL      = _BASE_URL + "/people"
 
