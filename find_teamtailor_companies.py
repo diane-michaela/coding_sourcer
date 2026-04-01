@@ -7,23 +7,24 @@ same platform as careers.phantombuster.com — then verifies each one has a
 
 How it works
 ────────────
-Step 1  Certificate Transparency  (crt.sh)
-        Query crt.sh for every SSL cert ever issued to *.teamtailor.com.
-        This surfaces ALL native company.teamtailor.com subdomains — free,
-        no rate-limit issues, typically returns 500-2000+ entries.
+Step 1  Common Crawl CDX  (primary, ~500-1000+ companies)
+        Query the Common Crawl index for all crawled *.teamtailor.com pages.
+        Common Crawl is a free public web crawl corpus; its CDX API returns
+        real company subdomains that were actually reachable on the web.
 
 Step 2  DuckDuckGo search  (secondary, finds custom domains)
-        Custom-domain Teamtailor sites (careers.company.com) don't appear in
-        the crt.sh wildcard query.  DuckDuckGo is used to find these via
-        searches for "Powered by Teamtailor" and related fingerprints.
+        Custom-domain Teamtailor sites (careers.company.com) don't appear as
+        *.teamtailor.com subdomains.  DuckDuckGo surfaces these via searches
+        for "Powered by Teamtailor".
 
 Step 3  Seed companies
-        20 known Teamtailor users merged in as a baseline.
+        Known Teamtailor users with custom domains merged in as a baseline.
 
 Step 4  Verification
         For each candidate, fetch the career root page and confirm the
-        Teamtailor fingerprint (data-controller="careersite--ready") in the
-        HTML, then check the /people sub-path.
+        Teamtailor fingerprint (careersite--ready) in the HTML, then check
+        the /people sub-path.  Sites served with JS-only rendering will show
+        as unverified — they can't be scraped with requests/BeautifulSoup.
 
 Step 5  Output
         CSV: company_name, base_url, people_url, source,
@@ -35,11 +36,13 @@ Usage
 
 Optional env vars
 ─────────────────
-    VERIFY_TIMEOUT_SEC   per-site HTTP timeout    (default 15)
-    MAX_VERIFY           max candidates to verify (default 300, 0 = all)
+    VERIFY_TIMEOUT_SEC   per-site HTTP timeout          (default 15)
+    MAX_VERIFY           max candidates to verify       (default 300, 0 = all)
     SKIP_VERIFY          set to "1" to skip verification and just dump URLs
+    CC_INDEX             Common Crawl index to query    (default CC-MAIN-2024-51)
 """
 
+import sys
 import os
 import re
 import csv
@@ -52,10 +55,21 @@ from pathlib import Path
 
 import requests
 
+# Force UTF-8 output so Unicode status chars print correctly on Windows
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 # ── Config ───────────────────────────────────────────────────────────────────
 VERIFY_TIMEOUT_SEC = int(os.getenv("VERIFY_TIMEOUT_SEC", "15"))
 MAX_VERIFY         = int(os.getenv("MAX_VERIFY", "300"))   # 0 = no limit
 SKIP_VERIFY        = os.getenv("SKIP_VERIFY", "0") == "1"
+# Multiple CC indexes tried in order until one succeeds
+CC_INDEXES = [
+    os.getenv("CC_INDEX", "CC-MAIN-2024-51"),
+    "CC-MAIN-2025-13",
+    "CC-MAIN-2024-38",
+    "CC-MAIN-2024-22",
+]
 
 OUTPUT_DIR  = Path(__file__).parent
 OUTPUT_FILE = OUTPUT_DIR / "teamtailor_companies.csv"
@@ -164,41 +178,121 @@ def verify_teamtailor(base_url: str) -> tuple[bool, bool]:
     return True, has_people
 
 
-# ── Step 1: crt.sh Certificate Transparency ──────────────────────────────────
+# ── Teamtailor infra subdomains to ignore ────────────────────────────────────
+# These are Teamtailor's own infrastructure, not customer career sites.
+_INFRA_SUBDOMAINS = {
+    'www', 'api', 'cdn', 'analytics', 'app', 'ext', 'support', 'docs',
+    'blog', 'trust', 'status', 'highlights', 'resources', 'refer', 'get',
+    'eu', 'na', 'au', 'eu2', 'discover', 'hello', 'dashboard', 'media',
+    'assets', 'staging', 'auth', 'ember', 'scripts', 'fonts', 'insights',
+    'errors', 'shipit', 'updates', 'career', 'career2', 'talentnote', 'web',
+    'finance', 'tt', 'partner', 'extssl', 'brusman-test', 'eu-north',
+    'eu-render', 'ext-f', 'ext-f2', 'ext-na', 'tt-converter', 'tt-parser',
+    'e', 'analytics-wo', 'analytics-ro', 'analytics-staging',
+    'insights-staging-aws', 'insights-aws', 'insights-eu', 'insights-na',
+    'auth-tests', 'errors-wl',
+}
 
-def discover_via_crtsh() -> set[str]:
+
+def _is_company_subdomain(host: str) -> bool:
+    """True if host looks like a real company career subdomain."""
+    if not host.endswith(".teamtailor.com"):
+        return False
+    sub = host.replace(".teamtailor.com", "")
+    # Must be a single label (no dots), not an infra subdomain
+    return "." not in sub and sub not in _INFRA_SUBDOMAINS and bool(sub)
+
+
+# ── Step 1: Common Crawl CDX ──────────────────────────────────────────────────
+
+def _fetch_cc_page(index: str, page: int, retries: int = 3) -> str | None:
+    """Fetch one page from a Common Crawl CDX index, with retries on 5xx."""
+    url = f"http://index.commoncrawl.org/{index}-index"
+    for attempt in range(1, retries + 1):
+        try:
+            r = requests.get(url, params={
+                "url": "*.teamtailor.com",
+                "output": "json",
+                "page": str(page),
+            }, headers=HEADERS, timeout=90)
+            if r.status_code == 200:
+                return r.text
+            if r.status_code in (429, 500, 502, 503, 504):
+                wait = 5 * attempt
+                print(f"    HTTP {r.status_code} on attempt {attempt}/{retries}, "
+                      f"waiting {wait}s …")
+                time.sleep(wait)
+            else:
+                return None   # 400, 404, etc. — no point retrying
+        except requests.exceptions.Timeout:
+            print(f"    Timeout on attempt {attempt}/{retries} …")
+            time.sleep(5 * attempt)
+        except Exception as e:
+            print(f"    Error: {e}")
+            return None
+    return None
+
+
+def _parse_cc_text(text: str) -> set[str]:
+    """Extract company subdomains from a raw CC CDX response body."""
+    found: set[str] = set()
+    for line in text.strip().splitlines():
+        try:
+            raw_url = json.loads(line).get("url", "")
+        except Exception:
+            raw_url = line.strip()
+        parsed = urllib.parse.urlparse(raw_url)
+        host = parsed.hostname or ""
+        if _is_company_subdomain(host):
+            found.add(f"https://{host}")
+    return found
+
+
+def discover_via_commoncrawl() -> set[str]:
     """
-    Query crt.sh for all SSL certs issued to *.teamtailor.com.
+    Query the Common Crawl CDX API for all crawled *.teamtailor.com pages.
+    Tries each index in CC_INDEXES until one returns data.
     Returns normalised https://subdomain.teamtailor.com base URLs.
     """
-    print("\n[Step 1] Querying crt.sh for *.teamtailor.com certificates …")
-    crt_url = "https://crt.sh/?q=%.teamtailor.com&output=json"
+    for index in CC_INDEXES:
+        print(f"\n[Step 1] Querying Common Crawl ({index}) for *.teamtailor.com …")
+        base_url = f"http://index.commoncrawl.org/{index}-index"
 
-    try:
-        resp = requests.get(crt_url, headers={"User-Agent": HEADERS["User-Agent"]},
-                            timeout=30)
-        resp.raise_for_status()
-        entries = resp.json()
-    except Exception as e:
-        print(f"  [crt.sh] Error: {e}")
-        return set()
+        # Get page count
+        try:
+            r = requests.get(base_url, params={
+                "url": "*.teamtailor.com",
+                "output": "json",
+                "showNumPages": "true",
+            }, headers=HEADERS, timeout=30)
+            info = r.json()
+            num_pages = info.get("pages", 1)
+            print(f"  -> {num_pages} result page(s) available in {index}")
+        except Exception as e:
+            print(f"  [CC] Could not get page count for {index}: {e}. Trying next.")
+            continue
 
-    found: set[str] = set()
-    for entry in entries:
-        raw = entry.get("name_value", "")
-        # name_value can contain multiple names separated by newlines
-        for name in raw.splitlines():
-            name = name.strip().lstrip("*.")
-            if not name.endswith(".teamtailor.com"):
+        found: set[str] = set()
+        any_success = False
+
+        for page in range(num_pages):
+            text = _fetch_cc_page(index, page)
+            if text is None:
+                print(f"  [CC] Page {page} failed after retries.")
                 continue
-            # skip wildcards and bare teamtailor.com itself
-            if name == "teamtailor.com" or name.startswith("*."):
-                continue
-            url = f"https://{name}"
-            found.add(url)
+            hits = _parse_cc_text(text)
+            found.update(hits)
+            any_success = True
+            time.sleep(0.5)
 
-    print(f"  -> {len(found)} unique *.teamtailor.com subdomains found")
-    return found
+        if any_success:
+            print(f"  -> {len(found)} unique company subdomains found")
+            return found
+
+        print(f"  [CC] No data from {index}, trying next index …")
+
+    print("  [CC] All indexes failed. Falling back to seeds + DDG only.")
+    return set()
 
 
 # ── Step 2: DuckDuckGo (custom-domain Teamtailor sites) ──────────────────────
@@ -255,7 +349,7 @@ def discover_via_duckduckgo() -> set[str]:
 
 # ── Step 3: Merge all sources ─────────────────────────────────────────────────
 
-def build_candidate_list(crt_urls: set[str], ddg_urls: set[str]) -> list[dict]:
+def build_candidate_list(cc_urls: set[str], ddg_urls: set[str]) -> list[dict]:
     seen: dict[str, dict] = {}
 
     for name, url in SEED_COMPANIES:
@@ -263,12 +357,12 @@ def build_candidate_list(crt_urls: set[str], ddg_urls: set[str]) -> list[dict]:
         if base:
             seen[base] = {"company_name": name, "base_url": base, "source": "seed"}
 
-    for url in crt_urls:
+    for url in cc_urls:
         if url not in seen:
             seen[url] = {
                 "company_name": extract_company_name(url),
                 "base_url": url,
-                "source": "crt.sh",
+                "source": "commoncrawl",
             }
 
     for url in ddg_urls:
@@ -312,9 +406,9 @@ def verify_candidates(candidates: list[dict]) -> list[dict]:
         is_tt, has_people = verify_teamtailor(base)
         people_url = (base.rstrip("/") + "/people") if has_people else ""
 
-        label = ("✓ Teamtailor + /people" if has_people
-                 else ("~ Teamtailor (no /people)" if is_tt
-                       else "✗ Not Teamtailor / JS-rendered"))
+        label = ("✓  Teamtailor + /people" if has_people
+                 else ("~  Teamtailor (no /people)" if is_tt
+                       else "✗  Not Teamtailor / JS-rendered"))
         print(f"  {label}")
 
         results.append({
@@ -370,12 +464,12 @@ def print_summary(rows: list[dict]) -> None:
 def main():
     print("=" * 70)
     print("Teamtailor Company Finder")
-    print("Discovery: crt.sh  +  DuckDuckGo  +  seed list")
+    print("Discovery: Common Crawl  +  DuckDuckGo  +  seed list")
     print("=" * 70)
 
-    crt_urls = discover_via_crtsh()
+    cc_urls  = discover_via_commoncrawl()
     ddg_urls = discover_via_duckduckgo()
-    candidates = build_candidate_list(crt_urls, ddg_urls)
+    candidates = build_candidate_list(cc_urls, ddg_urls)
     results = verify_candidates(candidates)
     save_csv(results)
     print_summary(results)
