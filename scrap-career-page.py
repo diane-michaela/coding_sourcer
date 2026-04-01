@@ -1,20 +1,32 @@
+import sys
 import requests
 from bs4 import BeautifulSoup
 import csv
 import os
 import re
 import time
+import urllib.parse
 
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-LIST_URL   = "https://careers.phantombuster.com/people"
-HEADERS    = {"User-Agent": "Mozilla/5.0"}
-SLEEP_SEC  = 1.0   # pause between profile page requests
+# Pass a Teamtailor career base URL as a CLI argument, e.g.:
+#   python scrap-career-page.py https://careers.mentimeter.com
+# Defaults to PhantomBuster when run without arguments.
+_DEFAULT_BASE = "https://careers.phantombuster.com"
+_BASE_URL     = sys.argv[1].rstrip("/") if len(sys.argv) > 1 else _DEFAULT_BASE
+LIST_URL      = _BASE_URL + "/people"
+
+HEADERS   = {"User-Agent": "Mozilla/5.0"}
+SLEEP_SEC = 1.0   # pause between profile page requests
+
+# Derive a safe company slug for the output filename
+_company_slug = re.sub(r"[^a-z0-9]+", "_",
+                       urllib.parse.urlparse(_BASE_URL).netloc.lower()).strip("_")
 
 OUTPUT_DIR  = os.path.join(os.path.expanduser("~"), "Desktop", "API")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-OUTPUT_FILE = os.path.join(OUTPUT_DIR, "phantombuster_people.csv")
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, f"{_company_slug}_people.csv")
 
 FIELDNAMES = [
     "person_id",

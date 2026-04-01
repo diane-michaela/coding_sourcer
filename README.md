@@ -85,6 +85,63 @@ URL cells are converted into **clickable hyperlinks** with friendly labels (e.g.
 
 ---
 
+## Career Page Scraping (Teamtailor)
+
+Two scripts work together to discover and scrape tech company team pages hosted on the **Teamtailor** career platform (the same platform used by PhantomBuster, Klarna, Trustpilot, and hundreds of other tech companies).
+
+### How the platform is identified
+
+Every Teamtailor site shares these fingerprints:
+- `data-controller="careersite--ready"` in the `<body>` tag
+- A `/people` route listing the team by department
+- CSS classes like `careersite-button`, `company-link-style--underline`
+
+### Step 1 — Discover companies (`find_teamtailor_companies.py`)
+
+```bash
+python find_teamtailor_companies.py
+```
+
+```mermaid
+flowchart TD
+    A["Google Dork Queries<br/>(site:teamtailor.com, Powered by Teamtailor, etc.)"] --> B["Candidate URL List"]
+    C["Seed companies<br/>(20 known Teamtailor users)"] --> B
+    B --> D["HTTP Fingerprint Verification<br/>(checks data-controller=careersite--ready)"]
+    D --> E{"/people page exists?"}
+    E -- Yes --> F["✓ Ready to scrape"]
+    E -- No  --> G["~ Teamtailor (no /people)"]
+    F --> H["teamtailor_companies.csv"]
+    G --> H
+```
+
+Outputs **`teamtailor_companies.csv`** with columns:
+`company_name`, `base_url`, `people_url`, `source`, `is_teamtailor`, `has_people_page`, `checked_at`
+
+**Discovery sources used:**
+| Source | Free? | Coverage |
+|--------|-------|----------|
+| Google dorks (`site:teamtailor.com`, `"Powered by Teamtailor"`, etc.) | Yes | Good for tech-sector companies |
+| 20 known seed companies (hardcoded) | Yes | Instant baseline |
+| [BuiltWith](https://builtwith.com/teamtailor) | Paid for full list | Thousands of companies |
+
+### Step 2 — Scrape a company's team (`scrap-career-page.py`)
+
+Accepts any Teamtailor career base URL as a CLI argument:
+
+```bash
+# Default: PhantomBuster
+python scrap-career-page.py
+
+# Any other Teamtailor company discovered in Step 1
+python scrap-career-page.py https://careers.mentimeter.com
+python scrap-career-page.py https://careers.trustpilot.com
+python scrap-career-page.py https://klarna.teamtailor.com
+```
+
+Output CSV is named after the company domain (e.g. `careers_mentimeter_com_people.csv`) and saved to `~/Desktop/API/`.
+
+---
+
 ## Fresh run trial (NLP.py)
 
 To confirm new rows are appended to the correct Google Sheet tab with a small, rate-limit–safe run:
