@@ -1,124 +1,156 @@
 company_name,base_url,people_url,source,is_teamtailor,has_people_page,tech_stage,tech_score,checked_at
-Hemnet,https://careers.hemnet.se,,seed,False,False,slug_keyword,,2026-04-01 11:04 UTC
-Biotwin,https://biotwin.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 11:04 UTC
-Tiptapp,https://tiptapp.teamtailor.com,https://tiptapp.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 11:04 UTC
-Therapieland,https://therapieland.teamtailor.com,https://therapieland.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 11:04 UTC
-Warnestadgruppen,https://warnestadgruppen.teamtailor.com,https://warnestadgruppen.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 11:04 UTC
-Eskersoftwaregmbh,https://eskersoftwaregmbh.teamtailor.com,https://eskersoftwaregmbh.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 11:04 UTC
-Infratec,https://infratec.teamtailor.com,https://infratec.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 11:04 UTC
-Techseed,https://techseed.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Vismasoftwareinternationalas,https://vismasoftwareinternationalas.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Fenarc,https://fenarc.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Fitxr 1642768457,https://fitxr-1642768457.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Multiloginnew,https://multiloginnew.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Aria Jobs,https://aria-jobs.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Duologoy,https://duologoy.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Cabaia,https://cabaia.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Ipfdigital,https://ipfdigital.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Harfanglab 1666711819,https://harfanglab-1666711819.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Partseurope 1661956441,https://partseurope-1661956441.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Cossystems,https://cossystems.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Ghanainternationalbank 1644937212,https://ghanainternationalbank-1644937212.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Happii,https://happii.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Hear,https://hear.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Netendersholding,https://netendersholding.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Agilarbetskraft,https://agilarbetskraft.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Sustainx,https://sustainx.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Bezerocarbon,https://bezerocarbon.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Isemaren,https://isemaren.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Megablockgaming,https://megablockgaming.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Polestar,https://polestar.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Teamliquid,https://teamliquid.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Castai,https://castai.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Fgeinternationalbvfiveguysnetherla,https://fgeinternationalbvfiveguysnetherla.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Targetitalia,https://targetitalia.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Hometreepartner3,https://hometreepartner3.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Klarnagroup,https://klarnagroup.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Nortrade,https://nortrade.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Geodata,https://geodata.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Advisensedenmark,https://advisensedenmark.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Biotage 1708019070,https://biotage-1708019070.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Eficode,https://eficode.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Cardiosignal,https://cardiosignal.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Marstrand,https://marstrand.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Kellydelipartnerships 1692187640,https://kellydelipartnerships-1692187640.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Doradogames,https://doradogames.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Stiftelsenmorapark,https://stiftelsenmorapark.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Smartestenergy,https://smartestenergy.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Ogilvyparis,https://ogilvyparis.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Sydvaranger,https://sydvaranger.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Thomashardie,https://thomashardie.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Metrodigital,https://metrodigital.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Ehartikainenoymaarakennus,https://ehartikainenoymaarakennus.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Napierai,https://napierai.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Keskosenukaidigital,https://keskosenukaidigital.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Digitalnewagencypolandspzoo,https://digitalnewagencypolandspzoo.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Altecosystem 1716211711,https://altecosystem-1716211711.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Clovrlabs,https://clovrlabs.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Marcusljung,https://marcusljung.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Maklarhuset,https://maklarhuset.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Ukrainedevs,https://ukrainedevs.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Kolsquareteamblue,https://kolsquareteamblue.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Attendodanmark,https://attendodanmark.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Gimrobotics,https://gimrobotics.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Teambluehungary,https://teambluehungary.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Berattarministeriet,https://berattarministeriet.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Dehistoriske,https://dehistoriske.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Webstraining 1725448992,https://webstraining-1725448992.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Hybridairvehicleslimited,https://hybridairvehicleslimited.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Dreamlit,https://dreamlit.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Hometreepartner2,https://hometreepartner2.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Varomtanke 1636017729,https://varomtanke-1636017729.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Cigames,https://cigames.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Gitguardian,https://gitguardian.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Marmaladegamestudio 1699882111,https://marmaladegamestudio-1699882111.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Stellaire,https://stellaire.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Focaldata,https://focaldata.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Zaibatsuinteractiveoy,https://zaibatsuinteractiveoy.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Parkster,https://parkster.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Hammarskiold,https://hammarskiold.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Starship,https://starship.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Sarawakfrance,https://sarawakfrance.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Keskosenukailithuania,https://keskosenukailithuania.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Kaminvarme 1694761839,https://kaminvarme-1694761839.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Evoressources,https://evoressources.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Evrocab 1692891239,https://evrocab-1692891239.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Breathebatterytechnologies,https://breathebatterytechnologies.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Stardust,https://stardust.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Xataio 1680192386,https://xataio-1680192386.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Echoanalytics,https://echoanalytics.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Sbinsight 1671108700,https://sbinsight-1671108700.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Superhosting,https://superhosting.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Metanet,https://metanet.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Realtainment,https://realtainment.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Veteranpoolenkarriar,https://veteranpoolenkarriar.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Pinkinternetgmbh,https://pinkinternetgmbh.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Curifylabs,https://curifylabs.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Teamlewis,https://teamlewis.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Barbri,https://barbri.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Adviserpartner,https://adviserpartner.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Aritmaas,https://aritmaas.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Psykologpartners,https://psykologpartners.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Sustainablepeople,https://sustainablepeople.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Fairgroup,https://fairgroup.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Haegercarlsson,https://haegercarlsson.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Saasglobal,https://saasglobal.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Aleanzarecrutementdurable,https://aleanzarecrutementdurable.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Bunnynet,https://bunnynet.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Ecobase Earth,https://ecobase-earth.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Westfallarsen,https://westfallarsen.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Proactivesoftwarenederlandbv,https://proactivesoftwarenederlandbv.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Kardham,https://kardham.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Insitepartab,https://insitepartab.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Saasteamblue,https://saasteamblue.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Parksterab,https://parksterab.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Rpcpartners,https://rpcpartners.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Investor,https://investor.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-Airtificial,https://airtificial.teamtailor.com,,commoncrawl,,,slug_keyword,,2026-04-01 11:04 UTC
-PhantomBuster,https://careers.phantombuster.com,https://careers.phantombuster.com/people,seed,True,True,title_scan,38,2026-04-01 11:04 UTC
-Detectify,https://careers.detectify.com,https://careers.detectify.com/people,seed,True,True,title_scan,6,2026-04-01 11:04 UTC
-Producthackers,https://producthackers.teamtailor.com,https://producthackers.teamtailor.com/people,commoncrawl,True,True,title_scan,19,2026-04-01 11:04 UTC
-Skippo,https://skippo.teamtailor.com,https://skippo.teamtailor.com/people,commoncrawl,True,True,title_scan,9,2026-04-01 11:04 UTC
-Fitflop 1706800191,https://fitflop-1706800191.teamtailor.com,https://fitflop-1706800191.teamtailor.com/people,commoncrawl,True,True,title_scan,8,2026-04-01 11:04 UTC
-Unikum,https://unikum.teamtailor.com,https://unikum.teamtailor.com/people,commoncrawl,True,True,title_scan,3,2026-04-01 11:04 UTC
-RavenPack,https://ravenpack.teamtailor.com,https://ravenpack.teamtailor.com/people,seed_manual,True,True,manual,,2026-04-01 11:04 UTC
+Hemnet,https://careers.hemnet.se,,seed,False,False,slug_keyword,,2026-04-01 12:59 UTC
+RavenPack,https://ravenpack.teamtailor.com,https://ravenpack.teamtailor.com/people,seed,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Bankdata,https://bankdata.teamtailor.com,https://bankdata.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Verifiedglobalab,https://verifiedglobalab.teamtailor.com,https://verifiedglobalab.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Intercloud,https://intercloud.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Biotage 1708019070,https://biotage-1708019070.teamtailor.com,https://biotage-1708019070.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Gmlhr,https://gmlhr.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Weisstechnikfrance 1685692485,https://weisstechnikfrance-1685692485.teamtailor.com,https://weisstechnikfrance-1685692485.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Arkivet,https://arkivet.teamtailor.com,https://arkivet.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Clovrlabs,https://clovrlabs.teamtailor.com,https://clovrlabs.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Webbfontainegroup,https://webbfontainegroup.teamtailor.com,https://webbfontainegroup.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Techseed,https://techseed.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Bigaudiencemachineab,https://bigaudiencemachineab.teamtailor.com,https://bigaudiencemachineab.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Normain,https://normain.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Airtanksgermany,https://airtanksgermany.teamtailor.com,https://airtanksgermany.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Johnsgarage,https://johnsgarage.teamtailor.com,https://johnsgarage.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Paralarmab,https://paralarmab.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Skandiamaklarna,https://skandiamaklarna.teamtailor.com,https://skandiamaklarna.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Evrocab 1692891239,https://evrocab-1692891239.teamtailor.com,https://evrocab-1692891239.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Ittotalab,https://ittotalab.teamtailor.com,https://ittotalab.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Mintos,https://mintos.teamtailor.com,https://mintos.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Hhrevision 1674590115,https://hhrevision-1674590115.teamtailor.com,https://hhrevision-1674590115.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Netendersholding,https://netendersholding.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Psykologpartners,https://psykologpartners.teamtailor.com,https://psykologpartners.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Playagames,https://playagames.teamtailor.com,https://playagames.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Zenitech,https://zenitech.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Logeco,https://logeco.teamtailor.com,https://logeco.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Betriebsarztserviceholdinggmbh,https://betriebsarztserviceholdinggmbh.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Bearingpointgmbh,https://bearingpointgmbh.teamtailor.com,https://bearingpointgmbh.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Winaparbeitsvermittlung,https://winaparbeitsvermittlung.teamtailor.com,https://winaparbeitsvermittlung.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Erlangsolutions,https://erlangsolutions.teamtailor.com,https://erlangsolutions.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Reallightyear,https://reallightyear.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Aico,https://aico.teamtailor.com,https://aico.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Caparol,https://caparol.teamtailor.com,https://caparol.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Valtechradon,https://valtechradon.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Armadillocrm,https://armadillocrm.teamtailor.com,https://armadillocrm.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Bitastad,https://bitastad.teamtailor.com,https://bitastad.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Klarnagroup,https://klarnagroup.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Proactivesoftwarenederlandbv,https://proactivesoftwarenederlandbv.teamtailor.com,https://proactivesoftwarenederlandbv.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Helicontechnologies,https://helicontechnologies.teamtailor.com,https://helicontechnologies.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Axolotgamesab,https://axolotgamesab.teamtailor.com,https://axolotgamesab.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Pubitygroupltd,https://pubitygroupltd.teamtailor.com,https://pubitygroupltd.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Tfbank,https://tfbank.teamtailor.com,https://tfbank.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Stockholmtradgardstjanst 1640098537,https://stockholmtradgardstjanst-1640098537.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Smartdokas,https://smartdokas.teamtailor.com,https://smartdokas.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Distrokid,https://distrokid.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Modulai,https://modulai.teamtailor.com,https://modulai.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Tradingview,https://tradingview.teamtailor.com,https://tradingview.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Realtainment,https://realtainment.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Harcour,https://harcour.teamtailor.com,https://harcour.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Allaboutpeople,https://allaboutpeople.teamtailor.com,https://allaboutpeople.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Raisiooyj,https://raisiooyj.teamtailor.com,https://raisiooyj.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Ludicrumtech,https://ludicrumtech.teamtailor.com,https://ludicrumtech.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Bearingpointnorway 1740562192,https://bearingpointnorway-1740562192.teamtailor.com,https://bearingpointnorway-1740562192.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Mpsystems,https://mpsystems.teamtailor.com,https://mpsystems.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Eathappygroup,https://eathappygroup.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Aria Jobs,https://aria-jobs.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Breathebatterytechnologies,https://breathebatterytechnologies.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Gaisler,https://gaisler.teamtailor.com,https://gaisler.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Lufthavnsvikar,https://lufthavnsvikar.teamtailor.com,https://lufthavnsvikar.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Vismasoftwareinternationalas,https://vismasoftwareinternationalas.teamtailor.com,https://vismasoftwareinternationalas.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Kolsquareteamblue,https://kolsquareteamblue.teamtailor.com,https://kolsquareteamblue.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Gardaalarm,https://gardaalarm.teamtailor.com,https://gardaalarm.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Taisteoy,https://taisteoy.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Alltordataochlarmteknik,https://alltordataochlarmteknik.teamtailor.com,https://alltordataochlarmteknik.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Claimscarbon,https://claimscarbon.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Barbri,https://barbri.teamtailor.com,https://barbri.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Geodata,https://geodata.teamtailor.com,https://geodata.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Forestpartners,https://forestpartners.teamtailor.com,https://forestpartners.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Sweatcoin,https://sweatcoin.teamtailor.com,https://sweatcoin.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Bearingpointunitedkingdom 1739287252,https://bearingpointunitedkingdom-1739287252.teamtailor.com,https://bearingpointunitedkingdom-1739287252.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Kellydelipartnerships 1692187640,https://kellydelipartnerships-1692187640.teamtailor.com,https://kellydelipartnerships-1692187640.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Barcaleeds 1696243307,https://barcaleeds-1696243307.teamtailor.com,https://barcaleeds-1696243307.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Bearingpointdenmark 1740562169,https://bearingpointdenmark-1740562169.teamtailor.com,https://bearingpointdenmark-1740562169.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Polestar,https://polestar.teamtailor.com,https://polestar.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Lafeemaraboutee,https://lafeemaraboutee.teamtailor.com,https://lafeemaraboutee.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Raidboxes,https://raidboxes.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Bambuser,https://bambuser.teamtailor.com,https://bambuser.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Ogilvyparis,https://ogilvyparis.teamtailor.com,https://ogilvyparis.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Eikservering,https://eikservering.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Aarsleffgroundengineering,https://aarsleffgroundengineering.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Hadronlabs,https://hadronlabs.teamtailor.com,https://hadronlabs.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Haegercarlsson,https://haegercarlsson.teamtailor.com,https://haegercarlsson.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Altecosystem 1716211711,https://altecosystem-1716211711.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Bearingpointfinland 1740562180,https://bearingpointfinland-1740562180.teamtailor.com,https://bearingpointfinland-1740562180.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Pinchonationdenmark,https://pinchonationdenmark.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Openhouse,https://openhouse.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Axposystemsag,https://axposystemsag.teamtailor.com,https://axposystemsag.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Xait,https://xait.teamtailor.com,https://xait.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Sweep,https://sweep.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Collyflowtech,https://collyflowtech.teamtailor.com,https://collyflowtech.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Typology 1732032895,https://typology-1732032895.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Flowersearlylearning,https://flowersearlylearning.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Resourcehub,https://resourcehub.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Omniarch,https://omniarch.teamtailor.com,https://omniarch.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Lejongardar,https://lejongardar.teamtailor.com,https://lejongardar.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Goodstack,https://goodstack.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Codento,https://codento.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Glintsolar 1674206598,https://glintsolar-1674206598.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Passionlab,https://passionlab.teamtailor.com,https://passionlab.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Castai,https://castai.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Jobbhedasecurity,https://jobbhedasecurity.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Bunnynet,https://bunnynet.teamtailor.com,,commoncrawl,True,False,slug_keyword,,2026-04-01 12:59 UTC
+Investor,https://investor.teamtailor.com,https://investor.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Ninetech,https://ninetech.teamtailor.com,https://ninetech.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Bearingpointnetherlands,https://bearingpointnetherlands.teamtailor.com,https://bearingpointnetherlands.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Vapiano,https://vapiano.teamtailor.com,https://vapiano.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Saasglobal,https://saasglobal.teamtailor.com,https://saasglobal.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Sekqatar,https://sekqatar.teamtailor.com,https://sekqatar.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Paretosecurities,https://paretosecurities.teamtailor.com,https://paretosecurities.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Livepeer,https://livepeer.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Wspnetherlands,https://wspnetherlands.teamtailor.com,https://wspnetherlands.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Sodervidningebagaren,https://sodervidningebagaren.teamtailor.com,https://sodervidningebagaren.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Sevr,https://sevr.teamtailor.com,https://sevr.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Amossys,https://amossys.teamtailor.com,https://amossys.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Rainbowgreenhousesinc,https://rainbowgreenhousesinc.teamtailor.com,,commoncrawl,False,False,slug_keyword,,2026-04-01 12:59 UTC
+Tiptapp,https://tiptapp.teamtailor.com,https://tiptapp.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Pinkinternetgmbh,https://pinkinternetgmbh.teamtailor.com,https://pinkinternetgmbh.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Sllenergiinfrastruktur,https://sllenergiinfrastruktur.teamtailor.com,https://sllenergiinfrastruktur.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Linkdesignanddevelopment,https://linkdesignanddevelopment.teamtailor.com,https://linkdesignanddevelopment.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Sydvaranger,https://sydvaranger.teamtailor.com,https://sydvaranger.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Hashpays,https://hashpays.teamtailor.com,https://hashpays.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Hypexbioexplosivestechnologyab,https://hypexbioexplosivestechnologyab.teamtailor.com,https://hypexbioexplosivestechnologyab.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+Traineesor 1727441936,https://traineesor-1727441936.teamtailor.com,https://traineesor-1727441936.teamtailor.com/people,commoncrawl,True,True,slug_keyword,,2026-04-01 12:59 UTC
+PhantomBuster,https://careers.phantombuster.com,https://careers.phantombuster.com/people,seed,True,True,title_scan,38,2026-04-01 12:59 UTC
+Detectify,https://careers.detectify.com,https://careers.detectify.com/people,seed,True,True,title_scan,6,2026-04-01 12:59 UTC
+Dema,https://dema.teamtailor.com,https://dema.teamtailor.com/people,commoncrawl,True,True,title_scan,24,2026-04-01 12:59 UTC
+Cedreo,https://cedreo.teamtailor.com,https://cedreo.teamtailor.com/people,commoncrawl,True,True,title_scan,3,2026-04-01 12:59 UTC
+Ucademy,https://ucademy.teamtailor.com,https://ucademy.teamtailor.com/people,commoncrawl,True,True,title_scan,3,2026-04-01 12:59 UTC
+4Cassociates,https://4cassociates.teamtailor.com,https://4cassociates.teamtailor.com/people,commoncrawl,True,True,title_scan,4,2026-04-01 12:59 UTC
+Impacthubberlin,https://impacthubberlin.teamtailor.com,https://impacthubberlin.teamtailor.com/people,commoncrawl,True,True,title_scan,5,2026-04-01 12:59 UTC
+Aceve,https://aceve.teamtailor.com,https://aceve.teamtailor.com/people,commoncrawl,True,True,title_scan,4,2026-04-01 12:59 UTC
+Aety 1733469196,https://aety-1733469196.teamtailor.com,https://aety-1733469196.teamtailor.com/people,commoncrawl,True,True,title_scan,3,2026-04-01 12:59 UTC
+Anthonynolan,https://anthonynolan.teamtailor.com,https://anthonynolan.teamtailor.com/people,commoncrawl,True,True,title_scan,11,2026-04-01 12:59 UTC
+Sessions,https://sessions.teamtailor.com,https://sessions.teamtailor.com/people,commoncrawl,True,True,title_scan,26,2026-04-01 12:59 UTC
+Doconomy,https://doconomy.teamtailor.com,https://doconomy.teamtailor.com/people,commoncrawl,True,True,title_scan,7,2026-04-01 12:59 UTC
+Tuidi 1737646222,https://tuidi-1737646222.teamtailor.com,https://tuidi-1737646222.teamtailor.com/people,commoncrawl,True,True,title_scan,20,2026-04-01 12:59 UTC
+Crowdfunderltd,https://crowdfunderltd.teamtailor.com,https://crowdfunderltd.teamtailor.com/people,commoncrawl,True,True,title_scan,6,2026-04-01 12:59 UTC
+Polypeptidestrasbourg,https://polypeptidestrasbourg.teamtailor.com,https://polypeptidestrasbourg.teamtailor.com/people,commoncrawl,True,True,title_scan,3,2026-04-01 12:59 UTC
+Orbioworld,https://orbioworld.teamtailor.com,https://orbioworld.teamtailor.com/people,commoncrawl,True,True,title_scan,3,2026-04-01 12:59 UTC
+Interfacefinancial,https://interfacefinancial.teamtailor.com,https://interfacefinancial.teamtailor.com/people,commoncrawl,True,True,title_scan,12,2026-04-01 12:59 UTC
+Kry 1719827697,https://kry-1719827697.teamtailor.com,https://kry-1719827697.teamtailor.com/people,commoncrawl,True,True,title_scan,2,2026-04-01 12:59 UTC
+Palaceforlifefoundation,https://palaceforlifefoundation.teamtailor.com,https://palaceforlifefoundation.teamtailor.com/people,commoncrawl,True,True,title_scan,3,2026-04-01 12:59 UTC
+Nofence,https://nofence.teamtailor.com,https://nofence.teamtailor.com/people,commoncrawl,True,True,title_scan,13,2026-04-01 12:59 UTC
+Kpmgglobalservices,https://kpmgglobalservices.teamtailor.com,https://kpmgglobalservices.teamtailor.com/people,commoncrawl,True,True,title_scan,2,2026-04-01 12:59 UTC
+Trafiko,https://trafiko.teamtailor.com,https://trafiko.teamtailor.com/people,commoncrawl,True,True,title_scan,2,2026-04-01 12:59 UTC
+Nudge 1724058604,https://nudge-1724058604.teamtailor.com,https://nudge-1724058604.teamtailor.com/people,commoncrawl,True,True,title_scan,27,2026-04-01 12:59 UTC
+Lskgroupoy,https://lskgroupoy.teamtailor.com,https://lskgroupoy.teamtailor.com/people,commoncrawl,True,True,title_scan,2,2026-04-01 12:59 UTC
+Convotisiberia,https://convotisiberia.teamtailor.com,https://convotisiberia.teamtailor.com/people,commoncrawl,True,True,title_scan,2,2026-04-01 12:59 UTC
+Grupomas,https://grupomas.teamtailor.com,https://grupomas.teamtailor.com/people,commoncrawl,True,True,title_scan,2,2026-04-01 12:59 UTC
+Bihr,https://bihr.teamtailor.com,https://bihr.teamtailor.com/people,commoncrawl,True,True,title_scan,9,2026-04-01 12:59 UTC
+Mytraffic,https://mytraffic.teamtailor.com,https://mytraffic.teamtailor.com/people,commoncrawl,True,True,title_scan,8,2026-04-01 12:59 UTC
+Mtekindustryab,https://mtekindustryab.teamtailor.com,https://mtekindustryab.teamtailor.com/people,commoncrawl,True,True,title_scan,25,2026-04-01 12:59 UTC
+Tamigo,https://tamigo.teamtailor.com,https://tamigo.teamtailor.com/people,commoncrawl,True,True,title_scan,25,2026-04-01 12:59 UTC
+Salt,https://salt.teamtailor.com,https://salt.teamtailor.com/people,commoncrawl,True,True,title_scan,2,2026-04-01 12:59 UTC
