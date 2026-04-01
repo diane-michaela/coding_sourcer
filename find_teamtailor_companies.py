@@ -113,6 +113,7 @@ SEED_COMPANIES = [
     ("Kry",           "https://careers.kry.se"),
     ("Einride",       "https://careers.einride.com"),
     ("Anyfin",        "https://careers.anyfin.com"),
+    ("RavenPack",     "https://ravenpack.teamtailor.com"),
 ]
 
 # ── DuckDuckGo queries (finds custom-domain Teamtailor sites) ─────────────────
