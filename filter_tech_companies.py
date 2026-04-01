@@ -113,6 +113,53 @@ EXCLUDE_SLUG_KEYWORDS = [
     "funeral", "begravning",
 ]
 
+# ── Known tech companies whose names don't contain obvious keywords ────────────
+# These are confirmed tech/SaaS companies that stage 1 would otherwise miss
+# because their subdomain slug contains no recognisable tech keyword and their
+# /people page only shows HR staff (so stage 2 also misses them).
+# Add any company slug here to force-include it.
+KNOWN_TECH_SLUGS = {
+    "ravenpack",       # AI/NLP data platform for financial markets
+    "tiptapp",         # peer-to-peer logistics app
+    "bambuser",        # live video commerce platform
+    "distrokid",       # music distribution SaaS
+    "tradingview",     # financial charting & trading platform
+    "livepeer",        # decentralised video streaming protocol
+    "sleepcycleab",    # sleep tracking app
+    "bunnynet",        # CDN / edge computing platform
+    "scrimba",         # interactive coding education platform
+    "gitguardian",     # secrets detection / DevSecOps
+    "solidgate",       # payment infrastructure
+    "sweatcoin",       # crypto fitness rewards app
+    "castai",          # cloud cost optimisation / Kubernetes
+    "multiversecomputing",  # quantum computing
+    "iqm",             # quantum computing hardware
+    "silenteight",     # AI fraud detection
+    "napierai",        # AI for financial services
+    "everymatrix",     # iGaming technology platform
+    "parkster",        # parking payments SaaS
+    "loomispay",       # payments technology
+    "flowscape",       # workplace management SaaS
+    "highsoft",        # Highcharts — data visualisation library
+    "breakit",         # tech media / startup news
+    "iloq",            # digital locking platform
+    "itiviti",         # trading technology
+    "clavister",       # cybersecurity
+    "advenica",        # high-assurance cybersecurity
+    "mintos",          # fintech lending marketplace
+    "memobank",        # digital business bank
+    "enfuceoy",        # payment solutions
+    "tfbank",          # digital consumer bank
+    "eficode",         # DevOps / software engineering services
+    "loopia",          # web hosting / domain registrar
+    "superhosting",    # web hosting
+    "onecomglobal",    # web hosting / digital services
+    "erlangsolutions",  # Erlang/Elixir software consultancy
+    "sweep",           # carbon management SaaS
+    "cozero",          # carbon accounting SaaS
+    "bezerocarbon",    # carbon ratings / climate data
+}
+
 # ── Stage 2: Job title keywords ───────────────────────────────────────────────
 
 TECH_TITLE_KEYWORDS = [
@@ -157,10 +204,16 @@ def stage1_classify(row: dict) -> str | None:
     name = row.get("company_name", "").lower()
     combined = slug + " " + name
 
+    # Hard exclude first
     for kw in EXCLUDE_SLUG_KEYWORDS:
         if kw in combined:
             return "exclude"
 
+    # Known tech companies by exact slug
+    if slug in KNOWN_TECH_SLUGS:
+        return "tech"
+
+    # Generic tech keyword match
     for kw in TECH_SLUG_KEYWORDS:
         if kw in combined:
             return "tech"
