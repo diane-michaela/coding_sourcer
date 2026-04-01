@@ -27,8 +27,8 @@ cards = soup.select('a[href*="/people/"]')
 for card in cards:
     link = urljoin(URL, card.get("href", ""))
 
-    name_el = card.select_one("h2, h3, h4, .text-block-link, .name")
-    title_el = card.select_one("p, .text-company, .text-md, .role")
+    name_el = card.select_one("div.text-block-link")
+    title_el = card.select_one("div.text-block-text:not(.text-block-link)")
     img_el = card.select_one("img")
 
     name = name_el.get_text(strip=True) if name_el else None
