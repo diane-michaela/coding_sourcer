@@ -14,4 +14,10 @@ tech_companies.csv
 batch_scrape_people.py
         ↓ produces
 all_tech_people.csv
+        ↓ loaded into
+   Google Sheet (Sheet1)
+        ↓ enriched by
+linkedin_search.py
+        ↓ writes LinkedIn URLs back to
+   Google Sheet (Sheet1)
 ```
