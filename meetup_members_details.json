@@ -1,0 +1,565 @@
+[
+  {
+    "id": "254527425",
+    "name": "Pierre-André Fortin",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "Depuis plus de 20 ans j'interviens sur des recrutements complexes. J’aime comprendre les viviers, créer des outils et partager des méthodes avec celles et ceux qui cherchent autrement.",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2018-05-15T02:49:44-04:00",
+    "events_attended": 12
+  },
+  {
+    "id": "480432953",
+    "name": "azizbchini",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2026-04-11T15:37:01-04:00",
+    "events_attended": 1
+  },
+  {
+    "id": "193629246",
+    "name": "Kahina Fer",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "Blockchain enthusiast | Software engineer",
+    "social_networks": [
+      {
+        "url": "https://twitter.com/KahinaFerri",
+        "service": "TWITTER",
+        "__typename": "SocialNetwork"
+      }
+    ],
+    "job_field": null,
+    "member_since": "2015-10-04T10:20:17-04:00",
+    "events_attended": 221
+  },
+  {
+    "id": "478695238",
+    "name": "Charaf FATHI",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2026-01-27T04:55:54-05:00",
+    "events_attended": 17
+  },
+  {
+    "id": "333317964",
+    "name": "Miguel",
+    "email": null,
+    "city": "FPO",
+    "country": "us",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2021-06-01T06:19:42-04:00",
+    "events_attended": 2
+  },
+  {
+    "id": "480730703",
+    "name": "Alexis R",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2026-04-23T05:05:11-04:00",
+    "events_attended": 1
+  },
+  {
+    "id": "418503867",
+    "name": "Hhmmzz",
+    "email": null,
+    "city": "Saint-Maur-des-Fossés",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2024-04-24T08:07:48-04:00",
+    "events_attended": 27
+  },
+  {
+    "id": "480247364",
+    "name": "mohamed_at",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "Dev ML & Web basé à Paris, toujours sur un projet en cours 😄 Co-fondateur de WePropre. Fan de tech, d’entrepreunariat et de bonnes idées",
+    "social_networks": [
+      {
+        "url": "https://www.instagram.com/mohamed_._._at?igsh=MXFhb3VydnEydTFidQ%3D%3D&utm_source=qr",
+        "service": "INSTAGRAM",
+        "__typename": "SocialNetwork"
+      }
+    ],
+    "job_field": null,
+    "member_since": "2026-04-03T07:08:19-04:00",
+    "events_attended": 8
+  },
+  {
+    "id": "69519672",
+    "name": "Jin",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2012-11-13T08:15:53-05:00",
+    "events_attended": 2945
+  },
+  {
+    "id": "294477324",
+    "name": "Jean Paul",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": "TECHNOLOGY",
+    "member_since": "2019-10-17T06:01:58-04:00",
+    "events_attended": 24
+  },
+  {
+    "id": "480717090",
+    "name": "agathe",
+    "email": null,
+    "city": "Corbeil-Essonnes",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2026-04-22T18:28:03-04:00",
+    "events_attended": 1
+  },
+  {
+    "id": "477428183",
+    "name": "Nawal",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2025-11-26T11:36:48-05:00",
+    "events_attended": 3
+  },
+  {
+    "id": "386555028",
+    "name": "Gautier",
+    "email": null,
+    "city": "APO",
+    "country": "us",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2023-03-06T06:01:22-05:00",
+    "events_attended": 24
+  },
+  {
+    "id": "480670751",
+    "name": "Martins Semedo Marie",
+    "email": null,
+    "city": "Durban",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2026-04-21T07:17:10-04:00",
+    "events_attended": 1
+  },
+  {
+    "id": "299222999",
+    "name": "Ian",
+    "email": null,
+    "city": "Maisons-Alfort",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2019-12-27T20:47:06-05:00",
+    "events_attended": 9
+  },
+  {
+    "id": "238561341",
+    "name": "Céline ",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2017-10-10T07:58:21-04:00",
+    "events_attended": 2
+  },
+  {
+    "id": "325125396",
+    "name": "Pascal Vivès",
+    "email": null,
+    "city": "Asnières-sur-Seine",
+    "country": "fr",
+    "bio": "Passionné par la tech et le développement, j’aime comprendre, construire et optimiser des solutions digitales. Toujours en veille, je m’intéresse autant aux nouveaux outils qui transforment notre manière d'appréhender un projet.",
+    "social_networks": [
+      {
+        "url": "https://www.linkedin.com/in/%F0%9F%91%8B-pascal-vives-2291843/",
+        "service": "LINKEDIN",
+        "__typename": "SocialNetwork"
+      }
+    ],
+    "job_field": "TECHNOLOGY",
+    "member_since": "2021-01-23T13:01:42-05:00",
+    "events_attended": 39
+  },
+  {
+    "id": "477810844",
+    "name": "PK",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2025-12-16T10:57:48-05:00",
+    "events_attended": 2
+  },
+  {
+    "id": "479785343",
+    "name": "Pirès Hervé Anagonou",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [
+      {
+        "url": "http://www.linkedin.com/in/a-ph",
+        "service": "LINKEDIN",
+        "__typename": "SocialNetwork"
+      }
+    ],
+    "job_field": null,
+    "member_since": "2026-03-12T18:54:40-04:00",
+    "events_attended": 20
+  },
+  {
+    "id": "206253140",
+    "name": "Jan Zymla",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2016-06-01T06:09:54-04:00",
+    "events_attended": 347
+  },
+  {
+    "id": "70203042",
+    "name": "Tris R",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "Brit in Paris\nADHD\nFood Tour Guide @eatlikethefrench.com\nGeeky Growth Hacker\nEx-Corporate Recruiter\nCommunity Builder",
+    "social_networks": [
+      {
+        "url": "https://instagram.com/chef_tris_",
+        "service": "INSTAGRAM",
+        "__typename": "SocialNetwork"
+      },
+      {
+        "url": "https://www.linkedin.com/in/trisrevill/",
+        "service": "LINKEDIN",
+        "__typename": "SocialNetwork"
+      }
+    ],
+    "job_field": null,
+    "member_since": "2012-11-19T13:12:23-05:00",
+    "events_attended": 18
+  },
+  {
+    "id": "477690741",
+    "name": "Emmanuel PILARD",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2025-12-10T11:17:41-05:00",
+    "events_attended": 1
+  },
+  {
+    "id": "280633687",
+    "name": "Ghazouani",
+    "email": null,
+    "city": "Courbevoie",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2019-05-07T19:08:26-04:00",
+    "events_attended": 33
+  },
+  {
+    "id": "229586504",
+    "name": "Abdel Rahman Massri Attal",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2017-06-12T18:15:59-04:00",
+    "events_attended": 192
+  },
+  {
+    "id": "480057945",
+    "name": "Victor Knutsenberger",
+    "email": null,
+    "city": "Nürnberg",
+    "country": "de",
+    "bio": "Hi, I'm Victor, telecom phd engineer working in the automotive field and interested in AI, technology and science. willing to meet interesting people, exchange ideas, discovering new places.",
+    "social_networks": [],
+    "job_field": "TECHNOLOGY",
+    "member_since": "2026-03-25T08:18:45-04:00",
+    "events_attended": 8
+  },
+  {
+    "id": "428401519",
+    "name": "Véronique",
+    "email": null,
+    "city": "Maisons-Alfort",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2024-09-11T13:58:04-04:00",
+    "events_attended": 9
+  },
+  {
+    "id": "478208072",
+    "name": "Charlotte Segal",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2026-01-06T05:33:14-05:00",
+    "events_attended": 4
+  },
+  {
+    "id": "480302372",
+    "name": "Eunice",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2026-04-05T20:53:41-04:00",
+    "events_attended": 20
+  },
+  {
+    "id": "334441129",
+    "name": "Stéphane Messaoudi",
+    "email": null,
+    "city": "Saint-Maurice",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2021-06-16T03:26:58-04:00",
+    "events_attended": 1
+  },
+  {
+    "id": "479323225",
+    "name": "adamskamate",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": "TECHNOLOGY",
+    "member_since": "2026-02-19T09:12:19-05:00",
+    "events_attended": 6
+  },
+  {
+    "id": "479728885",
+    "name": "maxime.balme",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2026-03-10T06:40:12-04:00",
+    "events_attended": 2
+  },
+  {
+    "id": "273290070",
+    "name": "Francois Gauthier",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2019-01-29T12:46:21-05:00",
+    "events_attended": 11
+  },
+  {
+    "id": "473421198",
+    "name": "Julien DURAND",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2025-06-04T02:21:58-04:00",
+    "events_attended": 57
+  },
+  {
+    "id": "480203978",
+    "name": "yolanda",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2026-04-01T05:04:07-04:00",
+    "events_attended": 1
+  },
+  {
+    "id": "480203853",
+    "name": "Léa Crd",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2026-04-01T04:52:39-04:00",
+    "events_attended": 1
+  },
+  {
+    "id": "477061632",
+    "name": "xiaoxiang.liu",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2025-11-08T07:27:42-05:00",
+    "events_attended": 4
+  },
+  {
+    "id": "472234982",
+    "name": "Joelle N",
+    "email": null,
+    "city": "Versailles",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2025-05-11T04:05:14-04:00",
+    "events_attended": 2
+  },
+  {
+    "id": "479885122",
+    "name": "exlibris616",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": "NOT_WORKING",
+    "member_since": "2026-03-17T10:04:49-04:00",
+    "events_attended": 2
+  },
+  {
+    "id": "478672631",
+    "name": "Raphael Bensaid-Beddock",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2026-01-26T04:05:47-05:00",
+    "events_attended": 3
+  },
+  {
+    "id": "477410815",
+    "name": "alex.fedda",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2025-11-25T13:16:20-05:00",
+    "events_attended": 5
+  },
+  {
+    "id": "295826591",
+    "name": "Camille Joye",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2019-11-05T07:58:55-05:00",
+    "events_attended": 14
+  },
+  {
+    "id": "390135253",
+    "name": "Dino M",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2023-04-18T00:09:05-04:00",
+    "events_attended": 6
+  },
+  {
+    "id": "474909588",
+    "name": "deborah.balde",
+    "email": null,
+    "city": "Paris",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2025-08-04T10:57:40-04:00",
+    "events_attended": 1
+  },
+  {
+    "id": "418909939",
+    "name": "Akram Bougrine",
+    "email": null,
+    "city": "Toulouse",
+    "country": "fr",
+    "bio": "",
+    "social_networks": [],
+    "job_field": null,
+    "member_since": "2024-04-29T17:38:33-04:00",
+    "events_attended": 5
+  }
+]
