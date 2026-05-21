@@ -99,7 +99,11 @@ KEYWORDS_OPTIONAL: list[str] = [
 KEYWORDS_AGENT: list[str] = [
     "LangGraph", "LangChain", "AutoGen", "CrewAI", "smolagents",
     "multi-agent", "agentic workflow", "agent framework", "agent orchestration",
-    "Semantic Kernel", "phidata", "MetaGPT", "tool calling", "llm agent", "ReAct agent",
+    "Semantic Kernel", "phidata", "MetaGPT", "tool calling", "tool use", "llm agent", "ReAct agent",
+    "sub-agent", "subagent",
+    "Amazon Bedrock", "Bedrock AgentCore", "AWS Bedrock",
+    "Model Context Protocol", "MCP server",
+    "RAG pipeline", "retrieval augmented generation", "prompt engineering",
 ]
 KEYWORDS_PRODUCTION: list[str] = [
     "LangFuse", "LangSmith", "llm observability",
@@ -107,6 +111,7 @@ KEYWORDS_PRODUCTION: list[str] = [
     "llm evaluation", "evals", "RAGAS", "DeepEval",
     "instructor", "structured output", "LiteLLM",
     "Mem0", "Zep memory", "OpenTelemetry llm",
+    "MLOps", "model versioning", "ml monitoring", "evaluation infrastructure",
 ]
 # Default: high + medium + agent + production
 KEYWORDS_DEFAULT_TIERS = ("high", "medium", "agent", "production")
@@ -139,6 +144,9 @@ SEED_REPOS: list[str] = [
     "langfuse/langfuse",
     "guardrails-ai/guardrails",
     "BerriAI/litellm",
+    # RAG / retrieval
+    "run-llama/llama_index",
+    "langchain-ai/langchain",
 ]
 
 EXCLUDE_TERMS_BY_CLUSTER: dict[str, list[str]] = {
