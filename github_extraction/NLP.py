@@ -96,22 +96,56 @@ KEYWORDS_OPTIONAL: list[str] = [
     "reward model", "TGI", "Text Generation Inference", "TensorRT-LLM", "Triton Inference Server",
     "ONNX Runtime", "quantization", "4-bit", "int8", "low-rank adaptation", "accelerate",
 ]
-# Default: high + medium only (no optional/broad to save budget and reduce noise)
-KEYWORDS_DEFAULT_TIERS = ("high", "medium")  # ("high", "medium", "optional") to include optional
+KEYWORDS_AGENT: list[str] = [
+    "LangGraph", "LangChain", "AutoGen", "CrewAI", "smolagents",
+    "multi-agent", "agentic workflow", "agent framework", "agent orchestration",
+    "Semantic Kernel", "phidata", "MetaGPT", "tool calling", "llm agent", "ReAct agent",
+]
+KEYWORDS_PRODUCTION: list[str] = [
+    "LangFuse", "LangSmith", "llm observability",
+    "guardrails", "NeMo Guardrails",
+    "llm evaluation", "evals", "RAGAS", "DeepEval",
+    "instructor", "structured output", "LiteLLM",
+    "Mem0", "Zep memory", "OpenTelemetry llm",
+]
+# Default: high + medium + agent + production
+KEYWORDS_DEFAULT_TIERS = ("high", "medium", "agent", "production")
+
+# Maps each tier to the cluster label written to the sheet
+CLUSTER_BY_TIER: dict[str, str] = {
+    "high": "finetuning_inference",
+    "medium": "finetuning_inference",
+    "optional": "finetuning_inference",
+    "agent": "agent_building",
+    "production": "production_readiness",
+}
 
 # Seed repos: high-signal; use core API only (no search). Always processed first.
 SEED_REPOS: list[str] = [
+    # Fine-tuning / inference
     "vllm-project/vllm",
     "huggingface/peft",
     "bitsandbytes-foundation/bitsandbytes",
     "axolotl-ai-cloud/axolotl",
     "huggingface/trl",
     "unslothai/unsloth",
+    # Agent frameworks
+    "langchain-ai/langgraph",
+    "microsoft/autogen",
+    "crewAIInc/crewAI",
+    "huggingface/smolagents",
+    "microsoft/semantic-kernel",
+    # Production / observability
+    "langfuse/langfuse",
+    "guardrails-ai/guardrails",
+    "BerriAI/litellm",
 ]
 
-# Cluster name for search results (single cluster for simplicity)
-SEARCH_CLUSTER_NAME = "finetuning_inference"
-EXCLUDE_TERMS_BY_CLUSTER: dict[str, list[str]] = {"default": []}
+EXCLUDE_TERMS_BY_CLUSTER: dict[str, list[str]] = {
+    "default": [],
+    "agent_building": [],
+    "production_readiness": [],
+}
 LANG_FILTERS: list[str] = [""]
 
 STATE_FILE = Path(__file__).with_name("state.json")
@@ -226,22 +260,25 @@ def can_afford_search_request(threshold: int = SEARCH_QUOTA_STOP_THRESHOLD) -> b
     return (snap.get("search") or {}).get("remaining", 0) > threshold
 
 
-def get_keywords_for_run() -> tuple[list[str], int]:
-    """Return (keywords to run this time, next_start_index for state). Uses tiers + rotation."""
+def get_keywords_for_run() -> tuple[list[tuple[str, str]], int]:
+    """Return ([(keyword, cluster), ...], next_start_index). Uses tiers + rotation."""
     tiers = KEYWORDS_DEFAULT_TIERS
-    all_kw: list[str] = []
+    all_kw: list[tuple[str, str]] = []
     if "high" in tiers:
-        all_kw.extend(KEYWORDS_HIGH)
+        all_kw.extend((kw, CLUSTER_BY_TIER["high"]) for kw in KEYWORDS_HIGH)
     if "medium" in tiers:
-        all_kw.extend(KEYWORDS_MEDIUM)
+        all_kw.extend((kw, CLUSTER_BY_TIER["medium"]) for kw in KEYWORDS_MEDIUM)
     if "optional" in tiers:
-        all_kw.extend(KEYWORDS_OPTIONAL)
+        all_kw.extend((kw, CLUSTER_BY_TIER["optional"]) for kw in KEYWORDS_OPTIONAL)
+    if "agent" in tiers:
+        all_kw.extend((kw, CLUSTER_BY_TIER["agent"]) for kw in KEYWORDS_AGENT)
+    if "production" in tiers:
+        all_kw.extend((kw, CLUSTER_BY_TIER["production"]) for kw in KEYWORDS_PRODUCTION)
     state = load_state()
     start = state.get("keyword_cursor", 0)
-    # Cap how many keywords we run this run
     slice_end = min(start + MAX_KEYWORDS_PER_RUN, len(all_kw))
     keywords_this_run = all_kw[start:slice_end]
-    next_cursor = slice_end if slice_end < len(all_kw) else 0  # wrap for next run
+    next_cursor = slice_end if slice_end < len(all_kw) else 0
     return keywords_this_run, next_cursor
 
 
@@ -1186,7 +1223,7 @@ def main():
 
     def run_scan(scan_type: str) -> None:
         nonlocal search_queries_skipped_budget
-        for keyword in keywords_this_run:
+        for keyword, cluster in keywords_this_run:
             if search_budget["used"] >= search_budget["max"]:
                 search_queries_skipped_budget += 1
                 continue
@@ -1195,13 +1232,13 @@ def main():
             for lang_filter in LANG_FILTERS:
                 if search_budget["used"] >= search_budget["max"]:
                     break
-                q = build_cluster_query(keyword, SEARCH_CLUSTER_NAME, window_start, window_end, scan_type, lang_filter=lang_filter)
+                q = build_cluster_query(keyword, cluster, window_start, window_end, scan_type, lang_filter=lang_filter)
                 lang_label = lang_filter or "(no lang filter)"
-                print(f"[{scan_type}] {SEARCH_CLUSTER_NAME} / {keyword!r} ({lang_label}): budget used={search_budget['used']}/{search_budget['max']}")
+                print(f"[{scan_type}] {cluster} / {keyword!r} ({lang_label}): budget used={search_budget['used']}/{search_budget['max']}")
                 seen_this_query = 0
                 try:
                     for repo in search_repositories(q, max_pages=MAX_PAGES_PER_QUERY, search_budget=search_budget):
-                        row = _build_row_from_repo(repo, SEARCH_CLUSTER_NAME, keyword, q, scan_type)
+                        row = _build_row_from_repo(repo, cluster, keyword, q, scan_type)
                         key = (row.get("repo_full_name") or "").strip()
                         if key:
                             all_rows[key] = row
