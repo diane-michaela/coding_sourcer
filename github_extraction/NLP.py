@@ -111,17 +111,11 @@ CLUSTER_BY_TIER: dict[str, str] = {
 
 # Seed repos: high-signal; use core API only (no search). Always processed first.
 SEED_REPOS: list[str] = [
-    # Agent frameworks
     "langchain-ai/langgraph",
     "microsoft/autogen",
     "crewAIInc/crewAI",
     "huggingface/smolagents",
     "microsoft/semantic-kernel",
-    # Production / observability
-    "langfuse/langfuse",
-    "guardrails-ai/guardrails",
-    "BerriAI/litellm",
-    # RAG / retrieval
     "run-llama/llama_index",
     "langchain-ai/langchain",
 ]
@@ -132,6 +126,14 @@ EXCLUDE_TERMS_BY_CLUSTER: dict[str, list[str]] = {
     "production_readiness": [],
 }
 LANG_FILTERS: list[str] = [""]
+
+# CEST timezone filter (UTC+2): 9am–8pm CEST = 07:00–18:00 UTC
+CEST_FILTER_ENABLED = True
+CEST_UTC_START = 7    # 9am CEST
+CEST_UTC_END = 18     # 8pm CEST
+CEST_MIN_PCT = 50     # min % of sampled commits in window to pass
+CEST_SAMPLE_REPOS = 3 # repos to sample commits from per person
+CEST_COMMITS_PER_REPO = 5
 
 STATE_FILE = Path(__file__).with_name("state.json")
 FIRST_RUN_LOOKBACK_DAYS = 183
@@ -603,6 +605,42 @@ def fetch_repo_by_full_name(full_name: str) -> dict | None:
         return None
 
 
+def fetch_commit_tz_signal(login: str, repo_full_names: list[str]) -> dict:
+    """Sample recent commits by login across repos to infer timezone offset and CEST activity %."""
+    offsets: list[float] = []
+    utc_hours: list[int] = []
+    for full_name in repo_full_names[:CEST_SAMPLE_REPOS]:
+        if "/" not in full_name:
+            continue
+        owner, repo = full_name.split("/", 1)
+        url = f"{GITHUB_API}/repos/{owner}/{repo}/commits?author={login}&per_page={CEST_COMMITS_PER_REPO}"
+        try:
+            data = get(url).json()
+            if not isinstance(data, list):
+                continue
+            for commit in data:
+                date_str = (((commit.get("commit") or {}).get("author")) or {}).get("date", "")
+                if not date_str:
+                    continue
+                try:
+                    dt = datetime.fromisoformat(date_str)
+                    if dt.tzinfo:
+                        offsets.append(dt.utcoffset().total_seconds() / 3600)
+                        utc_hours.append(dt.astimezone(timezone.utc).hour)
+                except Exception:
+                    pass
+        except Exception:
+            continue
+    if not offsets:
+        return {"commit_tz_offset": "", "cest_activity_pct": ""}
+    median_offset = sorted(offsets)[len(offsets) // 2]
+    sign = "+" if median_offset >= 0 else "-"
+    offset_str = f"{sign}{int(abs(median_offset)):02d}:00"
+    in_window = sum(1 for h in utc_hours if CEST_UTC_START <= h <= CEST_UTC_END)
+    cest_pct = round(in_window / len(utc_hours) * 100) if utc_hours else 0
+    return {"commit_tz_offset": offset_str, "cest_activity_pct": cest_pct}
+
+
 def owner_fields(owner_json: dict) -> dict:
     name = (owner_json.get("name") or "").strip()
     email = (owner_json.get("email") or "").strip()
@@ -979,6 +1017,8 @@ PEOPLE_HEADER = [
     "person_blog",
     "person_x",
     "person_linkedin",
+    "commit_tz_offset",
+    "cest_activity_pct",
     "run_id",
     "run_timestamp_utc",
 ]
@@ -1072,6 +1112,8 @@ def _build_aggregated_person_row(
         person_blog = o.get("owner_blog", "")
         person_x = o.get("owner_x", "")
         person_linkedin = o.get("owner_linkedin", "")
+    repo_names = [r.strip() for r in ag.get("matched_repo_names", "").split(";") if r.strip()]
+    tz_signal = fetch_commit_tz_signal(login, repo_names)
     return {
         "person_login": login,
         "person_url": f"https://github.com/{login}" if login else "",
@@ -1088,6 +1130,8 @@ def _build_aggregated_person_row(
         "person_blog": person_blog,
         "person_x": person_x,
         "person_linkedin": person_linkedin,
+        "commit_tz_offset": tz_signal.get("commit_tz_offset", ""),
+        "cest_activity_pct": tz_signal.get("cest_activity_pct", ""),
         "run_id": run_id,
         "run_timestamp_utc": run_ts,
     }
@@ -1304,6 +1348,14 @@ def main():
     ensure_header(ws_people, PEOPLE_HEADER)
     people_rows = [_build_aggregated_person_row(ag, run_id, run_ts, fetch_profile=True) for ag in aggregated]
     people_to_append = [row for row in people_rows if row]
+    if CEST_FILTER_ENABLED:
+        before = len(people_to_append)
+        people_to_append = [
+            row for row in people_to_append
+            if row.get("cest_activity_pct") == ""  # no data — keep (unknown)
+            or row.get("cest_activity_pct", 0) >= CEST_MIN_PCT
+        ]
+        print(f"CEST filter: kept {len(people_to_append)}/{before} people (≥{CEST_MIN_PCT}% commits in 09:00–20:00 CEST or unknown)")
     if people_to_append:
         append_rows(ws_people, people_to_append, PEOPLE_HEADER)
 
