@@ -1,7 +1,7 @@
 """
-GitHub repo sourcer for LLM fine-tuning / inference — search-budget aware, seed-first.
+GitHub repo sourcer for agentic AI / production LLM systems — search-budget aware, seed-first.
 
-- Seed repos first (core API only; no search): vLLM, PEFT, bitsandbytes, Axolotl, TRL, Unsloth, etc.
+- Seed repos first (core API only; no search): LangGraph, AutoGen, CrewAI, smolagents, etc.
 - Search used sparingly: MAX_SEARCH_REQUESTS_PER_RUN, MAX_PAGES_PER_QUERY=1, keyword tiers + rotation.
 - On search exhaustion: stop search phase (no long sleep); continue with contributor aggregation.
 - Priorities: (1) seed + light search, (2) contributor discovery, (3) person aggregation, (4) expertise_score.
@@ -26,8 +26,8 @@ import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
 
-SPREADSHEET_ID = "1OVr2EigkJ5ZHceilXGn-Zl8xpGTGPVxp8jKIEJnOgmo"
-SHEET_GID = 1382489855
+SPREADSHEET_ID = "1PQp73xi5y1_Xt3D7U82SmPU-rBJVuGBVkgDa4rvklIs"
+SHEET_GID = 0
 SERVICE_ACCOUNT_FILE = "google_service_account.json"
 
 def _gspread_client():
@@ -83,19 +83,7 @@ SEARCH_QUOTA_STOP_THRESHOLD = 2   # stop search phase when remaining <= this (do
 ENABLE_CREATED_SCAN = os.getenv("ENABLE_CREATED_SCAN", "false").strip().lower() in ("1", "true", "yes")
 ENABLE_PUSHED_SCAN = os.getenv("ENABLE_PUSHED_SCAN", "true").strip().lower() in ("1", "true", "yes")
 
-# Keyword priority tiers (do not run all every time; use top tiers + rotation)
-KEYWORDS_HIGH: list[str] = [
-    "QLoRA", "LoRA", "PEFT", "Axolotl", "TRL", "Unsloth", "vLLM", "bitsandbytes", "AWQ", "GPTQ",
-]
-KEYWORDS_MEDIUM: list[str] = [
-    "DeepSpeed", "FSDP", "flash-attention", "FlashAttention",
-]
-KEYWORDS_OPTIONAL: list[str] = [
-    "transformers", "huggingface", "fine-tuning", "finetuning", "datasets", "adapter", "adapters",
-    "Hugging Face Transformers", "instruction tuning", "SFT", "RLHF", "DPO", "preference optimization",
-    "reward model", "TGI", "Text Generation Inference", "TensorRT-LLM", "Triton Inference Server",
-    "ONNX Runtime", "quantization", "4-bit", "int8", "low-rank adaptation", "accelerate",
-]
+# Keyword tiers — agent building and production readiness only
 KEYWORDS_AGENT: list[str] = [
     "LangGraph", "LangChain", "AutoGen", "CrewAI", "smolagents",
     "multi-agent", "agentic workflow", "agent framework", "agent orchestration",
@@ -113,27 +101,16 @@ KEYWORDS_PRODUCTION: list[str] = [
     "Mem0", "Zep memory", "OpenTelemetry llm",
     "MLOps", "model versioning", "ml monitoring", "evaluation infrastructure",
 ]
-# Default: high + medium + agent + production
-KEYWORDS_DEFAULT_TIERS = ("high", "medium", "agent", "production")
+KEYWORDS_DEFAULT_TIERS = ("agent", "production")
 
 # Maps each tier to the cluster label written to the sheet
 CLUSTER_BY_TIER: dict[str, str] = {
-    "high": "finetuning_inference",
-    "medium": "finetuning_inference",
-    "optional": "finetuning_inference",
     "agent": "agent_building",
     "production": "production_readiness",
 }
 
 # Seed repos: high-signal; use core API only (no search). Always processed first.
 SEED_REPOS: list[str] = [
-    # Fine-tuning / inference
-    "vllm-project/vllm",
-    "huggingface/peft",
-    "bitsandbytes-foundation/bitsandbytes",
-    "axolotl-ai-cloud/axolotl",
-    "huggingface/trl",
-    "unslothai/unsloth",
     # Agent frameworks
     "langchain-ai/langgraph",
     "microsoft/autogen",
@@ -171,7 +148,7 @@ PAGE_SLEEP_RANGE = (0.2, 0.8)  # seconds (randomized)
 
 # Contributors (only for new repos; rate-limit safe)
 INCLUDE_CONTRIBUTORS = os.getenv("INCLUDE_CONTRIBUTORS", "true").strip().lower() in ("1", "true", "yes")
-TOP_N_CONTRIBUTORS = int(os.getenv("TOP_N_CONTRIBUTORS", "5"))
+TOP_N_CONTRIBUTORS = int(os.getenv("TOP_N_CONTRIBUTORS", "20"))
 MIN_STARS_FOR_CONTRIB = int(os.getenv("MIN_STARS_FOR_CONTRIB", "0"))  # fetch contributors from all repos for max discovery
 REFRESH_CONTRIBUTORS_ON_UPDATE = True  # always refresh for people sheet; contributors fetched for high-star repos
 _CONTRIB_CACHE: dict[str, dict] = {}
