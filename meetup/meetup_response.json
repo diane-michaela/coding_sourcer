@@ -1,0 +1,5271 @@
+{
+  "data": {
+    "event": {
+      "id": "314040194",
+      "title": "Open Sourcer Meetup  - Sourcer Github! ",
+      "eventUrl": "https://www.meetup.com/fr-FR/open-sourcer/events/314040194/",
+      "dateTime": "2026-04-23T19:00:00+02:00",
+      "endTime": "2026-04-23T21:00:00+02:00",
+      "status": "PAST",
+      "eventType": "PHYSICAL",
+      "eventHosts": [
+        {
+          "memberId": "254527425",
+          "__typename": "EventHost"
+        }
+      ],
+      "rsvpQuestions": [],
+      "actions": [],
+      "guestLimit": 0,
+      "maxTickets": 50,
+      "rsvpSettings": {
+        "rsvpCloseTime": null,
+        "rsvpOpenTime": null,
+        "__typename": "RsvpOpenSettings"
+      },
+      "venue": {
+        "name": "Ideuzo at Work",
+        "address": "22 Rue de Palestro",
+        "__typename": "Venue"
+      },
+      "venues": [
+        {
+          "id": "28222523",
+          "venueType": "",
+          "eventVenueOptions": {
+            "goingCount": 44,
+            "rsvpLimit": 50,
+            "guestLimit": 0,
+            "__typename": "EventVenueOptions"
+          },
+          "__typename": "Venue"
+        }
+      ],
+      "canSeeAttendees": false,
+      "rsvps": {
+        "totalCount": 42,
+        "yesCount": 42,
+        "noCount": 4,
+        "waitlistCount": 0,
+        "attendedCount": 0,
+        "noShowCount": 0,
+        "absentCount": 2,
+        "edges": [
+          {
+            "node": {
+              "id": "2067085957",
+              "member": {
+                "id": "254527425",
+                "name": "Pierre-André Fortin",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "277217102",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ORGS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": true,
+                "noShowCount": 0,
+                "eventsAttended": 12,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "ORGANIZER",
+                "status": "LEADER",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-03-30T12:57:42-04:00",
+              "isHost": true,
+              "isFirstEvent": false,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": true,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2068784287",
+              "member": {
+                "id": "480432953",
+                "name": "azizbchini",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "60445",
+                        "name": "Foot entre hommes",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "103276",
+                        "name": "Informatique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "1518926",
+                        "name": "CNCF",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 1,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-25T13:19:22-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "EXCUSED_ABSENCE",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069318764",
+              "member": {
+                "id": "193629246",
+                "name": "Kahina Fer",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO"
+                ],
+                "memberPhoto": {
+                  "id": "281675668",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": false,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 221,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-25T09:17:08-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "EXCUSED_ABSENCE",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069399617",
+              "member": {
+                "id": "478695238",
+                "name": "Charaf FATHI",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "14657",
+                        "name": "Vie sociale",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15814",
+                        "name": "En extérieur",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17038",
+                        "name": "Faites-vous de nouveaux amis",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17293",
+                        "name": "Fitness",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17381",
+                        "name": "Networking professionnel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17865",
+                        "name": "Sorties et détente",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 17,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-23T13:11:50-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069392502",
+              "member": {
+                "id": "333317964",
+                "name": "Miguel",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 2,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-23T11:48:40-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069365020",
+              "member": {
+                "id": "480730703",
+                "name": "Alexis R",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "14657",
+                        "name": "Vie sociale",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "20148",
+                        "name": "Réseau social",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 1,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-23T05:06:54-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069363266",
+              "member": {
+                "id": "418503867",
+                "name": "Hhmmzz",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "320197698",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ORGS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "659",
+                        "name": "Création de sites internet",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15582",
+                        "name": "Développement web",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "16285",
+                        "name": "Voyages",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "28904",
+                        "name": "danse",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "32528",
+                        "name": "Programmation informatique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "35170",
+                        "name": "Randonnée",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "73857",
+                        "name": "Fitness en plein air",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "167221",
+                        "name": "Soirées jeux",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "788002",
+                        "name": "Technologies web",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 27,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-23T04:23:00-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069361465",
+              "member": {
+                "id": "480247364",
+                "name": "mohamed_at",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "325364341",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "19029",
+                        "name": "Reconversion professionnelle",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "21557",
+                        "name": "Gagner de l'argent",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "44297",
+                        "name": "IaaS (Infrastructure as a Service)",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "62619",
+                        "name": "Pitch startup",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "62946",
+                        "name": "Développement produit : logiciel et tech",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "94783",
+                        "name": "Récents diplômés",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": true,
+                "noShowCount": 0,
+                "eventsAttended": 8,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-23T03:44:20-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069359042",
+              "member": {
+                "id": "69519672",
+                "name": "Jin",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO"
+                ],
+                "memberPhoto": {
+                  "id": "81881032",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": false,
+                  "whoCanContact": "ORGS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 7,
+                "eventsAttended": 2945,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-23T02:47:51-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069338681",
+              "member": {
+                "id": "294477324",
+                "name": "Jean Paul",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "293753694",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "8192",
+                        "name": "Open source",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17865",
+                        "name": "Sorties et détente",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "18424",
+                        "name": "Partage de connaissances",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "18522",
+                        "name": "Formation",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "43601",
+                        "name": "Développement professionnel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "92209",
+                        "name": "Prise de parole en public",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "108403",
+                        "name": "Startups tech",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "698222",
+                        "name": "Formations et ateliers",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 24,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-22T20:03:40-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069331789",
+              "member": {
+                "id": "480717090",
+                "name": "agathe",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "14657",
+                        "name": "Vie sociale",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15814",
+                        "name": "En extérieur",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17038",
+                        "name": "Faites-vous de nouveaux amis",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17293",
+                        "name": "Fitness",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17865",
+                        "name": "Sorties et détente",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "20148",
+                        "name": "Réseau social",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 1,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-22T18:30:05-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069303585",
+              "member": {
+                "id": "477428183",
+                "name": "Nawal",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "20148",
+                        "name": "Réseau social",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 3,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-22T12:42:01-04:00",
+              "isHost": false,
+              "isFirstEvent": false,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069229296",
+              "member": {
+                "id": "386555028",
+                "name": "Gautier",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ORGS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17293",
+                        "name": "Fitness",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "20148",
+                        "name": "Réseau social",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "43601",
+                        "name": "Développement professionnel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "45330",
+                        "name": "Art",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 24,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-21T16:18:22-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069187533",
+              "member": {
+                "id": "480670751",
+                "name": "Martins Semedo Marie",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "14657",
+                        "name": "Vie sociale",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "16881",
+                        "name": "Réseau féminin",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17381",
+                        "name": "Networking professionnel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "23893",
+                        "name": "Médecine énergétique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "43601",
+                        "name": "Développement professionnel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 1,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-21T07:31:41-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069178613",
+              "member": {
+                "id": "299222999",
+                "name": "Ian",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ORGS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 1,
+                "eventsAttended": 9,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-21T04:27:14-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069177896",
+              "member": {
+                "id": "238561341",
+                "name": "Céline ",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 2,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-21T04:14:29-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069176734",
+              "member": {
+                "id": "325125396",
+                "name": "Pascal Vivès",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS"
+                ],
+                "memberPhoto": {
+                  "id": "323012654",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "GROUPS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "8192",
+                        "name": "Open source",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15582",
+                        "name": "Développement web",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17639",
+                        "name": "Microsoft",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "33089",
+                        "name": "SaaS (Software as a Service)",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "85951",
+                        "name": "Frameworks JavaScript",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "488822",
+                        "name": "Intelligence artificielle",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "1493232",
+                        "name": "Blockchain",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": true,
+                "noShowCount": 0,
+                "eventsAttended": 39,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-21T03:47:11-04:00",
+              "isHost": false,
+              "isFirstEvent": false,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069105175",
+              "member": {
+                "id": "477810844",
+                "name": "PK",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "20555",
+                        "name": "Recrutement",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "57928",
+                        "name": "Recruteur dans l'informatique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 2,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-20T12:38:20-04:00",
+              "isHost": false,
+              "isFirstEvent": false,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2069034792",
+              "member": {
+                "id": "479785343",
+                "name": "Pirès Hervé Anagonou",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "325217609",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": false,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 20,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-19T17:09:22-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2068929941",
+              "member": {
+                "id": "206253140",
+                "name": "Jan Zymla",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO"
+                ],
+                "memberPhoto": {
+                  "id": "262577410",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": false,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 347,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-18T12:30:05-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2068688984",
+              "member": {
+                "id": "70203042",
+                "name": "Tris R",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO"
+                ],
+                "memberPhoto": {
+                  "id": "274139161",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": false,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": true,
+                "noShowCount": 0,
+                "eventsAttended": 18,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-16T02:42:41-04:00",
+              "isHost": false,
+              "isFirstEvent": false,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2068414849",
+              "member": {
+                "id": "477690741",
+                "name": "Emmanuel PILARD",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "17156",
+                        "name": "Capital-risque",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "19120",
+                        "name": "Lever des fonds",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "60653",
+                        "name": "Capital d'amorçage",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 1,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-13T10:46:05-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2068369310",
+              "member": {
+                "id": "280633687",
+                "name": "Ghazouani",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "287974713",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "286",
+                        "name": "Film d'animation",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "1527",
+                        "name": "Spiritualité",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "3475",
+                        "name": "Tango",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "7504",
+                        "name": "Mode et style",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "8192",
+                        "name": "Open source",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "8505",
+                        "name": "Entrepreneurs",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "10438",
+                        "name": "Bricolage",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "14266",
+                        "name": "Stratégie d'entreprise",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15081",
+                        "name": "Hip-hop",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15167",
+                        "name": "Cloud computing",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15814",
+                        "name": "En extérieur",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15844",
+                        "name": "Auteurs",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "16944",
+                        "name": "Libération de la femme",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17148",
+                        "name": "Musique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17293",
+                        "name": "Fitness",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17298",
+                        "name": "Artistes",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17704",
+                        "name": "Danse et mouvement",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17754",
+                        "name": "Auto-défense",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17865",
+                        "name": "Sorties et détente",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 33,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-13T02:07:25-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2068251986",
+              "member": {
+                "id": "229586504",
+                "name": "Abdel Rahman Massri Attal",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "321921751",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "GROUPS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "16048",
+                        "name": "Nouvel arrivant",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "16285",
+                        "name": "Voyages",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17038",
+                        "name": "Faites-vous de nouveaux amis",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17381",
+                        "name": "Networking professionnel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "19029",
+                        "name": "Reconversion professionnelle",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "120095",
+                        "name": "Développement logiciel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "488822",
+                        "name": "Intelligence artificielle",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": true,
+                "noShowCount": 0,
+                "eventsAttended": 192,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-11T18:26:25-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2068063376",
+              "member": {
+                "id": "480057945",
+                "name": "Victor Knutsenberger",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "325291826",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "14657",
+                        "name": "Vie sociale",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17038",
+                        "name": "Faites-vous de nouveaux amis",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": true,
+                "noShowCount": 0,
+                "eventsAttended": 8,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-09T18:23:08-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2068000688",
+              "member": {
+                "id": "428401519",
+                "name": "Véronique",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "320767527",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ORGS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "55604",
+                        "name": "Anglais langue étrangère",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "521102",
+                        "name": "Bilingue français / anglais",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": true,
+                "noShowCount": 0,
+                "eventsAttended": 9,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-09T03:20:22-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067832048",
+              "member": {
+                "id": "478208072",
+                "name": "Charlotte Segal",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "14266",
+                        "name": "Stratégie d'entreprise",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "14657",
+                        "name": "Vie sociale",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "16048",
+                        "name": "Nouvel arrivant",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17381",
+                        "name": "Networking professionnel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17865",
+                        "name": "Sorties et détente",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "19303",
+                        "name": "Réseau d'entrepreneurs",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "20148",
+                        "name": "Réseau social",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "41644",
+                        "name": "Créativité",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "43601",
+                        "name": "Développement professionnel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "53839",
+                        "name": "Petites entreprises",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "120095",
+                        "name": "Développement logiciel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "130965",
+                        "name": "Théâtre",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "1484122",
+                        "name": "Échange linguistique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 4,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-07T09:44:14-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067684847",
+              "member": {
+                "id": "480302372",
+                "name": "Eunice",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "325361872",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "713",
+                        "name": "Diner au restaurant",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "14266",
+                        "name": "Stratégie d'entreprise",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15073",
+                        "name": "Techniques de communication",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15133",
+                        "name": "Développement personnel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15814",
+                        "name": "En extérieur",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15824",
+                        "name": "Vie associative",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "16881",
+                        "name": "Réseau féminin",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "16944",
+                        "name": "Libération de la femme",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17381",
+                        "name": "Networking professionnel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17390",
+                        "name": "Entreprenariat",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17865",
+                        "name": "Sorties et détente",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "18280",
+                        "name": "Collaboration entre esprits créatifs",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "18424",
+                        "name": "Partage de connaissances",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "18489",
+                        "name": "Marcheurs",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "18522",
+                        "name": "Formation",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "19303",
+                        "name": "Réseau d'entrepreneurs",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "20148",
+                        "name": "Réseau social",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "21517",
+                        "name": "Effort personnel et travail sur soi",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "23013",
+                        "name": "Changement de vie",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "23893",
+                        "name": "Médecine énergétique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 20,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-05T21:51:07-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067660022",
+              "member": {
+                "id": "334441129",
+                "name": "Stéphane Messaoudi",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ORGS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "18865",
+                        "name": "Internet et Technologie",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "21517",
+                        "name": "Effort personnel et travail sur soi",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "26927",
+                        "name": "Exercice physique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "62946",
+                        "name": "Développement produit : logiciel et tech",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "356101",
+                        "name": "Technologies de l'information",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "1367102",
+                        "name": "Approvisionnement",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 1,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-05T15:14:09-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067593741",
+              "member": {
+                "id": "479323225",
+                "name": "adamskamate",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": false,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 6,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-04T17:58:37-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067480048",
+              "member": {
+                "id": "479728885",
+                "name": "maxime.balme",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "15582",
+                        "name": "Développement web",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "32528",
+                        "name": "Programmation informatique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "120095",
+                        "name": "Développement logiciel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 2,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-03T12:09:46-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067473550",
+              "member": {
+                "id": "273290070",
+                "name": "Francois Gauthier",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "304113330",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ORGS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "3006",
+                        "name": "Ressources humaines",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "18865",
+                        "name": "Internet et Technologie",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "20551",
+                        "name": "Écriture",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "20555",
+                        "name": "Recrutement",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "22748",
+                        "name": "Recrutement de talents",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "25740",
+                        "name": "Écrivains en herbe",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "30609",
+                        "name": "Startups",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "37143",
+                        "name": "Recruteurs de cadres",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "57928",
+                        "name": "Recruteur dans l'informatique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "92654",
+                        "name": "Réseau de recrutement",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "108403",
+                        "name": "Startups tech",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "132937",
+                        "name": "Recrutement de techniciens",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "356101",
+                        "name": "Technologies de l'information",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "1215362",
+                        "name": "Stratégie en RH",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "1324002",
+                        "name": "Gestion du capital humain",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "1512095",
+                        "name": "Professionnels RH",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 11,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-03T10:54:12-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067267555",
+              "member": {
+                "id": "473421198",
+                "name": "Julien DURAND",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "8192",
+                        "name": "Open source",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "788002",
+                        "name": "Technologies web",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 57,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-01T06:10:32-04:00",
+              "isHost": false,
+              "isFirstEvent": false,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067264453",
+              "member": {
+                "id": "480203978",
+                "name": "yolanda",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "14657",
+                        "name": "Vie sociale",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "20148",
+                        "name": "Réseau social",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 1,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-01T05:05:24-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067264319",
+              "member": {
+                "id": "480203853",
+                "name": "Léa Crd",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "15472",
+                        "name": "Sécurité des réseaux informatiques",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "20148",
+                        "name": "Réseau social",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 1,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-01T05:02:33-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067259991",
+              "member": {
+                "id": "477061632",
+                "name": "xiaoxiang.liu",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "324365239",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "503032",
+                        "name": "Algorithmes d'IA",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "1511425",
+                        "name": "IA conversationnelle",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "1520909",
+                        "name": "AI/ML",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 4,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-01T03:06:31-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067257990",
+              "member": {
+                "id": "472234982",
+                "name": "Joelle N",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "15231",
+                        "name": "Jeunes actifs",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "16944",
+                        "name": "Libération de la femme",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17293",
+                        "name": "Fitness",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17390",
+                        "name": "Entreprenariat",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17993",
+                        "name": "Danse latine",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "20148",
+                        "name": "Réseau social",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "21517",
+                        "name": "Effort personnel et travail sur soi",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "22166",
+                        "name": "Motivation et succès",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "29532",
+                        "name": "Investissement",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "42197",
+                        "name": "Ateliers d'écriture",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "48260",
+                        "name": "Femmes actives",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "50881",
+                        "name": "Amitiés internationales",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "54493",
+                        "name": "Leadership",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "102138",
+                        "name": "Langue et culture",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "1484122",
+                        "name": "Échange linguistique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 2,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-04-01T02:13:19-04:00",
+              "isHost": false,
+              "isFirstEvent": false,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067227975",
+              "member": {
+                "id": "479885122",
+                "name": "exlibris616",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "325331954",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": false,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 2,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-03-31T19:16:50-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067218237",
+              "member": {
+                "id": "478672631",
+                "name": "Raphael Bensaid-Beddock",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "14657",
+                        "name": "Vie sociale",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "18865",
+                        "name": "Internet et Technologie",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "20148",
+                        "name": "Réseau social",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "62946",
+                        "name": "Développement produit : logiciel et tech",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "109937",
+                        "name": "Jeux de société",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 3,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-03-31T18:04:21-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067203248",
+              "member": {
+                "id": "477410815",
+                "name": "alex.fedda",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "21517",
+                        "name": "Effort personnel et travail sur soi",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 5,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-03-31T15:20:54-04:00",
+              "isHost": false,
+              "isFirstEvent": false,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067191760",
+              "member": {
+                "id": "295826591",
+                "name": "Camille Joye",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ORGS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "8192",
+                        "name": "Open source",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "18865",
+                        "name": "Internet et Technologie",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "62946",
+                        "name": "Développement produit : logiciel et tech",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "108403",
+                        "name": "Startups tech",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "120095",
+                        "name": "Développement logiciel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "253511",
+                        "name": "Deep learning",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "356101",
+                        "name": "Technologies de l'information",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "786242",
+                        "name": "Professionnels de la technologie",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "788002",
+                        "name": "Technologies web",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "908312",
+                        "name": "Les femmes et la technologie",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 14,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-03-31T12:57:55-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067183988",
+              "member": {
+                "id": "390135253",
+                "name": "Dino M",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ORGS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "18865",
+                        "name": "Internet et Technologie",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "22748",
+                        "name": "Recrutement de talents",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "108403",
+                        "name": "Startups tech",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "124887",
+                        "name": "Talent",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 6,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-03-31T11:27:39-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067183259",
+              "member": {
+                "id": "474909588",
+                "name": "deborah.balde",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": null,
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ALL_MEMBERS",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "9696",
+                        "name": "Nouvelles technologies",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17381",
+                        "name": "Networking professionnel",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17390",
+                        "name": "Entreprenariat",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 1,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-03-31T11:19:23-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          },
+          {
+            "node": {
+              "id": "2067176988",
+              "member": {
+                "id": "418909939",
+                "name": "Akram Bougrine",
+                "gender": null,
+                "allowableActions": [
+                  "SEE_BIO",
+                  "SEE_PHOTO",
+                  "SEE_TOPICS",
+                  "SEE_GROUPS"
+                ],
+                "memberPhoto": {
+                  "id": "319333107",
+                  "baseUrl": "https://secure-content.meetupstatic.com/images/classic-member/",
+                  "__typename": "PhotoInfo"
+                },
+                "profilePrivacy": {
+                  "showInterests": true,
+                  "whoCanContact": "ORGS_ONLY",
+                  "__typename": "ProfilePrivacy"
+                },
+                "topics": {
+                  "edges": [
+                    {
+                      "node": {
+                        "id": "15167",
+                        "name": "Cloud computing",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "16225",
+                        "name": "Communication",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "17390",
+                        "name": "Entreprenariat",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "18865",
+                        "name": "Internet et Technologie",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "19303",
+                        "name": "Réseau d'entrepreneurs",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "32528",
+                        "name": "Programmation informatique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "41644",
+                        "name": "Créativité",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "42473",
+                        "name": "Photographie",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "92209",
+                        "name": "Prise de parole en public",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "102811",
+                        "name": "Data science",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "128595",
+                        "name": "Startups Internet",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "584902",
+                        "name": "Apprentissage automatique",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    },
+                    {
+                      "node": {
+                        "id": "1515085",
+                        "name": "Data analytics",
+                        "__typename": "Topic"
+                      },
+                      "__typename": "TopicEdge"
+                    }
+                  ],
+                  "__typename": "TopicsConnection"
+                },
+                "commonTopics": {
+                  "totalCount": 0,
+                  "edges": [],
+                  "__typename": "TopicsConnection"
+                },
+                "reasonsForJoining": [],
+                "isFamiliarFace": false,
+                "hasWaitlistPriority": false,
+                "noShowCount": 0,
+                "eventsAttended": 5,
+                "isSuperOrganizer": false,
+                "__typename": "Member"
+              },
+              "membership": {
+                "role": "MEMBER",
+                "status": "ACTIVE",
+                "title": "",
+                "__typename": "Membership"
+              },
+              "updated": "2026-03-31T10:03:57-04:00",
+              "isHost": false,
+              "isFirstEvent": true,
+              "status": "YES",
+              "payStatus": null,
+              "guestsCount": 0,
+              "answer": null,
+              "actions": [],
+              "event": {
+                "id": "314040194",
+                "guestsAllowed": false,
+                "guestLimit": 0,
+                "numberOfAllowedGuests": 0,
+                "isAttending": false,
+                "maxTickets": 50,
+                "group": {
+                  "id": "38274708",
+                  "link": "https://www.meetup.com/open-sourcer",
+                  "__typename": "Group"
+                },
+                "feeSettings": null,
+                "__typename": "Event"
+              },
+              "venue": {
+                "id": "28222523",
+                "venueType": "",
+                "__typename": "Venue"
+              },
+              "isRsvpUnlocked": false,
+              "__typename": "Rsvp"
+            },
+            "__typename": "RsvpEdge"
+          }
+        ],
+        "pageInfo": {
+          "hasPreviousPage": true,
+          "hasNextPage": false,
+          "endCursor": "NDM=",
+          "__typename": "PageInfo"
+        },
+        "__typename": "RsvpConnection"
+      },
+      "group": {
+        "id": "38274708",
+        "isPrivate": false,
+        "isMember": false,
+        "isPrimaryOrganizer": false,
+        "membershipMetadata": null,
+        "link": "https://www.meetup.com/open-sourcer",
+        "urlname": "open-sourcer",
+        "starterTierMaxRsvpLimit": 10,
+        "organizer": {
+          "id": "254527425",
+          "isStarterOrganizer": false,
+          "__typename": "Member"
+        },
+        "__typename": "Group"
+      },
+      "__typename": "Event"
+    }
+  }
+}
