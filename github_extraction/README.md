@@ -81,7 +81,31 @@ URL cells are converted into **clickable hyperlinks** with friendly labels (e.g.
 - **Auth:** Uses `GITHUB_TOKEN` env var or `token_1.py`’s `GITHUB_TOKEN_2` if present.
 - **Freshness:** Even after search, double-checks repos’ `pushed_at` vs `2024-01-01`.
 - **Google Sheets (NLP.py):** Main output is UPSERT into one sheet (one row per repo). **NLP.py** sources repos by **keyword clusters** (inference_prod, quantization, alignment, peft_lora, vector_database)—one GitHub search query per keyword—with **created** and **pushed** rolling-window scans. Queries use `in:readme in:description` and **exclude** RAG/agent-related terms (e.g. RAG, agent, langchain, llamaindex). Each row includes **skill_cluster**, **keyword_matched**, and **query** (full query string) for traceability. Put `google_service_account.json` in the project root. State uses `last_successful_created_scan_utc` and `last_successful_pushed_scan_utc`; `upsert_rows` dedupes by `repo_full_name`. Optional columns `contributors_top` and `contributors_top_n` are filled only for **new** repos (stars >= MIN_STARS_FOR_CONTRIB; set INCLUDE_CONTRIBUTORS=false to disable).
+- **PR authors (NLP.py, lisp.py):** Alongside repo contributors, both scripts also pull PR authors via `/pulls?state=all` — a second talent pool that catches people who only ever opened a PR (common on smaller repos where the contributors list stays thin). In **NLP.py** they land in the people sheet with `role=pr_author` (set `INCLUDE_PR_AUTHORS=false` to disable, `TOP_N_PR_AUTHORS` to size it). In **lisp.py** they're merged straight into `contributors_top`.
+- **Contributor email fallback (NLP.py, lisp.py):** Most GitHub users never set a public profile email. Both scripts now resolve one via a 3-tier fallback — (1) profile `email` field, (2) commit-author email mined from the user's recent public **PushEvents**, (3) regex scan of bio/blog text — the same chain already used for repo owners. **NLP.py** writes the result to `person_email` + `person_email_source` in the people sheet (`profile` / `push_event` / `bio_blog`, or blank if none found); a run summary prints emails-resolved-by-source. **lisp.py** writes `contributors_emails` (`login:email (source)`, semicolon-joined) and `contributors_with_email_n` next to `contributors_top`; set `RESOLVE_CONTRIBUTOR_EMAILS=false` to skip tiers 2–3 and keep only profile emails. **Enrichment only — neither script sends anything.** Treat scraped emails the same as any other sourced contact: export to CSV for Airtable/outreach review rather than emailing directly, per this workspace's GDPR-conscious conventions.
 - **URL hygiene:** Normalizes URLs, tolerates missing schemes, and extracts links from free text.
+
+---
+
+## Figma + React design engineers (figma_react.py)
+
+Same architecture as `lisp.py`, retargeted at the "product design + engineering" hybrid:
+people who bridge Figma (design source of truth) and React (implementation) — design-system
+authors, design-token/component-library maintainers, design-to-code tooling builders.
+
+- **`BASE_QUERY = "figma react"`** — repos mentioning both terms (design systems, Figma-token
+  pipelines, design-to-code tools), scanned over the same rolling created/pushed window as
+  `lisp.py`.
+- **No Google Sheets setup required.** Unlike `lisp.py`/`NLP.py`, this one writes straight to
+  a standalone `github_repos_figma_react_design_engineers.xlsx` in this folder — just set
+  `GITHUB_TOKEN` and run `python figma_react.py`. Each run **merges** into the existing file by
+  `repo_full_name`: fresh repo fields overwrite, but contributor/PR-author/email columns are
+  preserved from the prior run for repos already on file (mirrors `lisp.py`'s upsert-preserve
+  behavior), unless `REFRESH_CONTRIBUTORS_ON_UPDATE=true`.
+- Uses its own state/cache files (`state_figma_react.json`, `geocode_cache_figma_react.json`)
+  so it doesn't interfere with `lisp.py`'s or `NLP.py`'s rolling windows.
+- Same contributor + PR-author pull and 3-tier email fallback as described above for
+  `lisp.py`/`NLP.py`.
 
 ---
 

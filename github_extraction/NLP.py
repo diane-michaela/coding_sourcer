@@ -155,6 +155,21 @@ MIN_STARS_FOR_CONTRIB = int(os.getenv("MIN_STARS_FOR_CONTRIB", "0"))  # fetch co
 REFRESH_CONTRIBUTORS_ON_UPDATE = True  # always refresh for people sheet; contributors fetched for high-star repos
 _CONTRIB_CACHE: dict[str, dict] = {}
 
+# PR authors: a second talent pool alongside repo contributors (catches people who
+# only ever opened PRs, e.g. on smaller repos where the contributors endpoint stays thin)
+INCLUDE_PR_AUTHORS = os.getenv("INCLUDE_PR_AUTHORS", "true").strip().lower() in ("1", "true", "yes")
+TOP_N_PR_AUTHORS = int(os.getenv("TOP_N_PR_AUTHORS", "10"))
+_PR_AUTHOR_CACHE: dict[str, list] = {}
+
+# Email fallback chain (profile -> PushEvent commit-author email -> bio/blog regex).
+# Most GitHub users never set a public profile email; commit metadata in recent
+# public pushes often leaks a real one, which is the highest-value fallback tier.
+EMAIL_REGEX = re.compile(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}")
+_NOREPLY_EMAIL_PATTERNS = [
+    re.compile(r".*@users\.noreply\.github\.com$"),
+    re.compile(r".*noreply.*"),
+]
+
 # Geocoding
 GEO_PROVIDER = (os.getenv("GEO_PROVIDER") or "").strip().lower()  # "google" or "nominatim" (optional)
 GOOGLE_MAPS_API_KEY = (os.getenv("GOOGLE_MAPS_API_KEY") or "").strip()
@@ -568,6 +583,89 @@ def fetch_top_contributors(owner_login: str, repo_name: str, top_n: int) -> dict
         result = {"contributors_top": "", "contributors_top_n": 0, "contributors_list": []}
     _CONTRIB_CACHE[cache_key] = result
     return result
+
+
+def fetch_pr_authors(owner_login: str, repo_name: str, top_n: int) -> list[dict]:
+    """GET repos/{owner}/{repo}/pulls?state=all. Returns [{login}, ...] for PR authors,
+    a talent pool distinct from (and often not fully overlapping with) repo contributors."""
+    cache_key = f"{owner_login}/{repo_name}:{top_n}"
+    if cache_key in _PR_AUTHOR_CACHE:
+        return _PR_AUTHOR_CACHE[cache_key]
+    url = (f"{GITHUB_API}/repos/{owner_login}/{repo_name}/pulls"
+           f"?state=all&sort=created&direction=desc&per_page={min(top_n, 100)}")
+    try:
+        data = get(url).json()
+    except GitHubNotFound:
+        data = []
+    except Exception:
+        data = []
+    result: list[dict] = []
+    if isinstance(data, list):
+        seen: set[str] = set()
+        for pr in data:
+            login = ((pr.get("user") or {}).get("login") or "").strip()
+            if login and login not in seen and not login.endswith("[bot]"):
+                seen.add(login)
+                result.append({"login": login})
+    _PR_AUTHOR_CACHE[cache_key] = result
+    return result
+
+
+def is_valid_contact_email(email: str) -> bool:
+    """Reject noreply/placeholder addresses; require a plausible email shape."""
+    if not email or "@" not in email:
+        return False
+    email_lower = email.strip().lower()
+    if any(p.match(email_lower) for p in _NOREPLY_EMAIL_PATTERNS):
+        return False
+    return bool(EMAIL_REGEX.fullmatch(email_lower))
+
+
+def fetch_events_email(login: str) -> str:
+    """Mine recent public PushEvents for a commit-author email. Most users never set a
+    public profile email, but their commit metadata often has a real one attached."""
+    if not login:
+        return ""
+    try:
+        data = get(f"{GITHUB_API}/users/{login}/events/public?per_page=100").json()
+    except GitHubNotFound:
+        return ""
+    except Exception:
+        return ""
+    if not isinstance(data, list):
+        return ""
+    for event in data:
+        if event.get("type") != "PushEvent":
+            continue
+        for commit in (event.get("payload") or {}).get("commits", []):
+            email = ((commit.get("author") or {}).get("email") or "").strip()
+            if email and is_valid_contact_email(email):
+                return email
+    return ""
+
+
+def email_from_text(*fields: str) -> str:
+    """Last-resort: regex-scan bio/blog text for a plain email address."""
+    text = " ".join(f for f in fields if f)
+    for candidate in EMAIL_REGEX.findall(text):
+        if is_valid_contact_email(candidate):
+            return candidate
+    return ""
+
+
+def resolve_person_email(login: str, owner_json: dict, owner: dict) -> tuple[str, str]:
+    """Email fallback chain: profile field -> PushEvent commit email -> bio/blog regex.
+    Returns (email, source) so the people sheet can show where each address came from."""
+    profile_email = owner.get("owner_email", "")
+    if profile_email and is_valid_contact_email(profile_email):
+        return profile_email, "profile"
+    event_email = fetch_events_email(login)
+    if event_email:
+        return event_email, "push_event"
+    bio_email = email_from_text(owner_json.get("bio", "") or "", owner.get("owner_blog", ""))
+    if bio_email:
+        return bio_email, "bio_blog"
+    return "", ""
 
 
 def fetch_repo_details(owner_login: str, repo_name: str) -> dict:
@@ -1013,6 +1111,7 @@ PEOPLE_HEADER = [
     "person_profile_status",
     "person_name",
     "person_email",
+    "person_email_source",
     "person_location",
     "person_blog",
     "person_x",
@@ -1098,6 +1197,7 @@ def _build_aggregated_person_row(
     person_profile_status = "OK"
     person_name = ""
     person_email = ""
+    person_email_source = ""
     person_location = ""
     person_blog = ""
     person_x = ""
@@ -1107,7 +1207,8 @@ def _build_aggregated_person_row(
         person_profile_status = ojson.get("_status", "OK") if ojson else "NOT_FOUND"
         o = owner_fields(ojson) if ojson else {}
         person_name = o.get("owner_name", "")
-        person_email = o.get("owner_email", "")
+        if person_profile_status == "OK":
+            person_email, person_email_source = resolve_person_email(login, ojson or {}, o)
         person_location = o.get("owner_location", "")
         person_blog = o.get("owner_blog", "")
         person_x = o.get("owner_x", "")
@@ -1126,6 +1227,7 @@ def _build_aggregated_person_row(
         "person_profile_status": person_profile_status,
         "person_name": person_name,
         "person_email": person_email,
+        "person_email_source": person_email_source,
         "person_location": person_location,
         "person_blog": person_blog,
         "person_x": person_x,
@@ -1305,6 +1407,7 @@ def main():
     # Contributor discovery: fetch for all repos (MIN_STARS_FOR_CONTRIB=0 for max discovery)
     raw_people: list[dict] = []  # {login, role, contributions, repo, cluster, keyword}
     contributors_fetched_count = 0
+    pr_authors_fetched_count = 0
     for key, r in all_rows.items():
         if not INCLUDE_CONTRIBUTORS:
             continue
@@ -1335,7 +1438,27 @@ def main():
         except Exception:
             r["contributors_top"] = ""
             r["contributors_top_n"] = 0
-    print(f"Contributors: fetched for {contributors_fetched_count} repos; raw person-repo links: {len(raw_people)}")
+
+        if not INCLUDE_PR_AUTHORS:
+            continue
+        try:
+            pr_authors = fetch_pr_authors(owner_login, repo_name, TOP_N_PR_AUTHORS)
+            if pr_authors:
+                pr_authors_fetched_count += 1
+            for pa in pr_authors:
+                raw_people.append({
+                    "login": pa.get("login", ""),
+                    "role": "pr_author",
+                    "contributions": 0,
+                    "repo": key,
+                    "cluster": cluster,
+                    "keyword": keyword,
+                })
+        except Exception:
+            pass
+    print(f"Contributors: fetched for {contributors_fetched_count} repos; "
+          f"PR authors: fetched for {pr_authors_fetched_count} repos; "
+          f"raw person-repo links: {len(raw_people)}")
 
     # Person aggregation: dedupe by login; aggregate repos/keywords/clusters; compute expertise_score
     aggregated = _aggregate_people(raw_people)
@@ -1364,6 +1487,13 @@ def main():
     print(f"Unique repos found: {len(all_rows)}")
     print(f"Repos appended to sheet: {num_appended}. Updated: {num_updated}.")
     print(f"Unique people (after aggregation): {len(aggregated)}; rows appended to 'people' sheet: {len(people_to_append)}")
+    email_source_counts: dict[str, int] = {}
+    for row in people_to_append:
+        source = row.get("person_email_source") or "none"
+        email_source_counts[source] = email_source_counts.get(source, 0) + 1
+    with_email = sum(v for k, v in email_source_counts.items() if k != "none")
+    print(f"Emails resolved: {with_email}/{len(people_to_append)} "
+          f"(by source: {email_source_counts})")
 
     state = load_state()
     state["last_successful_created_scan_utc"] = window_end.isoformat()
