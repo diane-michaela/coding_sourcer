@@ -4,6 +4,9 @@
 !.env.example
 token_1.py
 
+# Local run state (batch IDs, candidate caches) — not repo content
+.*last_batch_id
+
 # Python
 __pycache__/
 *.py[cod]
@@ -32,6 +35,9 @@ venv/
 env/
 .env/
 talent_radar/
+
+# Symlinked external folders
+LLM-wiki-vault
 
 # IDE
 .idea/
