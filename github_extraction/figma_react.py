@@ -1,14 +1,24 @@
 """
-GitHub repo sourcer (LISP-only, repo-centric) + owner enrichment + location geocoding/normalization.
+GitHub repo sourcer for Figma + React design engineers (repo-centric) + owner enrichment
++ location geocoding/normalization.
 
-- Searches GitHub repos for BASE_QUERY + created date range (from state/window)
+Targets the "product design + engineering" hybrid: people who bridge Figma (design source
+of truth) and React (implementation) — design-system authors, design-token/component-library
+maintainers, design-to-code tooling builders. Same architecture as lisp.py, adapted to:
+- BASE_QUERY = "figma react" instead of a single-language keyword
+- Standalone Excel output (no Google Sheets/service-account setup required) so it's
+  immediately runnable; merges into the existing .xlsx on each run instead of a live upsert
+
+- Searches GitHub repos for BASE_QUERY + created/pushed date range (from state/window)
 - For each repo: collects repo fields
 - For each owner: fetches profile fields (cached) and enriches with:
   owner_name, owner_email, owner_location (raw), blog/website, X, LinkedIn, extra links
 - Geocodes/normalizes the owner's location (raw text) into:
   owner_location_norm, owner_city, owner_region, owner_country, owner_country_code, owner_lat, owner_lon
   + provider + status
-- Writes clickable Excel (or CSV fallback)
+- For NEW repos: pulls contributors + PR authors (merged talent pool), each resolved
+  with an email via a 3-tier fallback (profile -> PushEvent commit email -> bio/blog regex)
+- Writes clickable Excel (or CSV fallback), merging with the existing file by repo_full_name
 
 Providers:
 - Google Geocoding API (if GOOGLE_MAPS_API_KEY set, or GEO_PROVIDER=google)
@@ -23,6 +33,11 @@ Terminal (VS Code):
 Env:
   setx GITHUB_TOKEN "...."
   (optional) setx GOOGLE_MAPS_API_KEY "...."
+
+Run:
+  python figma_react.py
+Output:
+  github_repos_figma_react_design_engineers.xlsx (in this folder)
 """
 
 import os
@@ -39,30 +54,6 @@ from urllib.parse import quote_plus, urlparse
 import requests
 import pandas as pd
 
-import gspread
-from google.oauth2.service_account import Credentials
-
-SPREADSHEET_ID = "1OVr2EigkJ5ZHceilXGn-Zl8xpGTGPVxp8jKIEJnOgmo"
-SHEET_GID = 1382489855
-SERVICE_ACCOUNT_FILE = "google_service_account.json"
-
-def get_gspread_worksheet():
-    scopes = ["https://www.googleapis.com/auth/spreadsheets"]
-    creds = Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE,
-        scopes=scopes
-    )
-    client = gspread.authorize(creds)
-    sh = client.open_by_key(SPREADSHEET_ID)
-
-    # Find worksheet by gid
-    for ws in sh.worksheets():
-        if ws.id == SHEET_GID:
-            return ws
-
-    raise ValueError(f"Worksheet with gid={SHEET_GID} not found. Check the gid in your URL.")
-
-
 from openpyxl import load_workbook
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
@@ -71,17 +62,15 @@ from requests.exceptions import ReadTimeout, ConnectionError, HTTPError
 from dotenv import load_dotenv
 load_dotenv()
 
-import os
 print("TOKEN present:", bool(os.getenv("GITHUB_TOKEN")))
-
 
 
 # ---------------- Config ----------------
 GITHUB_API = "https://api.github.com"
 
-BASE_QUERY = "lisp"
+BASE_QUERY = "figma react"
 
-STATE_FILE = Path(__file__).with_name("state.json")
+STATE_FILE = Path(__file__).with_name("state_figma_react.json")
 FIRST_RUN_LOOKBACK_DAYS = 62       # ~2 months
 WINDOW_OVERLAP_HOURS = 12          # safety overlap
 
@@ -89,7 +78,7 @@ PER_PAGE = 100   # GitHub Search supports up to 100
 MAX_REPOS = 200
 TIMEOUT = 20
 
-DEFAULT_XLSX = "github_repos_lisp_with_owner_details.xlsx"
+DEFAULT_XLSX = "github_repos_figma_react_design_engineers.xlsx"
 
 # Gentle pacing to reduce abuse detection on /search endpoints
 PAGE_SLEEP_RANGE = (0.2, 0.8)  # seconds (randomized)
@@ -117,8 +106,9 @@ _NOREPLY_EMAIL_PATTERNS = [
 GEO_PROVIDER = (os.getenv("GEO_PROVIDER") or "").strip().lower()  # "google" or "nominatim" (optional)
 GOOGLE_MAPS_API_KEY = (os.getenv("GOOGLE_MAPS_API_KEY") or "").strip()
 
-# Cache file for geocoding results (disk)
-GEO_CACHE_FILE = Path(__file__).with_name("geocode_cache.json")
+# Cache file for geocoding results (disk) — separate from lisp.py/NLP.py's, per this
+# workspace's convention of one geocode cache file per script variant.
+GEO_CACHE_FILE = Path(__file__).with_name("geocode_cache_figma_react.json")
 _GEO_CACHE: dict[str, dict] = {}
 
 # Common non-geocodable locations
@@ -151,7 +141,6 @@ else:
     print("No GitHub token found (GITHUB_TOKEN env var or token_1.py:GITHUB_TOKEN_2). "
           "Running unauthenticated => very low rate limit.")
 
-# 🔍 DEBUG (DOIT être hors du if/else)
 auth = SESSION.headers.get("Authorization", "")
 print("TOKEN present:", bool(TOKEN))
 print("Auth scheme:", auth.split(" ")[0] if auth else "NONE")
@@ -264,7 +253,7 @@ def write_excel_with_fallback(df: pd.DataFrame, filename: str) -> Path:
                 if not idx:
                     continue
                 cell = ws.cell(row=r, column=idx)
-                val = (cell.value or "").strip()
+                val = (cell.value or "").strip() if isinstance(cell.value, str) else ""
                 if not val:
                     continue
                 url = val.split(";")[0].strip()
@@ -776,92 +765,40 @@ def compute_window() -> tuple[datetime, datetime]:
     return start.replace(microsecond=0), end
 
 
-def ensure_header(ws, header: list[str]) -> list[str]:
-    existing = ws.row_values(1)
-    if not existing:
-        ws.append_row(header)
-        return header
+CONTRIBUTOR_COLUMNS = ("contributors_top", "contributors_top_n", "contributors_emails", "contributors_with_email_n")
 
-    s = set(existing)
-    missing = [c for c in header if c not in s]
-    if missing:
-        new_header = existing + missing
-        ws.update(values=[new_header], range_name="1:1")
-        return new_header
-    return existing
-
-
-def load_existing_repo_full_names(ws) -> set[str]:
-    header = ws.row_values(1)
-    if "repo_full_name" not in header:
-        return set()
-    col_index = header.index("repo_full_name") + 1
-    vals = ws.col_values(col_index)[1:]
-    return set(v.strip() for v in vals if v and v.strip())
+HEADER = [
+    "run_id", "run_timestamp_utc", "window_start_utc", "window_end_utc", "query",
+    "repo_full_name", "repo_url", "description", "language", "stars", "forks", "open_issues",
+    "created_at", "updated_at", "pushed_at",
+    "owner_login", "owner_url", "owner_name", "owner_location", "owner_email",
+    "owner_blog", "owner_x", "owner_linkedin", "owner_extra_links",
+    "contributors_top", "contributors_top_n", "contributors_emails", "contributors_with_email_n",
+    "owner_location_norm", "owner_city", "owner_region", "owner_country", "owner_country_code",
+    "owner_lat", "owner_lon", "owner_geocode_provider", "owner_geocode_status",
+]
 
 
-def append_rows(ws, rows: list[dict], header: list[str]) -> None:
-    if not rows:
-        return
-    values = [[r.get(col, "") for col in header] for r in rows]
-    ws.append_rows(values, value_input_option="RAW")
-
-
-def build_repo_row_map(ws) -> dict[str, int]:
-    """Return mapping repo_full_name -> 1-based row number (header is row 1)."""
-    header = ws.row_values(1)
-    if "repo_full_name" not in header:
+def load_existing_rows(xlsx_path: Path) -> dict[str, dict]:
+    """Read the previous run's Excel output (if any) into {repo_full_name: row_dict}."""
+    if not xlsx_path.exists():
         return {}
-    col_index = header.index("repo_full_name") + 1
-    vals = ws.col_values(col_index)[1:]
-    out: dict[str, int] = {}
-    for i, v in enumerate(vals):
-        if v and v.strip():
-            out[v.strip()] = i + 2
+    try:
+        df = pd.read_excel(xlsx_path)
+    except Exception as e:
+        print(f"Could not read existing {xlsx_path.name} (starting fresh): {e}")
+        return {}
+    out: dict[str, dict] = {}
+    for _, rec in df.iterrows():
+        d = rec.where(pd.notna(rec), "").to_dict()
+        key = str(d.get("repo_full_name", "")).strip()
+        if key:
+            out[key] = d
     return out
 
 
-CONTRIBUTOR_COLUMNS = ("contributors_top", "contributors_top_n", "contributors_emails", "contributors_with_email_n")
-
-
-def upsert_rows(ws, rows: list[dict], header: list[str]) -> tuple[int, int]:
-    """Update existing rows by repo_full_name, append new ones. Returns (num_appended, num_updated)."""
-    repo_row = build_repo_row_map(ws)
-    num_updated = 0
-    to_append: list[dict] = []
-    last_col = get_column_letter(len(header))
-    updates: list[tuple[int, list]] = []
-    for r in rows:
-        key = (r.get("repo_full_name") or "").strip()
-        if not key:
-            continue
-        values = [r.get(col, "") for col in header]
-        if key in repo_row:
-            row_num = repo_row[key]
-            if not REFRESH_CONTRIBUTORS_ON_UPDATE:
-                try:
-                    existing = ws.row_values(row_num)
-                    for col in CONTRIBUTOR_COLUMNS:
-                        if col in header:
-                            idx = header.index(col)
-                            if idx < len(existing):
-                                values[idx] = existing[idx]
-                except Exception:
-                    pass
-            updates.append((row_num, values))
-            num_updated += 1
-        else:
-            to_append.append(r)
-    if updates:
-        body = [{"range": f"A{row_num}:{last_col}{row_num}", "values": [values]} for row_num, values in updates]
-        ws.batch_update(body, value_input_option="RAW")
-    if to_append:
-        append_rows(ws, to_append, header)
-    return len(to_append), num_updated
-
-
 def _build_row_from_repo(repo: dict, query_label: str) -> dict:
-    """Build one sheet row from a GitHub repo dict and query label (created/pushed)."""
+    """Build one output row from a GitHub repo dict and query label (created/pushed)."""
     owner = repo.get("owner") or {}
     owner_login = owner.get("login") or ""
     owner_url = owner.get("html_url") or ""
@@ -911,19 +848,10 @@ def main():
     print("Geocoding provider:", GEO_PROVIDER or ("google" if GOOGLE_MAPS_API_KEY else "nominatim"))
     print("Google API key detected:", "YES" if GOOGLE_MAPS_API_KEY else "NO (will use Nominatim unless GEO_PROVIDER=google)")
 
-    header = [
-        "run_id", "run_timestamp_utc", "window_start_utc", "window_end_utc", "query",
-        "repo_full_name", "repo_url", "description", "language", "stars", "forks", "open_issues",
-        "created_at", "updated_at", "pushed_at",
-        "owner_login", "owner_url", "owner_name", "owner_location", "owner_email",
-        "owner_blog", "owner_x", "owner_linkedin", "owner_extra_links",
-        "contributors_top", "contributors_top_n", "contributors_emails", "contributors_with_email_n",
-        "owner_location_norm", "owner_city", "owner_region", "owner_country", "owner_country_code",
-        "owner_lat", "owner_lon", "owner_geocode_provider", "owner_geocode_status",
-    ]
-    ws = get_gspread_worksheet()
-    header = ensure_header(ws, header)
-    repo_row = build_repo_row_map(ws)
+    xlsx_path = Path(__file__).with_name(DEFAULT_XLSX)
+    existing_by_key = load_existing_rows(xlsx_path)
+    existing_keys = set(existing_by_key)
+    print(f"Existing rows loaded: {len(existing_keys)} (from {xlsx_path.name if xlsx_path.exists() else 'none'})")
 
     all_rows: dict[str, dict] = {}
 
@@ -959,50 +887,70 @@ def main():
         if seen2 >= MAX_REPOS:
             break
 
-    # Contributors: only for NEW repos (not in repo_row), subject to throttles
+    # Contributors: only for NEW repos (not already in the existing file), subject to throttles
     contributors_fetched_count = 0
     contributors_skipped_low_stars = 0
     contributors_skipped_existing_repo = 0
     contributors_with_email_total = 0
-    for key, r in all_rows.items():
-        if key in repo_row:
+    for key, row in all_rows.items():
+        if key in existing_keys:
             contributors_skipped_existing_repo += 1
             continue
         if not INCLUDE_CONTRIBUTORS:
             continue
-        if (r.get("stars") or 0) < MIN_STARS_FOR_CONTRIB:
+        if (row.get("stars") or 0) < MIN_STARS_FOR_CONTRIB:
             contributors_skipped_low_stars += 1
             continue
         try:
-            owner_login = r.get("owner_login", "")
+            owner_login = row.get("owner_login", "")
             parts = key.split("/", 1)
             repo_name = parts[1] if len(parts) == 2 else ""
             if owner_login and repo_name:
                 data = fetch_top_contributors(owner_login, repo_name, TOP_N_CONTRIBUTORS)
-                r["contributors_top"] = data["contributors_top"]
-                r["contributors_top_n"] = data["contributors_top_n"]
-                r["contributors_emails"] = data["contributors_emails"]
-                r["contributors_with_email_n"] = data["contributors_with_email_n"]
+                row["contributors_top"] = data["contributors_top"]
+                row["contributors_top_n"] = data["contributors_top_n"]
+                row["contributors_emails"] = data["contributors_emails"]
+                row["contributors_with_email_n"] = data["contributors_with_email_n"]
                 contributors_fetched_count += 1
                 contributors_with_email_total += data["contributors_with_email_n"]
         except Exception:
-            r["contributors_top"] = ""
-            r["contributors_top_n"] = 0
-            r["contributors_emails"] = ""
-            r["contributors_with_email_n"] = 0
+            row["contributors_top"] = ""
+            row["contributors_top_n"] = 0
+            row["contributors_emails"] = ""
+            row["contributors_with_email_n"] = 0
     print(f"Contributors: fetched={contributors_fetched_count}, skipped_low_stars={contributors_skipped_low_stars}, "
           f"skipped_existing_repo={contributors_skipped_existing_repo}, with_email={contributors_with_email_total}")
 
     run_id = uuid.uuid4().hex[:10]
     run_ts = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-    for r in all_rows.values():
-        r["run_id"] = run_id
-        r["run_timestamp_utc"] = run_ts
-        r["window_start_utc"] = window_start.isoformat()
-        r["window_end_utc"] = window_end.isoformat()
+    for row in all_rows.values():
+        row["run_id"] = run_id
+        row["run_timestamp_utc"] = run_ts
+        row["window_start_utc"] = window_start.isoformat()
+        row["window_end_utc"] = window_end.isoformat()
 
-    num_appended, num_updated = upsert_rows(ws, list(all_rows.values()), header)
-    print(f"Appended {num_appended} new rows to Google Sheet. Updated {num_updated} existing rows.")
+    # Merge into existing rows: new/rescanned repos overwrite, but preserve the existing
+    # contributor columns for already-known repos (mirrors lisp.py's upsert_rows behavior),
+    # unless REFRESH_CONTRIBUTORS_ON_UPDATE is set.
+    num_appended = 0
+    num_updated = 0
+    final_by_key = dict(existing_by_key)
+    for key, row in all_rows.items():
+        if key in existing_keys:
+            if not REFRESH_CONTRIBUTORS_ON_UPDATE:
+                old = existing_by_key.get(key, {})
+                for col in CONTRIBUTOR_COLUMNS:
+                    old_val = old.get(col, "")
+                    if old_val not in ("", None):
+                        row[col] = old_val
+            num_updated += 1
+        else:
+            num_appended += 1
+        final_by_key[key] = row
+
+    df = pd.DataFrame(list(final_by_key.values()), columns=HEADER)
+    write_excel_with_fallback(df, DEFAULT_XLSX)
+    print(f"Appended {num_appended} new rows. Updated {num_updated} existing rows. Total rows: {len(final_by_key)}.")
 
     state = load_state()
     state["last_successful_created_scan_utc"] = window_end.isoformat()
