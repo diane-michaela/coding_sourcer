@@ -109,6 +109,46 @@ authors, design-token/component-library maintainers, design-to-code tooling buil
 
 ---
 
+## Figma/React design-engineer candidate search (figma_react_candidates.py)
+
+A one-shot, **person-centric** discovery script — not part of the recurring rolling-window
+pipeline like the three scripts above. Run it whenever you want a fresh scan; there's no
+state file, so each run re-searches from scratch rather than picking up where a prior run
+left off.
+
+- **Targeted queries, not a broad keyword.** `figma react` alone mostly surfaces generic
+  design-system repos. This script instead runs 8 queries built around what actually
+  distinguishes a real Figma-to-code practitioner: `figma mcp`, `figma code connect`,
+  `claude code figma skill`, `design tokens figma react`, `figma variables tailwind`,
+  `storybook figma`, `figma design system react`, and `"design engineer" figma react`.
+- **No star-count gate.** Real candidate signal here often sits at 0 stars (a personal
+  Figma-tooling side project) — filtering by stars would throw away exactly the hidden-gem
+  repos this search exists to find.
+- **One row per person, not per repo.** Every repo's owner + contributors + PR authors are
+  enriched (name, location, bio, email via the same 3-tier fallback, LinkedIn if extractable)
+  and deduplicated by GitHub login — someone who shows up across several matched repos gets
+  one row with all their repos/queries merged in, not one row per repo.
+- **Repo summary, topics, and keywords per person's top repo:**
+  - `top_repo_summary` — the GitHub description when it's substantive (≥25 chars), otherwise
+    the README's opening paragraph (badges/markdown stripped) — most of these smaller repos
+    have a thin or missing description.
+  - `top_repo_topics` — GitHub's own repo tags, when the owner set them.
+  - `top_repo_keywords` — matched against a curated tech-stack vocabulary (figma, design
+    tokens, code connect, react, typescript, tailwind, mcp, claude skill, storybook, etc.)
+    from the repo name + description + README.
+- **Output:** `figma_react_candidates.csv` (gitignored — contains real people's scraped
+  contact info, kept local-only) — pair it with a quick local viewer (a generated
+  `candidates_viewer.html` served via `python -m http.server`) for a searchable/sortable
+  table if you want one; that HTML isn't tracked either, for the same reason.
+
+Run:
+
+```bash
+python figma_react_candidates.py
+```
+
+---
+
 ## Career Page Scraping (Teamtailor)
 
 Two scripts work together to discover and scrape tech company team pages hosted on the **Teamtailor** career platform (the same platform used by PhantomBuster, Klarna, Trustpilot, and hundreds of other tech companies).
