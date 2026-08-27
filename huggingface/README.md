@@ -127,3 +127,81 @@ raises HF rate limits) and `ANTHROPIC_API_KEY` (required unless `--dry-run`) fro
 `phantombuster-api/.env` for `rank_profiles.py`. Claude Haiku batch scoring runs on that Anthropic
 API account's own billing, separate from any Claude Pro/Code subscription — a full run of ~400
 candidates costs roughly $0.15–0.20.
+
+---
+
+## hf_search_llm_ops_sourcer.py
+
+Standalone trial sourcer built for one req — [Senior ML Engineer, Search & LLM Ops
+(RavenPack)](https://ravenpack.teamtailor.com/jobs/8186536-senior-ml-engineer-search-llm-ops).
+Same architecture as `hf_ml_engineer_ai_specialist_sourcer.py` (separate config, does not share
+code or state with either other sourcer) but with its own JD keyword list — reranker,
+cross-encoder, bi-encoder, dense retrieval, semantic search, colbert, splade, matryoshka/binary
+embedding, late interaction, recommender system, learning to rank, knowledge distillation, vector
+database — and its own `SCORING_SYSTEM_PROMPT` tuned to that JD's signals (ranking/retrieval,
+LLM fine-tuning/distillation, semantic embeddings, recommenders, vector DBs, bonus: financial
+services + MLOps/cloud).
+
+```bash
+python hf_search_llm_ops_sourcer.py --dry-run   # free preview, no Anthropic spend
+python hf_search_llm_ops_sourcer.py             # full run incl. Claude scoring
+python hf_search_llm_ops_sourcer.py --resume-batch-id <id>
+```
+
+Output: `hf_search_llm_ops_candidates.xlsx` / `.csv`, same column layout as
+`hf_ml_engineer_ai_specialist_sourcer.py` (see above), plus a `prolific_signal` column that now
+breaks out matched-repo counts by kind (e.g. `2 spaces, 1 model`) — see **Sourcing signal
+rubric** below for why that split matters.
+
+### Companion pipeline (post-processing)
+
+These two scripts consume this sourcer's CSV output and are specific to this trial — run in order:
+
+1. **`filter_with_github_location.py`** — drops candidates with neither a `github_link` nor a
+   `linkedin_link`, then calls the GitHub API for a real `location` field on anyone with a GitHub
+   link (far more reliable than the bio-guess `location_guess` column, which only fires on
+   flag-emoji/city-name mentions in an HF bio). LinkedIn-only candidates keep their bio-guess as-is
+   since LinkedIn's location isn't scrapable without an authenticated session. Requires
+   `GITHUB_TOKEN` in `.env` (falls back to unauthenticated, 60 req/hr). Reads
+   `hf_search_llm_ops_candidates.csv` → writes `hf_search_llm_ops_candidates_with_location.csv`.
+2. **`build_candidates_viewer.py`** — reads that location-enriched CSV and generates
+   `hf_candidates_viewer.html`, a self-contained (no server needed) searchable/sortable table with
+   a GitHub-vs-bio-guess location badge, a text filter, and GitHub/LinkedIn/has-location toggles.
+
+```bash
+python filter_with_github_location.py
+python build_candidates_viewer.py
+```
+
+### Requirements & auth
+
+Same as `hf_ml_engineer_ai_specialist_sourcer.py` above, plus `GITHUB_TOKEN` (optional) and
+`python-dotenv` for `filter_with_github_location.py`.
+
+---
+
+## Sourcing signal rubric
+
+The two trial sourcers' `SCORING_SYSTEM_PROMPT` (and the enrichment step feeding it) encode a
+qualification heuristic, refined after comparing this pipeline against an external HF-sourcing
+training playbook aimed at manual/Boolean-search recruiting:
+
+- **A Space outweighs a model/dataset upload.** A Space is a working demo — proof someone wired
+  something together end-to-end — vs. a model/dataset upload, which only proves they shared a
+  checkpoint. `prolific_signal` now reports the matched-repo kind breakdown (e.g. `2 spaces, 1
+  model`) so the scoring model can weigh accordingly, and the system prompt says so explicitly.
+- **Recency and reinforcing signals matter more than tag overlap alone.** A single old,
+  unmaintained repo with a matching tag but no bio, no org, and 12+ months of inactivity is a weak
+  match even though it superficially matches the search — the prompt now tells the model to say so
+  in `score_reasons` rather than inflate the score off keyword overlap.
+- **Location is context for outreach, not a sourcing filter.** `location_guess` /
+  `github_location` exist to help a recruiter prioritize outreach (time zone, visa likelihood to
+  flag for the intake conversation), not to exclude candidates from the search itself — neither
+  sourcer filters or ranks on these fields, and no `--location` CLI flag exists in either script by
+  design. If wiring these results into Airtable or another CRM, keep that same rule: location is a
+  data point surfaced at outreach time, not a search-time filter, and inferred demographics
+  (ethnicity, age, gender) should never be recorded from a profile photo or name.
+- **Cross-verification beyond GitHub/LinkedIn is manual, not automated here.** For a borderline
+  candidate landing in the middle of the score range, a quick manual look at Stack Overflow rep
+  (in relevant tags), Kaggle tier, or Google Scholar (for a researcher profile with linked code) is
+  worth doing by hand before an outreach decision — none of that is scraped by these scripts.

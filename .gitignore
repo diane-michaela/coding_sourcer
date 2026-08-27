@@ -50,3 +50,7 @@ LLM-wiki-vault
 *.csv
 *.json
 *.log
+
+# Generated candidate viewers (embed real candidate PII as inline JSON) — same
+# reason as the csv/xlsx exclusion above, just a different output format.
+*viewer.html
