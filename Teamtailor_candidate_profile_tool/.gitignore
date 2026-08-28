@@ -1,0 +1,8 @@
+# Full-name/email/phone PII for 6k+ candidates — never commit.
+dashboard.html
+export/
+tags_cache.json
+dashboard_data.json
+airtable_deltas/
+airtable_sync_state.json
+.DS_Store

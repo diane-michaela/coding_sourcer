@@ -1,0 +1,836 @@
+<title>Candidate Index</title>
+<style>
+  :root{
+    --bg:#f2f3ef;
+    --surface:#ffffff;
+    --ink:#1b2430;
+    --muted:#6e7268;
+    --line:#dcddd5;
+    --accent:#a8671e;
+    --accent-ink:#5c3a10;
+    --good:#3f6e4e;
+    --good-bg:#e4ede4;
+    --critical:#a5433b;
+    --critical-bg:#f3e3e0;
+    --neutral-stage:#7a7357;
+    --neutral-stage-bg:#ecebe1;
+    --focus:#2f6fb0;
+    --radius:5px;
+    --serif:"Iowan Old Style","Palatino Linotype",Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+  }
+  :root[data-theme="dark"]{
+    --bg:#141821;
+    --surface:#1b2029;
+    --ink:#e8e6dd;
+    --muted:#9a9c93;
+    --line:#2b313b;
+    --accent:#e0a64a;
+    --accent-ink:#f7dba7;
+    --good:#6fae82;
+    --good-bg:#213027;
+    --critical:#d97066;
+    --critical-bg:#33211f;
+    --neutral-stage:#a79f87;
+    --neutral-stage-bg:#282a24;
+    --focus:#6fb3e8;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#141821;
+      --surface:#1b2029;
+      --ink:#e8e6dd;
+      --muted:#9a9c93;
+      --line:#2b313b;
+      --accent:#e0a64a;
+      --accent-ink:#f7dba7;
+      --good:#6fae82;
+      --good-bg:#213027;
+      --critical:#d97066;
+      --critical-bg:#33211f;
+      --neutral-stage:#a79f87;
+      --neutral-stage-bg:#282a24;
+      --focus:#6fb3e8;
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:14px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--focus);}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
+
+  .page{max-width:1280px;margin:0 auto;padding:28px 24px 64px;}
+
+  header.masthead{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:24px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:18px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+  }
+  header.masthead h1{
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:28px;
+    letter-spacing:0.2px;
+    margin:0;
+    text-wrap:balance;
+  }
+  header.masthead .subtitle{
+    color:var(--muted);
+    font-size:13px;
+    margin-top:4px;
+  }
+  header.masthead .meta{
+    color:var(--muted);
+    font-size:12px;
+    text-align:right;
+    font-family:var(--mono);
+  }
+
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin-bottom:20px;
+  }
+  .stat{
+    background:var(--surface);
+    padding:12px 16px;
+  }
+  .stat .n{
+    font-family:var(--mono);
+    font-variant-numeric:tabular-nums;
+    font-size:22px;
+    font-weight:600;
+    display:block;
+  }
+  .stat .n.accent{color:var(--accent-ink);}
+  .stat .n.good{color:var(--good);}
+  .stat .label{
+    color:var(--muted);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    margin-top:2px;
+    display:block;
+  }
+
+  .toolbar{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+    position:sticky;
+    top:0;
+    background:var(--bg);
+    padding:10px 0;
+    z-index:5;
+    border-bottom:1px solid var(--line);
+    margin-bottom:14px;
+  }
+  .toolbar input[type="search"]{
+    flex:1 1 220px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:8px 10px;
+    color:var(--ink);
+    font-size:13px;
+    font-family:var(--sans);
+  }
+  .toolbar select{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:8px 10px;
+    color:var(--ink);
+    font-size:13px;
+    font-family:var(--sans);
+  }
+  .toolbar .count{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:12px;
+    font-variant-numeric:tabular-nums;
+    margin-left:auto;
+    white-space:nowrap;
+  }
+  .toolbar .reset{
+    background:none;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    color:var(--muted);
+    padding:8px 10px;
+    font-size:12px;
+    cursor:pointer;
+  }
+  .toolbar .reset:hover{color:var(--ink);border-color:var(--muted);}
+
+  .subbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+  .subbar .saved-searches, .subbar .selection-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .subbar select, .subbar button{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    color:var(--ink);
+    padding:6px 10px;
+    font-size:12px;
+    font-family:var(--sans);
+    cursor:pointer;
+  }
+  .subbar button:disabled{opacity:0.4;cursor:default;}
+  .subbar button:not(:disabled):hover{border-color:var(--accent);}
+  #selection-count{color:var(--muted);font-family:var(--mono);font-variant-numeric:tabular-nums;}
+
+  .select-col{width:32px;}
+  td.select-col{padding-right:0;}
+  .row-select{cursor:pointer;}
+
+  .similar-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+  .similar-list li{font-size:12px;display:flex;flex-direction:column;gap:2px;}
+  .similar-list .sim-name{font-weight:600;}
+  .similar-list .sim-shared{color:var(--muted);}
+
+  .table-wrap{
+    overflow-x:auto;
+    overflow-y:auto;
+    max-height:640px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--surface);
+  }
+  table{width:100%;border-collapse:collapse;min-width:920px;}
+  thead th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--muted);
+    font-weight:600;
+    padding:10px 12px;
+    border-bottom:1px solid var(--line);
+    background:var(--surface);
+    position:sticky;
+    top:0;
+  }
+  tbody td{
+    padding:10px 12px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr.candidate-row{cursor:pointer;}
+  tbody tr.candidate-row:hover{background:color-mix(in srgb, var(--accent) 6%, transparent);}
+
+  .name{font-weight:600;}
+  .name .email{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:1px;}
+  .title-cell{color:var(--ink);}
+  .title-cell .seniority{color:var(--muted);font-size:11px;text-transform:capitalize;}
+
+  .chips{display:flex;flex-wrap:wrap;gap:4px;max-width:260px;}
+  .chip{
+    display:inline-block;
+    background:var(--neutral-stage-bg);
+    color:var(--neutral-stage);
+    border-radius:999px;
+    padding:2px 8px;
+    font-size:11px;
+    line-height:1.6;
+    white-space:nowrap;
+  }
+  .chip.more{background:transparent;color:var(--muted);padding-left:2px;}
+
+  .pill{
+    display:inline-block;
+    border-radius:999px;
+    padding:3px 9px;
+    font-size:11px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .pill.good{background:var(--good-bg);color:var(--good);}
+  .pill.critical{background:var(--critical-bg);color:var(--critical);}
+  .pill.neutral{background:var(--neutral-stage-bg);color:var(--neutral-stage);}
+
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px;}
+  .source{color:var(--muted);font-size:12px;}
+
+  .empty-state{padding:40px 16px;text-align:center;color:var(--muted);}
+
+  .detail-row td{background:color-mix(in srgb, var(--accent) 4%, var(--surface));padding:16px 20px;}
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .detail-grid h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);}
+  .role-history{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;}
+  .role-history li{font-size:12px;display:flex;gap:8px;align-items:baseline;}
+  .role-history .job{font-weight:600;flex:1;}
+  .role-history .date{font-family:var(--mono);color:var(--muted);font-variant-numeric:tabular-nums;}
+
+  .name .profile-link{color:var(--ink);text-decoration:none;}
+  .name .profile-link:hover{color:var(--focus);text-decoration:underline;}
+  .li-badge{
+    display:inline-block;
+    margin-left:6px;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:0.02em;
+    color:var(--focus);
+    border:1px solid var(--focus);
+    border-radius:3px;
+    padding:0 4px;
+    text-decoration:none;
+    vertical-align:1px;
+  }
+  .li-badge:hover{background:var(--focus);color:var(--surface);}
+  .chip.company{cursor:pointer;}
+  .chip.company:hover{background:var(--accent);color:var(--surface);}
+  .cv-text{
+    margin-top:16px;
+    font-size:12px;
+    color:var(--ink);
+    white-space:pre-wrap;
+    max-height:160px;
+    overflow-y:auto;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:10px 12px;
+  }
+
+  .pagination{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:14px;
+    padding:16px 0 4px;
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .pagination button{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    color:var(--ink);
+    padding:6px 12px;
+    cursor:pointer;
+    font-family:var(--sans);
+    font-size:12px;
+  }
+  .pagination button:disabled{opacity:0.35;cursor:default;}
+  .pagination button:not(:disabled):hover{border-color:var(--accent);}
+
+  footer.note{
+    margin-top:24px;
+    color:var(--muted);
+    font-size:11px;
+    border-top:1px solid var(--line);
+    padding-top:12px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;}
+  }
+</style>
+
+<div class="page">
+  <header class="masthead">
+    <div>
+      <h1>Candidate Index</h1>
+      <div class="subtitle">Full Teamtailor candidate base — CV-derived title &amp; keyword tags, pipeline history</div>
+    </div>
+    <div class="meta">generated __GENERATED_AT__<br/>__TOTAL_CANDIDATES__ candidates</div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><span class="n">__TOTAL_CANDIDATES__</span><span class="label">Total candidates</span></div>
+    <div class="stat"><span class="n accent">__TAGGED_PCT__%</span><span class="label">CV-tagged</span></div>
+    <div class="stat"><span class="n">__WITH_APPLICATION__</span><span class="label">Applied to a role</span></div>
+    <div class="stat"><span class="n good">__HIRED_COUNT__</span><span class="label">Hired</span></div>
+    <div class="stat"><span class="n">__SOURCED_COUNT__</span><span class="label">Sourced (not applied)</span></div>
+  </div>
+
+  <div class="toolbar">
+    <input type="search" id="search" placeholder='Search name, title, keyword, CV text… (supports AND / OR / NOT, "phrases", and parens)' aria-label="Search candidates"/>
+    <select id="filter-stage" aria-label="Filter by stage"><option value="">All stages</option></select>
+    <select id="filter-source" aria-label="Filter by source"><option value="">All sources</option></select>
+    <select id="filter-seniority" aria-label="Filter by seniority"><option value="">All seniority</option></select>
+    <select id="filter-company" aria-label="Filter by past company"><option value="">All past companies</option></select>
+    <button class="reset" id="reset-filters" type="button">Clear</button>
+    <span class="count" id="result-count"></span>
+  </div>
+
+  <div class="subbar">
+    <div class="saved-searches">
+      <select id="saved-select" aria-label="Saved searches"><option value="">Saved searches…</option></select>
+      <button type="button" id="save-search-btn">Save current</button>
+      <button type="button" id="delete-search-btn">Delete</button>
+    </div>
+    <div class="selection-bar">
+      <span id="selection-count" class="mono">0 selected</span>
+      <button type="button" id="export-csv-btn" disabled>Export CSV</button>
+      <button type="button" id="clear-selection-btn">Clear selection</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="select-col"></th>
+          <th>Candidate</th>
+          <th>Suggested title</th>
+          <th>Keywords</th>
+          <th>Latest role applied</th>
+          <th>Stage</th>
+          <th>Source</th>
+          <th>Apps</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty-state" id="empty-state" hidden>No candidates match these filters.</div>
+  </div>
+
+  <div class="pagination" id="pagination"></div>
+
+  <footer class="note">
+    Salary and interview comments/reviews are not included — no salary field exists anywhere in Teamtailor's data model, and the notes/reviews endpoints return no data on this API plan. Location and past companies are inferred from each candidate's own CV text when stated explicitly — coverage is well below title/keyword tagging since resumes rarely state an address.
+  </footer>
+</div>
+
+<script id="candidate-data" type="application/json">__DATA_JSON__</script>
+<script>
+(function(){
+  const DATA = JSON.parse(document.getElementById('candidate-data').textContent);
+  const PAGE_SIZE = 60;
+  let filtered = DATA;
+  let page = 0;
+  const SELECTED = new Set();
+  const SAVED_SEARCHES_KEY = 'candidateIndexSavedSearches_v1';
+
+  function stageClass(row){
+    const stage = (row.latest_stage || '').toLowerCase();
+    if (row.roles_applied.some(r => r.rejected_at)) return 'critical';
+    if (stage.includes('hired')) return 'good';
+    return 'neutral';
+  }
+
+  function escapeHtml(s){
+    return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function fmtDate(iso){
+    if (!iso) return '';
+    return iso.slice(0,10);
+  }
+
+  function renderChips(keywords){
+    if (!keywords || !keywords.length) return '<span class="mono">—</span>';
+    const shown = keywords.slice(0,4);
+    let html = shown.map(k => `<span class="chip">${escapeHtml(k)}</span>`).join('');
+    if (keywords.length > shown.length) html += `<span class="chip more">+${keywords.length - shown.length}</span>`;
+    return `<div class="chips">${html}</div>`;
+  }
+
+  function renderCompanyChips(companies){
+    if (!companies || !companies.length) return '<span class="mono">—</span>';
+    const html = companies.map(c => `<span class="chip company" data-company="${escapeHtml(c)}" title="Filter by ${escapeHtml(c)}">${escapeHtml(c)}</span>`).join('');
+    return `<div class="chips">${html}</div>`;
+  }
+
+  function renderRow(row){
+    const cls = stageClass(row);
+    const stageLabel = row.roles_applied.some(r => r.rejected_at) ? 'Rejected'
+      : (row.latest_stage || (row.sourced ? 'Sourced' : '—'));
+    return `
+      <tr class="candidate-row" data-id="${row.id}">
+        <td class="select-col"><input type="checkbox" class="row-select" data-id="${row.id}" aria-label="Select ${escapeHtml(row.name)}" onclick="event.stopPropagation()" ${SELECTED.has(row.id) ? 'checked' : ''}/></td>
+        <td class="name">
+          ${row.profile_url
+            ? `<a class="profile-link" href="${escapeHtml(row.profile_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escapeHtml(row.name) || '(no name)'}</a>`
+            : (escapeHtml(row.name) || '(no name)')}
+          ${row.linkedin_url ? `<a class="li-badge" href="${escapeHtml(row.linkedin_url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Open LinkedIn profile">in</a>` : ''}
+          <span class="email">${escapeHtml(row.email)}</span>
+        </td>
+        <td class="title-cell">${escapeHtml(row.suggested_title) || '<span class="mono">—</span>'}<div class="seniority">${escapeHtml(row.seniority)}</div></td>
+        <td>${renderChips(row.keywords)}</td>
+        <td>${escapeHtml(row.latest_role_applied) || '<span class="mono">—</span>'}</td>
+        <td><span class="pill ${cls}">${escapeHtml(stageLabel)}</span></td>
+        <td class="source">${escapeHtml(row.source) || '—'}</td>
+        <td class="mono">${row.num_applications}</td>
+      </tr>
+      <tr class="detail-row" data-detail-for="${row.id}" hidden>
+        <td colspan="8">
+          <div class="detail-grid">
+            <div>
+              <h4>Role history</h4>
+              ${row.roles_applied.length ? `<ul class="role-history">${row.roles_applied.map(r => `
+                <li><span class="job">${escapeHtml(r.job_title) || '(untitled job)'} — ${escapeHtml(r.stage)}</span><span class="date">${fmtDate(r.applied_at)}${r.rejected_at ? ' · rejected ' + fmtDate(r.rejected_at) : ''}</span></li>
+              `).join('')}</ul>` : '<span class="mono">No applications on record.</span>'}
+              <h4 style="margin-top:16px;">Past companies</h4>
+              ${renderCompanyChips(row.past_companies)}
+            </div>
+            <div>
+              <h4>Contact &amp; tags</h4>
+              <div style="font-size:12px;display:flex;flex-direction:column;gap:6px;">
+                <span>${row.phone ? escapeHtml(row.phone) : '<span class="mono">no phone</span>'}</span>
+                <span>${row.linkedin_url ? `<a href="${escapeHtml(row.linkedin_url)}" target="_blank" rel="noopener">${escapeHtml(row.linkedin_url)}</a>` : '<span class="mono">no linkedin</span>'}</span>
+                <span>${row.location ? escapeHtml(row.location) : '<span class="mono">no CV-stated location</span>'}</span>
+                ${renderChips(row.tt_tags)}
+              </div>
+            </div>
+          </div>
+          <h4 style="margin-top:16px;">Similar candidates</h4>
+          <div class="similar-container" data-similar-for="${row.id}"><span class="mono">Expand to compute…</span></div>
+          ${row.cv_text ? `<h4 style="margin-top:16px;">CV summary</h4><div class="cv-text">${escapeHtml(row.cv_text)}</div>` : ''}
+        </td>
+      </tr>
+    `;
+  }
+
+  function populateSelect(id, values){
+    const sel = document.getElementById(id);
+    Array.from(new Set(values.map(v => (v || '').trim()))).filter(Boolean).sort().forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v; opt.textContent = v;
+      sel.appendChild(opt);
+    });
+  }
+
+  // Boolean search: "senior AND react", "backend OR frontend", NOT intern,
+  // nested parens, and "quoted phrases". Bare words with no operator between
+  // them are implicitly AND-ed, so plain-text search still works as before.
+  function tokenizeQuery(q){
+    const tokens = [];
+    let i = 0;
+    while (i < q.length){
+      const ch = q[i];
+      if (/\s/.test(ch)){ i++; continue; }
+      if (ch === '(' || ch === ')'){ tokens.push(ch); i++; continue; }
+      if (ch === '"'){
+        let j = i + 1;
+        while (j < q.length && q[j] !== '"') j++;
+        tokens.push({type:'TERM', value:q.slice(i+1, j)});
+        i = j + 1;
+        continue;
+      }
+      let j = i;
+      while (j < q.length && !/[\s()]/.test(q[j])) j++;
+      const word = q.slice(i, j);
+      const upper = word.toUpperCase();
+      if (upper === 'AND' || upper === 'OR' || upper === 'NOT') tokens.push(upper);
+      else tokens.push({type:'TERM', value:word});
+      i = j;
+    }
+    return tokens;
+  }
+
+  function parseQuery(tokens){
+    let pos = 0;
+    const peek = () => tokens[pos];
+    const next = () => tokens[pos++];
+
+    function parseOr(){
+      let node = parseAnd();
+      while (peek() === 'OR'){ next(); node = {op:'OR', left:node, right:parseAnd()}; }
+      return node;
+    }
+    function parseAnd(){
+      let node = parseUnary();
+      while (peek() && peek() !== 'OR' && peek() !== ')'){
+        if (peek() === 'AND') next();
+        node = {op:'AND', left:node, right:parseUnary()};
+      }
+      return node;
+    }
+    function parseUnary(){
+      if (peek() === 'NOT'){ next(); return {op:'NOT', node:parseUnary()}; }
+      return parsePrimary();
+    }
+    function parsePrimary(){
+      const tok = next();
+      if (tok === '('){
+        const node = parseOr();
+        if (peek() === ')') next();
+        return node;
+      }
+      if (tok && tok.type === 'TERM') return {op:'TERM', value:tok.value.toLowerCase()};
+      return {op:'TERM', value:''};
+    }
+    return parseOr();
+  }
+
+  function evalQuery(node, haystack){
+    if (!node) return true;
+    switch (node.op){
+      case 'TERM': return node.value ? haystack.includes(node.value) : true;
+      case 'NOT': return !evalQuery(node.node, haystack);
+      case 'AND': return evalQuery(node.left, haystack) && evalQuery(node.right, haystack);
+      case 'OR': return evalQuery(node.left, haystack) || evalQuery(node.right, haystack);
+      default: return true;
+    }
+  }
+
+  function candidateHaystack(row){
+    return [row.name, row.suggested_title, row.latest_role_applied, row.location, row.cv_text,
+      ...(row.keywords||[]), ...(row.tt_tags||[]), ...(row.past_companies||[])]
+      .join(' ').toLowerCase();
+  }
+
+  // Similar candidates: cheap keyword/title/company overlap score, no
+  // embeddings — computed lazily, only when a row's detail panel is opened.
+  function similarityScore(seed, other){
+    const seedKw = new Set((seed.keywords||[]).map(k => k.toLowerCase()));
+    const sharedKeywords = (other.keywords||[]).filter(k => seedKw.has(k.toLowerCase()));
+    let score = sharedKeywords.length * 3;
+
+    const seedCo = new Set(seed.past_companies||[]);
+    const sharedCompanies = (other.past_companies||[]).filter(c => seedCo.has(c));
+    score += sharedCompanies.length * 2;
+
+    if (seed.seniority && seed.seniority === other.seniority) score += 1;
+
+    if (seed.suggested_title && other.suggested_title){
+      const a = new Set(seed.suggested_title.toLowerCase().split(/\s+/).filter(w => w.length > 2));
+      const b = new Set(other.suggested_title.toLowerCase().split(/\s+/).filter(w => w.length > 2));
+      let titleOverlap = 0;
+      a.forEach(w => { if (b.has(w)) titleOverlap++; });
+      score += titleOverlap * 2;
+    }
+    return {score, sharedKeywords, sharedCompanies};
+  }
+
+  function renderSimilarList(seedId){
+    const seed = DATA.find(r => r.id === seedId);
+    if (!seed || !(seed.keywords||[]).length){
+      return '<span class="mono">Not enough tagged data on this candidate to compare.</span>';
+    }
+    const ranked = DATA
+      .filter(other => other.id !== seed.id)
+      .map(other => ({other, ...similarityScore(seed, other)}))
+      .filter(r => r.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 6);
+    if (!ranked.length) return '<span class="mono">No close matches found in the current base.</span>';
+    return `<ul class="similar-list">${ranked.map(r => {
+      const shared = [...r.sharedKeywords.slice(0,3), ...r.sharedCompanies.slice(0,1)];
+      return `<li>
+        <span class="sim-name">${r.other.profile_url
+          ? `<a href="${escapeHtml(r.other.profile_url)}" target="_blank" rel="noopener">${escapeHtml(r.other.name)}</a>`
+          : escapeHtml(r.other.name)} <span class="mono">${escapeHtml(r.other.suggested_title || '')}</span></span>
+        ${shared.length ? `<span class="sim-shared">shares: ${shared.map(escapeHtml).join(', ')}</span>` : ''}
+      </li>`;
+    }).join('')}</ul>`;
+  }
+
+  function loadSavedSearches(){
+    try { return JSON.parse(localStorage.getItem(SAVED_SEARCHES_KEY) || '[]'); }
+    catch(e){ return []; }
+  }
+
+  function storeSavedSearches(list){
+    try { localStorage.setItem(SAVED_SEARCHES_KEY, JSON.stringify(list)); } catch(e){}
+  }
+
+  function currentFilterState(){
+    return {
+      q: document.getElementById('search').value,
+      stage: document.getElementById('filter-stage').value,
+      source: document.getElementById('filter-source').value,
+      seniority: document.getElementById('filter-seniority').value,
+      company: document.getElementById('filter-company').value,
+    };
+  }
+
+  function applyFilterState(state){
+    document.getElementById('search').value = state.q || '';
+    document.getElementById('filter-stage').value = state.stage || '';
+    document.getElementById('filter-source').value = state.source || '';
+    document.getElementById('filter-seniority').value = state.seniority || '';
+    document.getElementById('filter-company').value = state.company || '';
+    applyFilters();
+  }
+
+  function refreshSavedSelect(){
+    const sel = document.getElementById('saved-select');
+    const list = loadSavedSearches();
+    const current = sel.value;
+    sel.innerHTML = '<option value="">Saved searches…</option>' +
+      list.map((s, i) => `<option value="${i}">${escapeHtml(s.name)}</option>`).join('');
+    if (list[current]) sel.value = current;
+  }
+
+  function updateSelectionUI(){
+    document.getElementById('selection-count').textContent = `${SELECTED.size.toLocaleString()} selected`;
+    document.getElementById('export-csv-btn').disabled = SELECTED.size === 0;
+  }
+
+  function csvField(v){
+    const s = Array.isArray(v) ? v.join('; ') : (v == null ? '' : String(v));
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  function exportSelectedCsv(){
+    const cols = ['name','email','phone','linkedin_url','profile_url','suggested_title','seniority',
+      'location','keywords','past_companies','latest_role_applied','latest_stage','source'];
+    const rows = DATA.filter(r => SELECTED.has(r.id));
+    const csv = [cols.join(','), ...rows.map(r => cols.map(c => csvField(r[c])).join(','))].join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `candidate-shortlist-${rows.length}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function applyFilters(){
+    const q = document.getElementById('search').value.trim();
+    const stage = document.getElementById('filter-stage').value;
+    const source = document.getElementById('filter-source').value;
+    const seniority = document.getElementById('filter-seniority').value;
+    const company = document.getElementById('filter-company').value;
+    const queryTree = q ? parseQuery(tokenizeQuery(q.toLowerCase())) : null;
+
+    filtered = DATA.filter(row => {
+      if (stage && row.latest_stage !== stage) return false;
+      if (source && row.source !== source) return false;
+      if (seniority && row.seniority !== seniority) return false;
+      if (company && !(row.past_companies||[]).includes(company)) return false;
+      if (queryTree && !evalQuery(queryTree, candidateHaystack(row))) return false;
+      return true;
+    });
+    page = 0;
+    render();
+  }
+
+  function render(){
+    const tbody = document.getElementById('rows');
+    const start = page * PAGE_SIZE;
+    const pageRows = filtered.slice(start, start + PAGE_SIZE);
+    tbody.innerHTML = pageRows.map(renderRow).join('');
+    document.getElementById('empty-state').hidden = filtered.length !== 0;
+    document.getElementById('result-count').textContent = `${filtered.length.toLocaleString()} of ${DATA.length.toLocaleString()}`;
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const pag = document.getElementById('pagination');
+    pag.innerHTML = `
+      <button id="prev-page" ${page === 0 ? 'disabled' : ''}>← Prev</button>
+      <span>page ${page + 1} / ${totalPages}</span>
+      <button id="next-page" ${page >= totalPages - 1 ? 'disabled' : ''}>Next →</button>
+    `;
+    document.getElementById('prev-page').addEventListener('click', () => { page--; render(); });
+    document.getElementById('next-page').addEventListener('click', () => { page++; render(); });
+
+    tbody.querySelectorAll('tr.candidate-row').forEach(tr => {
+      tr.addEventListener('click', () => {
+        const detail = tbody.querySelector(`tr.detail-row[data-detail-for="${tr.dataset.id}"]`);
+        if (!detail) return;
+        detail.hidden = !detail.hidden;
+        if (!detail.hidden){
+          const container = detail.querySelector('.similar-container');
+          if (container && !container.dataset.loaded){
+            container.dataset.loaded = '1';
+            container.innerHTML = renderSimilarList(tr.dataset.id);
+          }
+        }
+      });
+    });
+
+    tbody.querySelectorAll('.row-select').forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (cb.checked) SELECTED.add(cb.dataset.id);
+        else SELECTED.delete(cb.dataset.id);
+        updateSelectionUI();
+      });
+    });
+
+    tbody.querySelectorAll('.chip.company').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('filter-company').value = chip.dataset.company;
+        applyFilters();
+        document.getElementById('rows').closest('.table-wrap').scrollTop = 0;
+      });
+    });
+
+    updateSelectionUI();
+  }
+
+  populateSelect('filter-stage', DATA.map(r => r.latest_stage));
+  populateSelect('filter-source', DATA.map(r => r.source));
+  populateSelect('filter-seniority', DATA.map(r => r.seniority));
+  populateSelect('filter-company', DATA.flatMap(r => r.past_companies || []));
+
+  document.getElementById('search').addEventListener('input', () => { applyFilters(); });
+  document.getElementById('filter-stage').addEventListener('change', applyFilters);
+  document.getElementById('filter-source').addEventListener('change', applyFilters);
+  document.getElementById('filter-seniority').addEventListener('change', applyFilters);
+  document.getElementById('filter-company').addEventListener('change', applyFilters);
+  document.getElementById('reset-filters').addEventListener('click', () => {
+    document.getElementById('search').value = '';
+    document.getElementById('filter-stage').value = '';
+    document.getElementById('filter-source').value = '';
+    document.getElementById('filter-seniority').value = '';
+    document.getElementById('filter-company').value = '';
+    applyFilters();
+  });
+
+  refreshSavedSelect();
+  document.getElementById('save-search-btn').addEventListener('click', () => {
+    const name = window.prompt('Name this search:');
+    if (!name) return;
+    const list = loadSavedSearches();
+    list.push({name, ...currentFilterState()});
+    storeSavedSearches(list);
+    refreshSavedSelect();
+  });
+  document.getElementById('saved-select').addEventListener('change', (e) => {
+    if (e.target.value === '') return;
+    const list = loadSavedSearches();
+    applyFilterState(list[Number(e.target.value)]);
+  });
+  document.getElementById('delete-search-btn').addEventListener('click', () => {
+    const sel = document.getElementById('saved-select');
+    if (sel.value === '') return;
+    const list = loadSavedSearches();
+    list.splice(Number(sel.value), 1);
+    storeSavedSearches(list);
+    refreshSavedSelect();
+  });
+
+  document.getElementById('export-csv-btn').addEventListener('click', exportSelectedCsv);
+  document.getElementById('clear-selection-btn').addEventListener('click', () => {
+    SELECTED.clear();
+    updateSelectionUI();
+    render();
+  });
+
+  render();
+})();
+</script>
