@@ -1,0 +1,1255 @@
+{
+	"id": 7009201,
+	"name": "Pre-Intake - Prep Question (Diane)",
+	"teamId": 67084,
+	"hookId": 3574803,
+	"blueprint": {
+		"flow": [
+			{
+				"id": 31,
+				"mapper": {},
+				"module": "gateway:CustomWebHook",
+				"version": 1,
+				"metadata": {
+					"designer": {
+						"x": 0,
+						"y": 0
+					}
+				},
+				"parameters": {
+					"hook": 3574803,
+					"maxResults": 1
+				}
+			},
+			{
+				"id": 2,
+				"filter": {
+					"name": "has JD link, not yet processed",
+					"conditions": [
+						[
+							{
+								"a": "{{31.description}}",
+								"b": "",
+								"o": "text:notequal"
+							},
+							{
+								"a": "{{31.description}}",
+								"b": "Intake questions:",
+								"o": "text:notcontain"
+							}
+						]
+					]
+				},
+				"mapper": {
+					"text": "{{31.description}}"
+				},
+				"module": "regexp:Parser",
+				"onerror": [
+					{
+						"id": 20,
+						"mapper": {
+							"$1": ""
+						},
+						"module": "builtin:Resume",
+						"version": 1,
+						"metadata": {
+							"designer": {
+								"x": 300,
+								"y": 300
+							}
+						},
+						"parameters": {}
+					}
+				],
+				"version": 1,
+				"metadata": {
+					"designer": {
+						"x": 300,
+						"y": 0
+					}
+				},
+				"parameters": {
+					"global": false,
+					"pattern": "([a-f0-9]{32})",
+					"multiline": false,
+					"sensitive": true,
+					"singleline": false,
+					"continueWhenNoRes": false
+				}
+			},
+			{
+				"id": 4,
+				"filter": {
+					"name": "JD id extracted",
+					"conditions": [
+						[
+							{
+								"a": "{{2.$1}}",
+								"b": "",
+								"o": "text:notequal"
+							}
+						]
+					]
+				},
+				"mapper": {
+					"qs": [],
+					"url": "/v1/pages/{{2.$1}}",
+					"method": "GET",
+					"headers": [],
+					"bodyType": "empty"
+				},
+				"module": "notion:makeApiCall",
+				"onerror": [
+					{
+						"id": 22,
+						"mapper": {
+							"body": "",
+							"headers": {},
+							"statusCode": ""
+						},
+						"module": "builtin:Resume",
+						"version": 1,
+						"metadata": {
+							"designer": {
+								"x": 600,
+								"y": 300
+							}
+						},
+						"parameters": {}
+					}
+				],
+				"version": 1,
+				"metadata": {
+					"designer": {
+						"x": 600,
+						"y": 0
+					}
+				},
+				"parameters": {
+					"__IMTCONN__": 8348430
+				}
+			},
+			{
+				"id": 11,
+				"mapper": {
+					"text": "{{4.body}}"
+				},
+				"module": "regexp:Parser",
+				"version": 1,
+				"metadata": {
+					"designer": {
+						"x": 900,
+						"y": 0
+					}
+				},
+				"parameters": {
+					"global": false,
+					"pattern": "\"plain_text\":\"([^\"]*)\"",
+					"multiline": false,
+					"sensitive": true,
+					"singleline": false,
+					"continueWhenNoRes": true
+				}
+			},
+			{
+				"id": 5,
+				"mapper": {
+					"qs": [],
+					"url": "/v1/blocks/{{2.$1}}/children",
+					"method": "GET",
+					"headers": [],
+					"bodyType": "empty"
+				},
+				"module": "notion:makeApiCall",
+				"onerror": [
+					{
+						"id": 21,
+						"mapper": {
+							"body": "",
+							"headers": {},
+							"statusCode": ""
+						},
+						"module": "builtin:Resume",
+						"version": 1,
+						"metadata": {
+							"designer": {
+								"x": 1200,
+								"y": 300
+							}
+						},
+						"parameters": {}
+					}
+				],
+				"version": 1,
+				"metadata": {
+					"designer": {
+						"x": 1200,
+						"y": 0
+					}
+				},
+				"parameters": {
+					"__IMTCONN__": 8348430
+				}
+			},
+			{
+				"id": 23,
+				"mapper": {
+					"object": "{{5.body}}"
+				},
+				"module": "json:TransformToJSON",
+				"version": 1,
+				"metadata": {
+					"designer": {
+						"x": 1500,
+						"y": 0
+					}
+				},
+				"parameters": {}
+			},
+			{
+				"id": 6,
+				"mapper": {
+					"model": "claude-haiku-4-5-20251001",
+					"messages": [
+						{
+							"role": "user",
+							"content": [
+								{
+									"text": "You are a recruiter about to have an intake meeting with the hiring manager for this role, to pressure-test this JD before you start sourcing. Below is the full JD (raw Notion block JSON — extract the text from the rich_text / plain_text fields):\n{{23.json}}\n\nGenerate CHALLENGING questions YOU (the recruiter) will ask the HIRING MANAGER — these are NOT candidate screening questions and NOT questions to ask a candidate. Actively look for inconsistencies in the JD and make the hiring manager defend or clarify them: does the job title actually match the stated mission/scope? Does the tech stack match what this person will really be doing day to day? Do the listed responsibilities match the seniority implied by the title? Is anything vague, contradictory, or overstated between the title, the mission, the stack, and the day-to-day tasks? These REPLACE the generic 'pick a bucket' profile-specific questions (Tech roles / Product / Revenue / Marketing / Customer Enablement) in the standard intake template, so every question must be grounded in something ACTUALLY written in THIS JD, not generic.\n\nHard rules on what to avoid — these questions must NEVER resemble or overlap with the standard intake template's own questions:\n- Do not ask about team vibe, how the team makes decisions, why the role exists, first-30-days expectations, a typical week, what's already built vs a blank page, must-haves vs nice-to-haves, the interview process, the panel, sourcing, or closing — the template already covers those.\n- Never ask what success looks like or how success will be measured, in any form, at any time horizon.\n- If a question could apply to any role rather than this specific JD's actual wording, it is wrong — rewrite it to cite something specific from the JD.\n\nOutput format is STRICT and MANDATORY, no exceptions even if the JD text looks incomplete or malformed — work with whatever JD content you have, never comment on its completeness:\n- Output EXACTLY 7 lines, nothing before line 1 and nothing after line 7\n- NO preamble, NO introduction, NO commentary, NO blank lines between values\n- The very first character of your output must be the first character of question 1\n\nLine 1: [must-ask challenge question 1]\nLine 2: [must-ask challenge question 2]\nLine 3: [must-ask challenge question 3]\nLine 4: [must-ask challenge question 4]\nLine 5: [must-ask challenge question 5]\nLine 6: [ask-if-relevant challenge question 1 — only include a real question if the JD genuinely warrants it; otherwise write None]\nLine 7: [ask-if-relevant challenge question 2 — same rule, or None if only one applies]\n\nRules:\n- Each question max 30 words\n- Phrase every question as something the RECRUITER asks the HIRING MANAGER — never a question addressed to a candidate\n- NO double quotes anywhere in the output\n- NO backslashes anywhere in the output\n- Each value on a single line, no line breaks within a value",
+									"type": "text"
+								}
+							],
+							"inputType": "multiple"
+						}
+					],
+					"max_tokens": 600,
+					"temperature": 0
+				},
+				"module": "anthropic-claude:createAMessage",
+				"version": 1,
+				"metadata": {
+					"designer": {
+						"x": 1800,
+						"y": 0
+					}
+				},
+				"parameters": {
+					"__IMTCONN__": 7541337
+				}
+			},
+			{
+				"id": 28,
+				"mapper": {
+					"object": {
+						"children": [
+							{
+								"type": "heading_2",
+								"heading_2": {
+									"rich_text": [
+										{
+											"text": {
+												"content": "Agenda at a glance"
+											},
+											"type": "text"
+										}
+									]
+								}
+							},
+							{
+								"type": "divider",
+								"divider": {}
+							},
+							{
+								"type": "toggle",
+								"toggle": {
+									"children": [
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Why does this role exist right now?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "A year from now — how do you know you hired the right person?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "What's the part of this job that would never make it onto the job description?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										}
+									],
+									"rich_text": [
+										{
+											"text": {
+												"content": "1. Start with the Why"
+											},
+											"type": "text",
+											"annotations": {
+												"bold": true
+											}
+										}
+									]
+								}
+							},
+							{
+								"type": "divider",
+								"divider": {}
+							},
+							{
+								"type": "toggle",
+								"toggle": {
+									"children": [
+										{
+											"type": "paragraph",
+											"paragraph": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Candidates don't join companies, they join teams."
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "How would you describe the team's vibe in three words?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "What kind of person has struggled here before?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "How does the team make decisions?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "What do you expect from this person in their first 30 days?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										}
+									],
+									"rich_text": [
+										{
+											"text": {
+												"content": "2. The Team"
+											},
+											"type": "text",
+											"annotations": {
+												"bold": true
+											}
+										}
+									]
+								}
+							},
+							{
+								"type": "divider",
+								"divider": {}
+							},
+							{
+								"type": "toggle",
+								"toggle": {
+									"children": [
+										{
+											"type": "paragraph",
+											"paragraph": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Now the job becomes tangible."
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "What does a typical week look like for this person?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "What are the top three things they're accountable for?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "What's landing on their desk in the first two quarters?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "What's already built, and what's a blank page?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										}
+									],
+									"rich_text": [
+										{
+											"text": {
+												"content": "3. The Role & Scope"
+											},
+											"type": "text",
+											"annotations": {
+												"bold": true
+											}
+										}
+									]
+								}
+							},
+							{
+								"type": "divider",
+								"divider": {}
+							},
+							{
+								"type": "toggle",
+								"toggle": {
+									"children": [
+										{
+											"type": "paragraph",
+											"paragraph": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Generated automatically from the JD instead of picking a generic bucket — pressure-tests title vs. mission vs. stack vs. day-to-day."
+														},
+														"type": "text",
+														"annotations": {
+															"italic": true
+														}
+													}
+												]
+											}
+										},
+										{
+											"type": "heading_3",
+											"heading_3": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Must-ask"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "{{trim(get(split(6.textResponse; newline); 1))}}"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "{{trim(get(split(6.textResponse; newline); 2))}}"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "{{trim(get(split(6.textResponse; newline); 3))}}"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "{{trim(get(split(6.textResponse; newline); 4))}}"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "{{trim(get(split(6.textResponse; newline); 5))}}"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "heading_3",
+											"heading_3": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Ask if relevant"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "{{trim(get(split(6.textResponse; newline); 6))}}"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "{{trim(get(split(6.textResponse; newline); 7))}}"
+														},
+														"type": "text"
+													}
+												]
+											}
+										}
+									],
+									"rich_text": [
+										{
+											"text": {
+												"content": "4. Role-specific — challenge the JD"
+											},
+											"type": "text",
+											"annotations": {
+												"bold": true
+											}
+										}
+									]
+								}
+							},
+							{
+								"type": "divider",
+								"divider": {}
+							},
+							{
+								"type": "toggle",
+								"toggle": {
+									"children": [
+										{
+											"type": "paragraph",
+											"paragraph": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Force a ranking now — or everything becomes a must-have in debriefs."
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "What are your top 3 hard requirements — things you won't compromise on?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "What would make you pass on an otherwise strong candidate?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										}
+									],
+									"rich_text": [
+										{
+											"text": {
+												"content": "5. Must-Have vs. Nice-to-Have"
+											},
+											"type": "text",
+											"annotations": {
+												"bold": true
+											}
+										}
+									]
+								}
+							},
+							{
+								"type": "divider",
+								"divider": {}
+							},
+							{
+								"type": "toggle",
+								"toggle": {
+									"children": [
+										{
+											"type": "paragraph",
+											"paragraph": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Set the rules of engagement now, not mid-search."
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Who else is involved in the process?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Is there a case study or technical test?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "How often do you want updates, and what's the best way to reach you for a quick call?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "What's the target start date?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "How many rounds, and how fast do we move once we have a finalist?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										}
+									],
+									"rich_text": [
+										{
+											"text": {
+												"content": "6. How We'll Work Together"
+											},
+											"type": "text",
+											"annotations": {
+												"bold": true
+											}
+										}
+									]
+								}
+							},
+							{
+								"type": "divider",
+								"divider": {}
+							},
+							{
+								"type": "toggle",
+								"toggle": {
+									"children": [
+										{
+											"type": "paragraph",
+											"paragraph": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Agree on this upfront — candidates notice when it's improvised."
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Who's on the panel, and what does each person assess?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Who has the final call?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "If there's a test or case study — who scores it, and against what?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Any internal candidates or referrals already in the mix?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "If you could only ask three questions in the recruiter screening to decide if someone is worth moving forward — what would they be?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										}
+									],
+									"rich_text": [
+										{
+											"text": {
+												"content": "7. The Interview Panel"
+											},
+											"type": "text",
+											"annotations": {
+												"bold": true
+											}
+										}
+									]
+								}
+							},
+							{
+								"type": "divider",
+								"divider": {}
+							},
+							{
+								"type": "toggle",
+								"toggle": {
+									"children": [
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Where have similar hires come from before?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Any companies or profiles we want to target — or avoid?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Remote, hybrid, or on-site? Any location constraints?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "If you had to sketch the ideal LinkedIn profile in 3 bullet points, what would it say?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Which communities, Slack groups, or newsletters does this type of person hang out in?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Any conferences or events where we'd find a concentration of these profiles?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Are we building a diverse slate? Any specific channels or communities to tap?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "bulleted_list_item",
+											"bulleted_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Who in your network looks like this person — 2 or 3 names, even if they're not available?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										}
+									],
+									"rich_text": [
+										{
+											"text": {
+												"content": "8. Sourcing"
+											},
+											"type": "text",
+											"annotations": {
+												"bold": true
+											}
+										}
+									]
+								}
+							},
+							{
+								"type": "divider",
+								"divider": {}
+							},
+							{
+								"type": "toggle",
+								"toggle": {
+									"children": [
+										{
+											"type": "paragraph",
+											"paragraph": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Selling the role is half the job. Don't skip this."
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "What's the strongest pitch for this role?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "What objections will top candidates have — and how do we handle them?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										},
+										{
+											"type": "numbered_list_item",
+											"numbered_list_item": {
+												"rich_text": [
+													{
+														"text": {
+															"content": "Is there anything I haven't asked that you think I really should?"
+														},
+														"type": "text"
+													}
+												]
+											}
+										}
+									],
+									"rich_text": [
+										{
+											"text": {
+												"content": "9. Closing"
+											},
+											"type": "text",
+											"annotations": {
+												"bold": true
+											}
+										}
+									]
+								}
+							}
+						]
+					}
+				},
+				"module": "json:TransformToJSON",
+				"version": 1,
+				"metadata": {
+					"designer": {
+						"x": 2100,
+						"y": 0
+					}
+				},
+				"parameters": {}
+			},
+			{
+				"id": 7,
+				"mapper": {
+					"page": "3c1d3fc42519805a8969f37cf784cc11",
+					"select": "page",
+					"content": "{{ifempty(11.$1; 31.summary)}} — Intake Meeting Questions"
+				},
+				"module": "notion:createAPage1",
+				"version": 1,
+				"metadata": {
+					"designer": {
+						"x": 2400,
+						"y": 0
+					}
+				},
+				"parameters": {
+					"__IMTCONN__": 8348430
+				}
+			},
+			{
+				"id": 8,
+				"mapper": {
+					"url": "/v1/blocks/{{7.id}}/children",
+					"body": "{{28.json}}",
+					"method": "PATCH",
+					"headers": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"bodyType": "raw"
+				},
+				"module": "notion:makeApiCall",
+				"version": 1,
+				"metadata": {
+					"designer": {
+						"x": 2700,
+						"y": 0
+					}
+				},
+				"parameters": {
+					"__IMTCONN__": 8348430
+				}
+			},
+			{
+				"id": 9,
+				"mapper": {
+					"text": "New Intake Meeting Questions page created for *{{ifempty(11.$1; 31.summary)}}*\n{{7.url}}",
+					"parse": false,
+					"mrkdwn": true,
+					"channel": "C0BAD2GUQMR",
+					"username": "Hiring-Robot",
+					"icon_emoji": ":wall-e:",
+					"channelType": "public",
+					"channelWType": "manualy"
+				},
+				"module": "slack:CreateMessage",
+				"version": 4,
+				"metadata": {
+					"designer": {
+						"x": 3000,
+						"y": 0
+					}
+				},
+				"parameters": {
+					"__IMTCONN__": 6723770
+				}
+			},
+			{
+				"id": 10,
+				"mapper": {
+					"event": "{{31.eventId}}",
+					"calendar": "diane.rocher@thephantomcompany.com",
+					"description": "{{substring(31.description; 0; if(indexOf(31.description; newline; indexOf(31.description; 2.$1)) = -1; length(31.description); indexOf(31.description; newline; indexOf(31.description; 2.$1))))}}\n📋 Intake questions: {{7.url}}{{substring(31.description; if(indexOf(31.description; newline; indexOf(31.description; 2.$1)) = -1; length(31.description); indexOf(31.description; newline; indexOf(31.description; 2.$1))))}}"
+				},
+				"module": "google-calendar:updateAnEvent",
+				"onerror": [
+					{
+						"id": 24,
+						"mapper": {},
+						"module": "builtin:Resume",
+						"version": 1,
+						"metadata": {
+							"designer": {
+								"x": 3300,
+								"y": 300
+							}
+						},
+						"parameters": {}
+					}
+				],
+				"version": 5,
+				"metadata": {
+					"designer": {
+						"x": 3300,
+						"y": 0
+					}
+				},
+				"parameters": {
+					"__IMTCONN__": 8503165
+				}
+			}
+		],
+		"name": "Pre-Intake - Prep Question (Diane)",
+		"metadata": {
+			"instant": true,
+			"version": 1,
+			"designer": {
+				"orphans": []
+			},
+			"scenario": {
+				"dlq": false,
+				"slots": null,
+				"dataloss": false,
+				"maxErrors": 3,
+				"autoCommit": true,
+				"roundtrips": 1,
+				"sequential": false,
+				"confidential": false,
+				"freshVariables": false,
+				"autoCommitTriggerLast": true
+			}
+		},
+		"scheduling": {
+			"type": "immediately",
+			"maximum_runs_per_minute": 100
+		},
+		"interface": {
+			"input": [],
+			"output": []
+		}
+	}
+}
