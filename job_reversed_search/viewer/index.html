@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Figma+React France — Leads</title>
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --card: #ffffff;
+    --border: #e5e3de;
+    --text: #23211d;
+    --muted: #736f68;
+    --accent: #b45309;
+    --accent-bg: #fdf1e2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  header {
+    padding: 28px 32px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .controls {
+    display: flex;
+    gap: 12px;
+    padding: 16px 32px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  input[type="search"] {
+    flex: 1;
+    min-width: 220px;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--card);
+    color: var(--text);
+  }
+  select {
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--card);
+    color: var(--text);
+  }
+  .count { color: var(--muted); font-size: 13px; white-space: nowrap; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+    vertical-align: middle;
+  }
+  th {
+    position: sticky;
+    top: 0;
+    background: var(--card);
+    cursor: pointer;
+    color: var(--muted);
+    font-weight: 600;
+    user-select: none;
+    z-index: 1;
+  }
+  th:hover { color: var(--text); }
+  tr:hover td { background: #faf9f7; }
+  .company {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
+  .company img {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    object-fit: cover;
+    background: #eee;
+  }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--accent-bg);
+    color: var(--accent);
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+  a.job-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  a.job-link:hover { text-decoration: underline; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .table-wrap { overflow-x: auto; }
+  .muted { color: var(--muted); }
+  footer {
+    padding: 20px 32px 40px;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Company reverse-search — Figma + React (France)</h1>
+    <div class="sub">LinkedIn job postings matching the Figma/React sourcing query · run 2026-08-14</div>
+  </header>
+
+  <div class="controls">
+    <input type="search" id="search" placeholder="Filter by company, title, or location…">
+    <select id="location-filter"><option value="">All locations</option></select>
+    <select id="workplace-filter"><option value="">All workplace types</option></select>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="leads-table">
+      <thead>
+        <tr>
+          <th data-key="companyName">Company</th>
+          <th data-key="jobTitle">Job title</th>
+          <th data-key="location">Location</th>
+          <th data-key="workplaceType">Workplace</th>
+          <th data-key="postedAt">Posted</th>
+          <th data-key="insights">Network</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="leads-body"></tbody>
+    </table>
+  </div>
+
+  <footer>Source: company_reverse_search_figma_react_france.json — served locally, not uploaded anywhere.</footer>
+</div>
+
+<script>
+let leads = [];
+let sortKey = null;
+let sortAsc = true;
+
+async function load() {
+  const res = await fetch('./leads.json');
+  leads = await res.json();
+  populateFilters();
+  render();
+}
+
+function populateFilters() {
+  const locs = [...new Set(leads.map(l => l.location).filter(Boolean))].sort();
+  const workplaces = [...new Set(leads.map(l => l.workplaceType).filter(Boolean))].sort();
+  const locSel = document.getElementById('location-filter');
+  const wpSel = document.getElementById('workplace-filter');
+  locs.forEach(l => {
+    const o = document.createElement('option');
+    o.value = l; o.textContent = l;
+    locSel.appendChild(o);
+  });
+  workplaces.forEach(w => {
+    const o = document.createElement('option');
+    o.value = w; o.textContent = w;
+    wpSel.appendChild(o);
+  });
+}
+
+function currentFilters() {
+  return {
+    q: document.getElementById('search').value.trim().toLowerCase(),
+    loc: document.getElementById('location-filter').value,
+    wp: document.getElementById('workplace-filter').value,
+  };
+}
+
+function render() {
+  const { q, loc, wp } = currentFilters();
+  let rows = leads.filter(l => {
+    if (loc && l.location !== loc) return false;
+    if (wp && l.workplaceType !== wp) return false;
+    if (q) {
+      const hay = `${l.companyName || ''} ${l.jobTitle || ''} ${l.location || ''}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if (sortKey) {
+    rows = rows.slice().sort((a, b) => {
+      const av = (a[sortKey] || '').toString().toLowerCase();
+      const bv = (b[sortKey] || '').toString().toLowerCase();
+      if (av < bv) return sortAsc ? -1 : 1;
+      if (av > bv) return sortAsc ? 1 : -1;
+      return 0;
+    });
+  }
+
+  document.getElementById('count').textContent = `${rows.length} of ${leads.length} leads`;
+
+  const body = document.getElementById('leads-body');
+  body.innerHTML = rows.map(l => `
+    <tr>
+      <td>
+        <div class="company">
+          ${l.logoUrl ? `<img src="${l.logoUrl}" alt="" onerror="this.style.display='none'">` : ''}
+          <span>${escapeHtml(l.companyName || '—')}</span>
+        </div>
+      </td>
+      <td>${escapeHtml(l.jobTitle || '—')}</td>
+      <td>${escapeHtml(l.location || '—')}</td>
+      <td>${l.workplaceType ? `<span class="tag">${escapeHtml(l.workplaceType)}</span>` : '<span class="muted">—</span>'}</td>
+      <td class="muted">${escapeHtml(l.postedAt || '—')}</td>
+      <td class="muted">${escapeHtml(l.insights || '—')}</td>
+      <td><a class="job-link" href="${l.jobUrl}" target="_blank" rel="noopener">View →</a></td>
+    </tr>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+document.getElementById('search').addEventListener('input', render);
+document.getElementById('location-filter').addEventListener('change', render);
+document.getElementById('workplace-filter').addEventListener('change', render);
+document.querySelectorAll('th[data-key]').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.dataset.key;
+    if (sortKey === key) sortAsc = !sortAsc;
+    else { sortKey = key; sortAsc = true; }
+    render();
+  });
+});
+
+load();
+</script>
+</body>
+</html>

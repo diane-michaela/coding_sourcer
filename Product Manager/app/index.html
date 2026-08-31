@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FDE React Candidates</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #f7f7f8; --panel: #ffffff; --border: #e2e2e6; --text: #1c1c1f;
+    --muted: #6b6b74; --accent: #3454d1; --hover: #f0f1fb; --tag-bg: #eef0fa;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #17181c; --panel: #1e1f24; --border: #2e2f36; --text: #ececef;
+      --muted: #96979f; --accent: #8ba4ff; --hover: #262832; --tag-bg: #262a3d; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  header {
+    padding: 20px 24px 12px; border-bottom: 1px solid var(--border); background: var(--panel);
+    position: sticky; top: 0; z-index: 10;
+  }
+  h1 { margin: 0 0 2px; font-size: 18px; }
+  .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 14px; }
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  input[type="search"], select {
+    background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    border-radius: 6px; padding: 7px 10px; font-size: 13px;
+  }
+  input[type="search"] { flex: 1; min-width: 200px; }
+  .count { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+  main { padding: 16px 24px 40px; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 1400px; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  th, td { padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  th { cursor: pointer; user-select: none; background: var(--panel); color: var(--muted);
+    font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.03em;
+    position: sticky; top: 0; }
+  th:hover { color: var(--text); }
+  th .arrow { opacity: 0.5; margin-left: 4px; }
+  tr:hover td { background: var(--hover); }
+  td.owner { min-width: 160px; }
+  td.repo { min-width: 220px; }
+  .name { font-weight: 600; }
+  .login { color: var(--muted); font-size: 12px; }
+  .bio { color: var(--muted); font-size: 12px; max-width: 260px; display: block;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .desc { color: var(--muted); font-size: 12.5px; max-width: 280px; display: block;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .readme { color: var(--text); font-size: 12.5px; max-width: 320px; display: -webkit-box;
+    -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .links a { margin-right: 8px; font-size: 12px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .tag { display: inline-block; background: var(--tag-bg); color: var(--accent);
+    border-radius: 4px; padding: 1px 6px; font-size: 11px; margin: 0 4px 2px 0; }
+  .stars { font-variant-numeric: tabular-nums; }
+  .empty-state { text-align: center; color: var(--muted); padding: 40px; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 20px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>FDE / React Candidates</h1>
+  <div class="sub">Sourced from GitHub — sourcing-only data, nothing pushed to Airtable/Sheets/Slack.</div>
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search name, login, bio, repo, description…">
+    <input type="search" id="keywords" placeholder="Keywords, comma-separated (e.g. agent, llm, design system)">
+    <select id="langFilter"><option value="">Any language</option></select>
+    <select id="countryFilter"><option value="">Any country</option></select>
+    <select id="queryFilter"><option value="">Any matched query</option></select>
+    <select id="minStars">
+      <option value="0">Any stars</option>
+      <option value="5">5+ stars</option>
+      <option value="20">20+ stars</option>
+      <option value="50">50+ stars</option>
+      <option value="100">100+ stars</option>
+    </select>
+    <span class="count" id="count"></span>
+  </div>
+</header>
+
+<main>
+  <table id="tbl">
+    <thead>
+      <tr>
+        <th data-key="owner_name">Owner</th>
+        <th data-key="repo_full_name">Repo</th>
+        <th data-key="description">Description</th>
+        <th data-key="readme_summary">What it's about (README)</th>
+        <th data-key="language">Language</th>
+        <th data-key="stars">Stars</th>
+        <th data-key="owner_location">Location</th>
+        <th data-key="pushed_at">Last pushed</th>
+        <th data-key="links">Links</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div id="emptyState" class="empty-state" style="display:none;">No rows match these filters.</div>
+</main>
+
+<footer id="footer"></footer>
+
+<script src="data.json.js"></script>
+<script>
+  let rows = window.__DATA__ || [];
+  let sortKey = "stars", sortDir = -1;
+
+  const $ = (id) => document.getElementById(id);
+  const qInput = $("q"), keywordsInput = $("keywords"), langSel = $("langFilter"),
+    countrySel = $("countryFilter"), querySel = $("queryFilter"), starsSel = $("minStars");
+
+  const UNKNOWN_COUNTRY = "__unknown__";
+
+  function populateFilterOptions() {
+    const langs = [...new Set(rows.map(r => r.language).filter(Boolean))].sort();
+    for (const l of langs) {
+      const o = document.createElement("option"); o.value = l; o.textContent = l;
+      langSel.appendChild(o);
+    }
+    const hasUnknown = rows.some(r => !r.owner_country);
+    const countries = [...new Set(rows.map(r => r.owner_country).filter(Boolean))].sort();
+    for (const c of countries) {
+      const o = document.createElement("option"); o.value = c; o.textContent = c;
+      countrySel.appendChild(o);
+    }
+    if (hasUnknown) {
+      const o = document.createElement("option"); o.value = UNKNOWN_COUNTRY; o.textContent = "Unknown location";
+      countrySel.appendChild(o);
+    }
+    const queries = [...new Set(rows.map(r => r.matched_query).filter(Boolean))];
+    queries.forEach((q, i) => {
+      const o = document.createElement("option");
+      o.value = q; o.textContent = `Query ${i + 1}: ${q.length > 50 ? q.slice(0, 50) + "…" : q}`;
+      querySel.appendChild(o);
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? "").replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return "";
+    return String(iso).slice(0, 10);
+  }
+
+  function linkRow(r) {
+    const links = [];
+    if (r.owner_linkedin) links.push(`<a href="${r.owner_linkedin}" target="_blank" rel="noopener">LinkedIn</a>`);
+    if (r.owner_blog) links.push(`<a href="${r.owner_blog}" target="_blank" rel="noopener">Site</a>`);
+    if (r.owner_x) links.push(`<a href="${r.owner_x}" target="_blank" rel="noopener">X</a>`);
+    if (r.owner_email) links.push(`<a href="mailto:${r.owner_email}">Email</a>`);
+    return links.join(" ") || "—";
+  }
+
+  function render() {
+    const q = qInput.value.trim().toLowerCase();
+    const keywords = keywordsInput.value.split(",").map(k => k.trim().toLowerCase()).filter(Boolean);
+    const lang = langSel.value;
+    const country = countrySel.value;
+    const query = querySel.value;
+    const minStars = Number(starsSel.value) || 0;
+
+    let filtered = rows.filter(r => {
+      if (lang && r.language !== lang) return false;
+      if (country) {
+        if (country === UNKNOWN_COUNTRY) { if (r.owner_country) return false; }
+        else if (r.owner_country !== country) return false;
+      }
+      if (query && r.matched_query !== query) return false;
+      if ((Number(r.stars) || 0) < minStars) return false;
+      if (q) {
+        const hay = [r.owner_name, r.owner_login, r.owner_bio, r.repo_full_name, r.description]
+          .join(" ").toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      if (keywords.length) {
+        // OR match: any keyword found anywhere in description/bio/README summary/matched query
+        const hay = [r.description, r.owner_bio, r.readme_summary, r.matched_query]
+          .join(" ").toLowerCase();
+        if (!keywords.some(k => hay.includes(k))) return false;
+      }
+      return true;
+    });
+
+    filtered.sort((a, b) => {
+      let av = a[sortKey], bv = b[sortKey];
+      if (sortKey === "stars") { av = Number(av) || 0; bv = Number(bv) || 0; }
+      if (av < bv) return -1 * sortDir;
+      if (av > bv) return 1 * sortDir;
+      return 0;
+    });
+
+    $("count").textContent = `${filtered.length} / ${rows.length} repos`;
+    $("emptyState").style.display = filtered.length ? "none" : "block";
+
+    const tbody = $("tbody");
+    tbody.innerHTML = filtered.map(r => `
+      <tr>
+        <td class="owner">
+          <span class="name">${escapeHtml(r.owner_name || r.owner_login)}</span><br>
+          <a class="login" href="${r.owner_url}" target="_blank" rel="noopener">@${escapeHtml(r.owner_login)}</a>
+          ${r.owner_bio ? `<span class="bio" title="${escapeHtml(r.owner_bio)}">${escapeHtml(r.owner_bio)}</span>` : ""}
+        </td>
+        <td class="repo">
+          <a href="${r.repo_url}" target="_blank" rel="noopener">${escapeHtml(r.repo_full_name)}</a>
+        </td>
+        <td><span class="desc" title="${escapeHtml(r.description)}">${escapeHtml(r.description) || "—"}</span></td>
+        <td><span class="readme" title="${escapeHtml(r.readme_summary)}">${escapeHtml(r.readme_summary) || "—"}</span></td>
+        <td>${r.language ? `<span class="tag">${escapeHtml(r.language)}</span>` : "—"}</td>
+        <td class="stars">★ ${r.stars ?? 0}</td>
+        <td>${escapeHtml(r.owner_country || r.owner_location) || "—"}</td>
+        <td>${fmtDate(r.pushed_at)}</td>
+        <td class="links">${linkRow(r)}</td>
+      </tr>
+    `).join("");
+  }
+
+  document.querySelectorAll("th[data-key]").forEach(th => {
+    th.addEventListener("click", () => {
+      const key = th.dataset.key;
+      if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = key === "stars" ? -1 : 1; }
+      render();
+    });
+  });
+
+  [qInput, keywordsInput, langSel, countrySel, querySel, starsSel].forEach(el => el.addEventListener("input", render));
+
+  populateFilterOptions();
+  render();
+  $("footer").textContent = rows.length
+    ? `${rows.length} candidates · local viewer, no data leaves this machine`
+    : "";
+</script>
+</body>
+</html>

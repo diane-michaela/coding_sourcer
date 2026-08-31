@@ -1,0 +1,396 @@
+<title>X Growth Pipeline</title>
+<style>
+  :root {
+    --bg: #f6f4f0;
+    --surface: #ffffff;
+    --fg: #201f1c;
+    --muted: #6f6b64;
+    --border: #ddd8d0;
+    --accent: #0f6f63;
+    --pill-live-bg: #e3f1ec;
+    --pill-live-fg: #0f6f63;
+    --pill-planned-bg: #eeece7;
+    --pill-planned-fg: #6f6b64;
+    --pill-paused-bg: #f3e8df;
+    --pill-paused-fg: #8a5a34;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15191a;
+      --surface: #1b2123;
+      --fg: #ece9e3;
+      --muted: #9b9d9a;
+      --border: #2c3335;
+      --accent: #3ec2ac;
+      --pill-live-bg: rgba(62, 194, 172, 0.16);
+      --pill-live-fg: #6fdcc6;
+      --pill-planned-bg: rgba(255, 255, 255, 0.07);
+      --pill-planned-fg: #b0b1ac;
+      --pill-paused-bg: rgba(198, 138, 86, 0.18);
+      --pill-paused-fg: #e5ac7c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #15191a;
+    --surface: #1b2123;
+    --fg: #ece9e3;
+    --muted: #9b9d9a;
+    --border: #2c3335;
+    --accent: #3ec2ac;
+    --pill-live-bg: rgba(62, 194, 172, 0.16);
+    --pill-live-fg: #6fdcc6;
+    --pill-planned-bg: rgba(255, 255, 255, 0.07);
+    --pill-planned-fg: #b0b1ac;
+    --pill-paused-bg: rgba(198, 138, 86, 0.18);
+    --pill-paused-fg: #e5ac7c;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+    margin: 0;
+    padding: 56px 24px 80px;
+  }
+
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .prose {
+    max-width: 700px;
+  }
+
+  h1 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: clamp(1.9rem, 1.5rem + 1.6vw, 2.6rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 8px;
+  }
+
+  .kicker {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 12px;
+  }
+
+  .lede {
+    font-size: 1.05rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  h2 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin: 0 0 6px;
+  }
+
+  .section-note {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin: 0 0 20px;
+  }
+
+  figure {
+    margin: 0;
+  }
+
+  .diagram-frame {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    overflow-x: auto;
+  }
+
+  .diagram-frame svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-width: 760px;
+    color: var(--fg);
+  }
+
+  figcaption {
+    margin-top: 14px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    max-width: 700px;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px 28px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .legend-swatch {
+    width: 22px;
+    height: 0;
+    border-top: 2.5px solid var(--fg);
+    flex-shrink: 0;
+  }
+
+  .legend-swatch.live { border-color: var(--accent); }
+  .legend-swatch.planned { border-color: var(--muted); border-top-style: dashed; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    font-size: 0.92rem;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  thead th {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    background: var(--bg);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .pill {
+    display: inline-block;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .pill.live { background: var(--pill-live-bg); color: var(--pill-live-fg); }
+  .pill.planned { background: var(--pill-planned-bg); color: var(--pill-planned-fg); }
+  .pill.paused { background: var(--pill-paused-bg); color: var(--pill-paused-fg); }
+
+  ol.next-steps {
+    padding-left: 22px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 700px;
+  }
+
+  ol.next-steps li strong {
+    font-weight: 600;
+  }
+</style>
+
+<div class="page">
+
+  <div class="prose">
+    <p class="kicker">RecOps sourcing &middot; personal branding</p>
+    <h1>X growth pipeline</h1>
+    <p class="lede">How the follower/following extraction, the engagement automations, and Diane's manual work fit together — what's already running, and what's still to build.</p>
+  </div>
+
+  <div>
+    <h2>The mechanism</h2>
+    <p class="section-note">Seeded from @HungLee today; the collector step is live, everything from dedupe onward is still to build.</p>
+    <figure>
+      <div class="diagram-frame">
+        <svg viewBox="0 0 1720 800" role="img" aria-label="Pipeline diagram: the Hung Lee seed feeds two live PhantomBuster collectors (followers, following); their output still needs to flow through a planned dedupe-and-tag step into a planned target list, which would fork into a planned automated-engagement path and a planned manual-reply path, both converging on audience growth alongside Diane's already-ongoing manual content posting; a planned feedback loop would refresh the seed list from that growth.">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+            </marker>
+            <marker id="arrowAccent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" style="fill:var(--accent)"></path>
+            </marker>
+          </defs>
+
+          <!-- edges: live (teal solid) -->
+          <g style="stroke:var(--accent)" stroke-width="2" fill="none">
+            <line x1="260" y1="285" x2="312" y2="285" marker-end="url(#arrowAccent)"></line>
+            <line x1="260" y1="300" x2="312" y2="450" marker-end="url(#arrowAccent)"></line>
+          </g>
+          <text x="286" y="275" font-size="11" text-anchor="middle" style="fill:var(--accent)">scrape followers</text>
+          <text x="300" y="395" font-size="11" text-anchor="middle" style="fill:var(--accent)" transform="rotate(52 300 395)">scrape following</text>
+
+          <!-- edges: manual/ongoing (solid currentColor) -->
+          <g stroke="currentColor" stroke-width="2" fill="none">
+            <line x1="1570" y1="130" x2="1570" y2="248" marker-end="url(#arrow)"></line>
+          </g>
+          <text x="1610" y="190" font-size="11" text-anchor="middle">3&ndash;5 posts / week</text>
+
+          <!-- edges: planned (dashed muted) -->
+          <g stroke="var(--muted)" stroke-width="1.75" stroke-dasharray="5 5" fill="none">
+            <line x1="260" y1="450" x2="312" y2="300" marker-end="url(#arrow)"></line>
+            <line x1="260" y1="465" x2="312" y2="465" marker-end="url(#arrow)"></line>
+
+            <line x1="540" y1="290" x2="596" y2="355" marker-end="url(#arrow)"></line>
+            <line x1="540" y1="460" x2="596" y2="400" marker-end="url(#arrow)"></line>
+
+            <line x1="820" y1="375" x2="876" y2="375" marker-end="url(#arrow)"></line>
+
+            <line x1="1100" y1="360" x2="1156" y2="295" marker-end="url(#arrow)"></line>
+            <line x1="1100" y1="390" x2="1156" y2="455" marker-end="url(#arrow)"></line>
+
+            <line x1="1380" y1="290" x2="1456" y2="330" marker-end="url(#arrow)"></line>
+            <line x1="1380" y1="460" x2="1456" y2="430" marker-end="url(#arrow)"></line>
+
+            <path d="M 1570 500 C 1570 600, 1570 660, 1460 665 L 160 665 C 130 665, 150 600, 150 500" marker-end="url(#arrow)"></path>
+          </g>
+
+          <g fill="var(--muted)" font-size="11">
+            <text x="480" y="315" text-anchor="middle">raw followers</text>
+            <text x="480" y="450" text-anchor="middle">raw following</text>
+            <text x="848" y="365" text-anchor="middle">merged +</text>
+            <text x="848" y="378" text-anchor="middle">deduped</text>
+            <text x="1128" y="315" text-anchor="middle">seed list</text>
+            <text x="1128" y="440" text-anchor="middle">seed list</text>
+            <text x="1420" y="295" text-anchor="middle">passive</text>
+            <text x="1420" y="480" text-anchor="middle">replies</text>
+            <text x="860" y="688" text-anchor="middle">refresh seed list every 2&ndash;3 weeks</text>
+          </g>
+
+          <!-- nodes -->
+          <!-- C1a seed live -->
+          <rect x="40" y="250" width="220" height="70" rx="10" fill="var(--surface)" style="stroke:var(--accent)" stroke-width="2"></rect>
+          <text x="150" y="278" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">@HungLee &mdash; seed</text>
+          <text x="150" y="296" text-anchor="middle" font-size="11" style="fill:var(--accent)">live</text>
+
+          <!-- C1b seed planned -->
+          <rect x="40" y="430" width="220" height="70" rx="10" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.75" stroke-dasharray="5 5"></rect>
+          <text x="150" y="458" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">+ 4&ndash;7 more seeds</text>
+          <text x="150" y="476" text-anchor="middle" font-size="11" fill="var(--muted)">not yet added</text>
+
+          <!-- C2a follower collector live -->
+          <rect x="320" y="250" width="220" height="70" rx="10" fill="var(--surface)" style="stroke:var(--accent)" stroke-width="2"></rect>
+          <text x="430" y="273" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Follower Collector</text>
+          <text x="430" y="291" text-anchor="middle" font-size="11" fill="var(--muted)">cap: 70 most recent</text>
+          <text x="430" y="306" text-anchor="middle" font-size="11" style="fill:var(--accent)">live &mdash; ran once</text>
+
+          <!-- C2b following collector live -->
+          <rect x="320" y="430" width="220" height="70" rx="10" fill="var(--surface)" style="stroke:var(--accent)" stroke-width="2"></rect>
+          <text x="430" y="453" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Following Collector</text>
+          <text x="430" y="471" text-anchor="middle" font-size="11" fill="var(--muted)">up to ~3,019, curated</text>
+          <text x="430" y="486" text-anchor="middle" font-size="11" style="fill:var(--accent)">live &mdash; ran once</text>
+
+          <!-- C3 merge+dedupe planned -->
+          <rect x="600" y="330" width="220" height="90" rx="10" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.75" stroke-dasharray="5 5"></rect>
+          <text x="710" y="368" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Merge + dedupe</text>
+          <text x="710" y="386" text-anchor="middle" font-size="11" fill="var(--muted)">single pool &mdash; seed's</text>
+          <text x="710" y="401" text-anchor="middle" font-size="11" fill="var(--muted)">audience is the filter</text>
+
+          <!-- C4 target list planned -->
+          <rect x="880" y="330" width="220" height="90" rx="10" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.75" stroke-dasharray="5 5"></rect>
+          <text x="990" y="368" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Target list</text>
+          <text x="990" y="386" text-anchor="middle" font-size="11" fill="var(--muted)">Google Sheet</text>
+          <text x="990" y="401" text-anchor="middle" font-size="11" fill="var(--muted)">phantom's native input</text>
+
+          <!-- C5a auto liker/follow planned -->
+          <rect x="1160" y="250" width="220" height="70" rx="10" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.75" stroke-dasharray="5 5"></rect>
+          <text x="1270" y="273" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Auto Liker / Follow</text>
+          <text x="1270" y="291" text-anchor="middle" font-size="11" fill="var(--muted)">10&ndash;50 / day, staggered</text>
+          <text x="1270" y="306" text-anchor="middle" font-size="11" fill="var(--muted)">against full list</text>
+
+          <!-- C5b manual replies planned -->
+          <rect x="1160" y="430" width="220" height="70" rx="10" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.75" stroke-dasharray="5 5"></rect>
+          <text x="1270" y="453" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Manual reply queue</text>
+          <text x="1270" y="471" text-anchor="middle" font-size="11" fill="var(--muted)">Diane, 20&ndash;30 min/day</text>
+          <text x="1270" y="486" text-anchor="middle" font-size="11" fill="var(--muted)">human-written, always</text>
+
+          <!-- content engine ongoing manual -->
+          <rect x="1460" y="60" width="220" height="70" rx="10" fill="var(--surface)" stroke="currentColor" stroke-width="1.75"></rect>
+          <text x="1570" y="88" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Content engine</text>
+          <text x="1570" y="106" text-anchor="middle" font-size="11" fill="var(--muted)">Diane's own posts</text>
+          <text x="1570" y="120" text-anchor="middle" font-size="11" fill="var(--muted)">ongoing, manual</text>
+
+          <!-- C6 growth -->
+          <rect x="1460" y="250" width="220" height="250" rx="10" fill="var(--surface)" stroke="currentColor" stroke-width="1.75"></rect>
+          <text x="1570" y="368" text-anchor="middle" font-size="14" font-weight="600" fill="currentColor">Visibility</text>
+          <text x="1570" y="388" text-anchor="middle" font-size="14" font-weight="600" fill="currentColor">&amp; growth</text>
+          <text x="1570" y="410" text-anchor="middle" font-size="11" fill="var(--muted)">the payoff</text>
+
+          <!-- legend -->
+          <g font-size="11" fill="var(--muted)">
+            <line x1="40" y1="740" x2="66" y2="740" style="stroke:var(--accent)" stroke-width="2.5"></line>
+            <text x="74" y="744">automation live now</text>
+
+            <line x1="230" y1="740" x2="256" y2="740" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 5"></line>
+            <text x="264" y="744">planned next step</text>
+
+            <line x1="420" y1="740" x2="446" y2="740" stroke="currentColor" stroke-width="2"></line>
+            <text x="454" y="744">manual / ongoing, not phantom automation</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>The two collectors are live and already ran once against @HungLee. Everything from the merge-and-dedupe step onward — the shared target list, the engagement fork, and the feedback loop that refreshes seeds from growth &mdash; is still to be built. No segment tagging: Hung Lee's own audience is already a filtered proxy for the RecOps/TA-ops/sourcing/Make.com audience, so one pooled list is enough. The target list is a Google Sheet rather than Airtable or a local file, since PhantomBuster's phantoms run on PhantomBuster's cloud and need a URL their servers can fetch &mdash; a local file isn't reachable, and a rendered page (like this one) isn't a fetchable CSV/sheet either. A separate one-time Auto Liker run already liked Hung Lee's 3 most recent tweets as an immediate warm-up touch, ahead of the list-driven version shown here. Diane's own content posting runs independently of this pipeline and already feeds growth today.</figcaption>
+    </figure>
+  </div>
+
+  <div>
+    <h2>Build status</h2>
+    <p class="section-note">What exists in the PhantomBuster account right now.</p>
+    <table>
+      <thead>
+        <tr><th>Component</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Follower Collector (@HungLee)</td><td><span class="pill live">live</span></td></tr>
+        <tr><td>Following Collector (@HungLee)</td><td><span class="pill live">live</span></td></tr>
+        <tr><td>Hung Lee Auto Liker (one-time, 3 tweets)</td><td><span class="pill live">live</span></td></tr>
+        <tr><td>Old Profile URL Finder daily schedule</td><td><span class="pill paused">paused</span></td></tr>
+        <tr><td>Merge + dedupe (single pool, no tagging)</td><td><span class="pill planned">planned</span></td></tr>
+        <tr><td>Target list (Google Sheet)</td><td><span class="pill planned">planned</span></td></tr>
+        <tr><td>List-driven Auto Liker / Auto Follow</td><td><span class="pill planned">planned</span></td></tr>
+        <tr><td>Manual reply routine against the list</td><td><span class="pill planned">planned</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <h2>Next steps</h2>
+    <ol class="next-steps">
+      <li><strong>Review collector output</strong> &mdash; actual counts returned and general audience fit.</li>
+      <li><strong>Merge + dedupe</strong> the two lists into one pool &mdash; no segment tagging, Hung Lee's audience is already the filter.</li>
+      <li><strong>Land the merged list in a Google Sheet</strong>, the format PhantomBuster's phantoms can actually read as input &mdash; not Airtable, not local, not an Artifact.</li>
+      <li><strong>Add 4&ndash;7 more seed accounts</strong> beyond Hung Lee, ideally sourced from Diane's own feed or keyword search rather than generic listicles &mdash; thin coverage found so far for the Make.com community specifically.</li>
+      <li><strong>Turn on Auto Follow</strong> against the merged list at conservative volume (10&ndash;20/day), only after review.</li>
+      <li><strong>Run the weekly routine</strong>: daily low-volume Auto Liker + Diane's 20&ndash;30 min manual reply block + 3&ndash;5 original posts/week.</li>
+    </ol>
+  </div>
+
+</div>

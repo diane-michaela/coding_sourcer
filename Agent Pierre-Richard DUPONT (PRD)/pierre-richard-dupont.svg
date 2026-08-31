@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <title>Pierre-Richard DUPONT (P.R.D.)</title>
+  <desc>Flat-icon portrait of Pierre-Richard DUPONT, the /PRD interviewer agent.</desc>
+
+  <rect x="0" y="0" width="400" height="400" rx="32" fill="#F6EFE4"/>
+
+  <!-- shoulders / torso -->
+  <path d="M95,400 L95,325 Q95,283 148,270 L252,270 Q305,283 305,325 L305,400 Z" fill="#2B2440"/>
+
+  <!-- collar -->
+  <path d="M182,270 L156,292 L182,288 Z" fill="#F6EFE4"/>
+  <path d="M218,270 L244,292 L218,288 Z" fill="#F6EFE4"/>
+
+  <!-- tie -->
+  <rect x="190" y="268" width="20" height="12" rx="3" fill="#C2492D"/>
+  <path d="M191,278 L209,278 L203,315 L197,315 Z" fill="#C2492D"/>
+
+  <!-- neck -->
+  <rect x="182" y="240" width="36" height="40" rx="10" fill="#E8B98A"/>
+
+  <!-- ears -->
+  <circle cx="130" cy="170" r="13" fill="#E8B98A"/>
+  <circle cx="270" cy="170" r="13" fill="#E8B98A"/>
+
+  <!-- head -->
+  <ellipse cx="200" cy="165" rx="70" ry="76" fill="#E8B98A"/>
+
+  <!-- hair -->
+  <path d="M131,140 A70,60 0 0 1 269,140 L269,118 A69,58 0 0 0 131,118 Z" fill="#2B2440"/>
+
+  <!-- eyebrows -->
+  <path d="M160,148 q14,-8 28,0" stroke="#2B2440" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M212,148 q14,-8 28,0" stroke="#2B2440" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+  <!-- glasses -->
+  <circle cx="176" cy="168" r="20" stroke="#2B2440" stroke-width="4" fill="none"/>
+  <circle cx="224" cy="168" r="20" stroke="#2B2440" stroke-width="4" fill="none"/>
+  <line x1="196" y1="168" x2="204" y2="168" stroke="#2B2440" stroke-width="4"/>
+  <line x1="156" y1="166" x2="146" y2="162" stroke="#2B2440" stroke-width="3"/>
+  <line x1="244" y1="166" x2="254" y2="162" stroke="#2B2440" stroke-width="3"/>
+
+  <!-- eyes -->
+  <circle cx="176" cy="168" r="3.5" fill="#2B2440"/>
+  <circle cx="224" cy="168" r="3.5" fill="#2B2440"/>
+
+  <!-- nose -->
+  <path d="M200,176 q-5,12 0,18" stroke="#2B2440" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- mustache -->
+  <path d="M154,200 C166,187 182,193 200,200 C218,193 234,187 246,200 C238,216 220,207 200,209 C180,207 162,216 154,200 Z" fill="#2B2440"/>
+
+  <!-- smile -->
+  <path d="M186,218 Q200,224 214,218" stroke="#2B2440" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- magnifying glass, the interviewer motif -->
+  <circle cx="305" cy="85" r="17" stroke="#C2492D" stroke-width="6" fill="none"/>
+  <line x1="317" y1="97" x2="333" y2="113" stroke="#C2492D" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- badge -->
+  <rect x="130" y="350" width="140" height="36" rx="18" fill="#2B2440"/>
+  <text x="200" y="374" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="bold" font-size="20" letter-spacing="3" fill="#F6EFE4">P.R.D.</text>
+</svg>
