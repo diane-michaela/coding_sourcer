@@ -54,3 +54,16 @@ LLM-wiki-vault
 # Generated candidate viewers (embed real candidate PII as inline JSON) — same
 # reason as the csv/xlsx exclusion above, just a different output format.
 *viewer.html
+data.json.js
+
+# OS junk / local shortcuts
+.DS_Store
+/Claude
+
+# Nested repos with their own remote — back up via their own git push,
+# not as a gitlink here. pb-daily-dashboard is company-owned (org repo),
+# excluded outright, not just deduped.
+/phantombuster-api/
+/coding_sourcer/
+/pb-daily-dashboard/
+/Teamtailor-sourced-candidates-per-job/

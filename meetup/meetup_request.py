@@ -23,8 +23,8 @@ headers = {
     "origin": "https://www.meetup.com",
     "priority": "u=1, i",
     "referer": (
-        "https://www.meetup.com/fr-fr/open-sourcer/events/314040194/"
-        "?eventOrigin=notifications&notificationId=%3Cinbox%3E%21333343546-1776857997173"
+        "https://www.meetup.com/figma-paris/events/262061926/"
+        "?eventOrigin=group_past_events"
     ),
     "sec-ch-ua": '"Google Chrome";v="147", "Not.A/Brand";v="8", "Chromium";v="147"',
     "sec-ch-ua-mobile": "?0",
@@ -42,7 +42,7 @@ headers = {
 payload = {
     "operationName": "getEventByIdForAttendees",
     "variables": {
-        "eventId": "314040194",
+        "eventId": "262061926",
         "first": 20,
         "filter": {
             "rsvpStatus": ["YES", "ATTENDED", "NO_SHOW", "EXCUSED_ABSENCE"]

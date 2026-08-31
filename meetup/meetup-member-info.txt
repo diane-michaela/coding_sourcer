@@ -1,0 +1,22 @@
+{operationName: "getSidebarInfo", variables: {memberId: "254527425"}, extensions: {,…}}
+extensions
+: 
+{,…}
+persistedQuery
+: 
+{version: 1, sha256Hash: "c0cd94d07bd64ba5b356aa8636a307fdd4661968ed1d7eda4305b58360b64a43"}
+sha256Hash
+: 
+"c0cd94d07bd64ba5b356aa8636a307fdd4661968ed1d7eda4305b58360b64a43"
+version
+: 
+1
+operationName
+: 
+"getSidebarInfo"
+variables
+: 
+{memberId: "254527425"}
+memberId
+: 
+"254527425"

@@ -1,0 +1,116 @@
+Request URL
+https://www.meetup.com/gql2
+Request Method
+POST
+Status Code
+200 OK
+Remote Address
+151.101.134.217:443
+Referrer Policy
+strict-origin-when-cross-origin
+
+:authority
+www.meetup.com
+:method
+POST
+:path
+/gql2
+:scheme
+https
+accept
+*/*
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+fr-FR
+apollographql-client-name
+nextjs-web
+baggage
+sentry-environment=production,sentry-release=30c955f8293b0d7276c3814de099afae4db10e3d,sentry-public_key=5d12cd2317664353456ab4c40d079af2,sentry-trace_id=ae1945f95c398637fa41f210a10b6a0e,sentry-org_id=6787,sentry-sampled=false,sentry-sample_rand=0.6756206712449033,sentry-sample_rate=0.1
+content-length
+358
+content-type
+application/json
+cookie
+MEETUP_BROWSER_ID=id=7b91b634-b5e4-45f0-8c3f-65f8cc4ee97c; SIFT_SESSION_ID=1017a73f-8fdf-41b7-94e6-0c76c5c678b8; USER_CHANGED_DISTANCE_FILTER=false; COOKIE_ID_PICOX_ID=769d4ac2-fcdf-47f1-8023-7f742196b50e; SIFT_SESSION_ID=1017a73f-8fdf-41b7-94e6-0c76c5c678b8; __stripe_mid=c75cc3d0-463e-49de-b8a0-390a8bb1731ec8bf07; __stripe_sid=947db1d0-a80e-4131-b2c6-f2541f1d0d0be9772b; g_state={"i_l":0,"i_ll":1777308506203,"i_e":{"enable_itp_optimization":0},"i_et":1777308506201}; MEETUP_LANGUAGE=language=fr&country=FR; __meetup_auth_access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiIzMzMzNDM1NDYiLCJuYmYiOjE3NzczMDg1MTMsInJvbGUiOiJmaXJzdF9wYXJ0eSIsImlzcyI6Ii5tZWV0dXAuY29tIiwicXVhbnR1bV9sZWFwZWQiOmZhbHNlLCJyZWZyZXNoX3Rva2Vuc19jaGFpbl9pZCI6IjBlMDBmOTA2LTNlZmQtNGFmMy04ZTgyLTBiNTExYjY5NzhjYyIsImV4cCI6MTc3NzMxMjExMywiaWF0IjoxNzc3MzA4NTEzLCJqdGkiOiJjNWYyMjIzYS03NWMwLTRhODUtOWM5Mi0yMDg0YmUyNzBkN2UifQ.NK4fT7Rdxut1qDzQ_VtrQuRd5EeXWcD2TYwnPH4ql8ACnhpp7py6JuZw5evmcAacUEjtIXl95yR2IolXBQYM1Q; isSpooner=false; MEETUP_SESSION=b75290e7-3641-4cbe-93a2-a8ca49893b32; memberId=333343546; MEETUP_CSRF=34b531db-07cb-4ca2-8e72-0a434adafab3; OptanonAlertBoxClosed=2026-04-27T16:48:36.822Z; eupubconsent-v2=CQjUWzAQjUWzAAcABBENCcFsAP_gAAAAAChQMYwHgBAACtAQkAhwBL4CbwFRALMAXmAwUBjIDUgGugPBAe0BPkCvcF0QXWguwC7MF3AXdgu-C9cF7QX-gwADAMGAwYJgwWDDMGGwYcAw_BiIGKoMWgxcBjEAAAAA.f_wAAAAAAAAA.IMYwGABAACtAQkAhwBL4CbwFRALMAXmAwUBjIDPgGpANdAeCA9oCPQE-QK9wXRBdqC7gMMwYbBhyDDwMQQYiBjEA; MEETUP_MEMBER_LOCATION_V2=city=Paris&country=fr&state=&name_string=Paris%252C+France&zip=meetup1&localized_country_name=fr&lat=48.86000061035156&lon=2.3399999141693115&isCountry=false&timeZone=Europe%252FParis; MEETUP_MEMBER_LOCATION=city=Paris&country=fr&state=&name_string=Paris%252C+France&zip=meetup1&localized_country_name=fr&lat=48.86000061035156&lon=2.3399999141693115&isCountry=false&timeZone=Europe%252FParis; _fbp=fb.1.1777308516903.96969253283334154; _hjSession_6522278=eyJpZCI6IjBjNTAwNTM0LTFiOGMtNGVjZS1iMjUzLTIyNTZmZDFiYmYzNiIsImMiOjE3NzczMDg1MTcyMDEsInMiOjAsInIiOjAsInNiIjowLCJzciI6MCwic2UiOjAsImZzIjoxfQ==; cookie=a5d43139-0f12-4929-b2b0-03e60d4b8ea1; cookie_cst=feZ9ow%3D%3D; _ga=GA1.2.417315372.1777308517; _gid=GA1.2.648708288.1777308517; __eoi=ID=df2e49c100fa97d7:T=1777308518:RT=1777308518:S=AA-AfjYuuwoZGsuhQ8XyeslwCen2; _ga_NP82XMKW0P=GS2.1.s1777308517$o1$g1$t1777308522$j58$l0$h0; RoktRecogniser=e5133966-6683-4d2a-97ed-fc95de80f6df; _hjSessionUser_6522278=eyJpZCI6IjdlNzc5NzYxLWY3OGYtNWFlNy04OTBmLWJiZWZlZmQ4NjY1MSIsImNyZWF0ZWQiOjE3NzczMDg1MTcyMDAsImV4aXN0aW5nIjp0cnVlfQ==; __Host-NEXT_MEETUP_CSRF=876e7b87-a853-45d8-a93f-979d1d82ad40; AMZN-Token=v2FweLxubVA1d3JpYjF2QThMejVXUjZqSlVTZkphcFVNd0hKTlVuSERHV2g1RXhlRHpDRHpNSVhDSWFBd2hsd0xJdUkvMzVsTkxnU0xFV0lSblFWRnYvMUZIcFk0Q1FUZm5DUWl3SDhhdkltZW5vRWRYVFh0VHV2K3pDSjBUQXV4N2ZidlFLdUY0Rm9GQ0E1RmJ1cW5uM3lrczZEVFpVbDNYRlBaZ2s1cUd6WUpKWnA0TS9WYTAwakJ5NHl0aGk0PWJrdgFiaXZ4HEowRS83Nys5QTFidnY3MGc3Nys5Q08rL3ZXTT3/; OptanonConsent=isGpcEnabled=0&datestamp=Mon+Apr+27+2026+18%3A49%3A53+GMT%2B0200+(heure+d%E2%80%99%C3%A9t%C3%A9+d%E2%80%99Europe+centrale)&version=202602.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=b9ebb762-df68-45e0-9112-ad9b01221898&interactionCount=3&isAnonUser=1&prevHadToken=0&landingPath=NotLandingPage&groups=C0004%3A0%2CC0003%3A1%2CC0002%3A1%2CC0001%3A1%2CV2STACK42%3A1&genVendors=V14%3A1%2CV17%3A1%2CV10%3A1%2CV6%3A1%2CV7%3A1%2CV13%3A1%2CV16%3A1%2CV15%3A1%2CV11%3A1%2CV12%3A1%2C&crTime=1777308518804&AwaitingReconsent=false&intType=1&geolocation=ES%3BAN
+dnt
+1
+origin
+https://www.meetup.com
+priority
+u=1, i
+referer
+https://www.meetup.com/fr-fr/open-sourcer/events/314040194/?eventOrigin=notifications&notificationId=%3Cinbox%3E%21333343546-1776857997173
+sec-ch-ua
+"Google Chrome";v="147", "Not.A/Brand";v="8", "Chromium";v="147"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"macOS"
+sec-fetch-dest
+empty
+sec-fetch-mode
+cors
+sec-fetch-site
+same-origin
+sentry-trace
+ae1945f95c398637fa41f210a10b6a0e-b906752875f834ba-0
+user-agent
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36 
+
+query: 
+{operationName: "getEventByIdForAttendees", variables: {eventId: "314040194", first: 20,…},…}
+extensions
+: 
+{,…}
+persistedQuery
+: 
+{version: 1, sha256Hash: "0ce7a205b999d4da76a331d142286f1fb4250cead193d3d6888aad258342bd7a"}
+sha256Hash
+: 
+"0ce7a205b999d4da76a331d142286f1fb4250cead193d3d6888aad258342bd7a"
+version
+: 
+1
+operationName
+: 
+"getEventByIdForAttendees"
+variables
+: 
+{eventId: "314040194", first: 20,…}
+eventId
+: 
+"314040194"
+filter
+: 
+{rsvpStatus: ["YES", "ATTENDED", "NO_SHOW", "EXCUSED_ABSENCE"]}
+rsvpStatus
+: 
+["YES", "ATTENDED", "NO_SHOW", "EXCUSED_ABSENCE"]
+0
+: 
+"YES"
+1
+: 
+"ATTENDED"
+2
+: 
+"NO_SHOW"
+3
+: 
+"EXCUSED_ABSENCE"
+first
+: 
+20
+sort
+: 
+{sortField: "RELEVANCE", sortOrder: "DESC", hostsFirst: true}
+hostsFirst
+: 
+true
+sortField
+: 
+"RELEVANCE"
+sortOrder
+: 
+"DESC"
