@@ -412,7 +412,7 @@
               "role": "user",
               "content": [
                 {
-                  "text": "Generate a TA screening kit for this role. Output exactly 11 lines, one value per line, in this exact order:\n\nLine 1: [must-have skill 1]\nLine 2: [must-have skill 2]\nLine 3: [must-have skill 3]\nLine 4: [must-have skill 4]\nLine 5: [project context: 100-150 words, one continuous line]\nLine 6: [screening question 1]\nLine 7: [screening question 2]\nLine 8: [screening question 3]\nLine 9: [red flag 1]\nLine 10: [red flag 2]\nLine 11: [closing recommendation]\n\nRole: {{4.role}}, Seniority: {{4.seniority}}, Department: {{4.department}}, HM: {{4.hm_name}}\nProject context: {{4.project_context}}\nTeam: {{4.team}}, Summary: {{4.summary}}\n\nRules:\n- Skills and red flags: max 15 words each\n- Screening questions: max 30 words each\n- Closing: max 20 words\n- NO double quotes anywhere in the output\n- NO backslashes anywhere in the output\n- Each value MUST be on a single line (no line breaks within a value)\n- Output ONLY the 11 values, one per line, nothing else",
+                  "text": "Generate a TA screening kit for this role. Output exactly 11 lines, one value per line, in this exact order:\n\nLine 1: [must-have skill 1]\nLine 2: [must-have skill 2]\nLine 3: [must-have skill 3]\nLine 4: [must-have skill 4]\nLine 5: [project context: 200-250 words, one continuous line]\nLine 6: [screening question 1]\nLine 7: [screening question 2]\nLine 8: [screening question 3]\nLine 9: [red flag 1]\nLine 10: [red flag 2]\nLine 11: [closing recommendation]\n\nRole: {{4.role}}, Seniority: {{4.seniority}}, Department: {{4.department}}, HM: {{4.hm_name}}\nProject context: {{4.project_context}}\nTeam: {{4.team}}, Summary: {{4.summary}}\n\nRules:\n- Skills and red flags: max 15 words each\n- Screening questions: max 30 words each\n- Closing: max 20 words\n- NO double quotes anywhere in the output\n- NO backslashes anywhere in the output\n- Each value MUST be on a single line (no line breaks within a value)\n- Output ONLY the 11 values, one per line, nothing else",
                   "type": "text"
                 }
               ],
@@ -861,13 +861,52 @@
                 }
               },
               {
+                "id": 221,
+                "mapper": {
+                  "object": "{{92.body}}"
+                },
+                "module": "json:TransformToJSON",
+                "onerror": [
+                  {
+                    "id": 2210,
+                    "mapper": {
+                      "json": ""
+                    },
+                    "module": "builtin:Resume",
+                    "version": 1,
+                    "metadata": {
+                      "expect": [
+                        {
+                          "name": "json",
+                          "type": "text",
+                          "label": "JSON string"
+                        }
+                      ],
+                      "restore": {},
+                      "designer": {
+                        "x": 4622,
+                        "y": -600
+                      }
+                    },
+                    "parameters": {}
+                  }
+                ],
+                "version": 1,
+                "metadata": {
+                  "designer": {
+                    "x": 4700,
+                    "y": -479
+                  }
+                }
+              },
+              {
                 "id": 93,
                 "mapper": {
                   "input": [],
                   "language": "python",
                   "inputFormat": "editor",
                   "dependencies": [],
-                  "codeEditorPython": "import re\n\nskills_raw = \"{{join(4.skills; \\\"|\\\")}}\"\nrole = \"{{4.role}}\"\ndepartment = \"{{4.department}}\"\n\nskills_raw = skills_raw.replace(\"\\\\\", \"\")\n\nskills = [s.strip() for s in skills_raw.split(\"|\") if s.strip()]\ntitles = [role] if role else []\nlocations = [\"France\", \"Portugal\", \"Spain\"]\n\n\ndef fmt(t):\n    return f'\"{t}\"' if \" \" in t else t\n\n\ndef or_group_hack(terms):\n    if not terms:\n        return \"\"\n    if len(terms) == 1:\n        return fmt(terms[0])\n    return \"(\" + fmt(terms[0]) + \" \" + \" \".join(f\"OR({fmt(t)})\" for t in terms[1:]) + \")\"\n\n\ndef or_group_plain(terms):\n    if not terms:\n        return \"\"\n    return \"(\" + \" OR \".join(fmt(t) for t in terms) + \")\"\n\n\nif skills:\n    rest = \" \".join(f\"AND({fmt(s)})\" for s in skills[1:])\n    skill_part = f\"{fmt(skills[0])} {rest}\".strip()\nelse:\n    skill_part = \"\"\ntitle_part = f\" AND({or_group_hack(titles)})\" if titles else \"\"\nlocation_part = f\" AND({or_group_hack(locations)})\" if locations else \"\"\nlinkedin_query = (skill_part + title_part + location_part).strip()\nlinkedin_valid = len(linkedin_query) <= 1000\n\nskills_group = f\"({' '.join(skills)})\" if skills else \"\"\ntitle_group = \"\"\nif titles:\n    title_group = \" (\" + \" OR \".join(f'intitle:\"{t}\"' if \" \" in t else f\"intitle:{t}\" for t in titles) + \")\"\nlocation_group = f\" {or_group_plain(locations)}\" if locations else \"\"\nexclusions = \" -site:linkedin.com -site:indeed.com -site:glassdoor.com\"\ngoogle_query = f\"{skills_group}{title_group}{location_group}{exclusions}\".strip()\ngoogle_words = len(google_query.split())\ngoogle_valid = google_words <= 32\n\nmeetup_skills_group = or_group_plain(skills)\nmeetup_location_group = or_group_plain(locations)\nmeetup_query = f\"site:meetup.com {meetup_skills_group} {meetup_location_group} inurl:/members/\".strip()\n\nCATEGORIES = [\n    (\"AI / ML / Data Science\", [\"ml\", \"machine learning\", \"data scien\", \"ai engineer\", \"ai researcher\", \"nlp\", \"llm\", \" ai \"]),\n    (\"Frontend / Mobile / Fullstack\", [\"frontend\", \"front-end\", \"front end\", \"mobile\", \"ios\", \"android\", \"fullstack\", \"full-stack\", \"full stack\"]),\n    (\"Backend\", [\"backend\", \"back-end\", \"back end\", \"api engineer\", \"server-side\"]),\n    (\"DevOps / SRE / Infrastructure\", [\"devops\", \"sre\", \"site reliability\", \"infrastructure\", \"platform engineer\", \"cloud engineer\", \"kubernetes\"]),\n    (\"Design\", [\"designer\", \"design\", \"ux\", \"ui \"]),\n    (\"Product\", [\"product manager\", \"product owner\", \" pm \", \"product lead\"]),\n    (\"Marketing / Growth\", [\"marketing\", \"growth\", \"seo\", \"content\"]),\n    (\"Sales / AE / BDR / SDR\", [\"sales\", \"account executive\", \" ae \", \"bdr\", \"sdr\"]),\n    (\"Customer Success / Enablement\", [\"customer success\", \"customer support\", \"enablement\", \"support\"]),\n    (\"Revenue / BizDev / Partnerships\", [\"revenue\", \"biz dev\", \"business development\", \"partnership\"]),\n    (\"Investor / VC / Advisor\", [\"investor\", \"vc\", \"venture\", \"advisor\"]),\n    (\"Other Engineering\", [\"engineer\", \"engineering\", \"qa\", \"test\", \"security\", \"embedded\", \"firmware\"]),\n]\n\ntext = f\" {role.lower()} {department.lower()} \"\nrole_bucket = \"Other / HR / Finance / Unknown\"\nfor name, kws in CATEGORIES:\n    if any(kw in text for kw in kws):\n        role_bucket = name\n        break\n\nresult = {\n    \"linkedin_query\": linkedin_query,\n    \"linkedin_valid\": linkedin_valid,\n    \"google_query\": google_query,\n    \"google_valid\": google_valid,\n    \"meetup_query\": meetup_query,\n    \"role_bucket\": role_bucket,\n}\n\nreturn result"
+                  "codeEditorPython": "import re\n\nskills_raw = \"{{join(4.skills; \\\"|\\\")}}\"\nrole = \"{{4.role}}\"\ndepartment = \"{{4.department}}\"\n\ndef sanitize(s):\n    s = s.replace(\"\\\\\", \"\")\n    for ch in ['\"', \"“\", \"”\", \"„\", \"‟\", \"«\", \"»\", \"″\"]:\n        s = s.replace(ch, \"\")\n    s = s.replace(\"\\n\", \" \").replace(\"\\r\", \" \").replace(\"\\t\", \" \")\n    return s.strip()\n\nrole_clean = sanitize(role)\ndepartment_clean = sanitize(department)\n\nskills_raw = skills_raw.replace(\"\\\\\", \"\")\nskills = [s.strip() for s in skills_raw.split(\"|\") if s.strip()]\n\nskill_terms = [sanitize(s).lower() for s in skills if sanitize(s)][:6]\nrole_conditions = [\n    f'SEARCH(LOWER(\"{role_clean.lower()}\"); LOWER({{latest_role_applied}})) > 0',\n    f'SEARCH(LOWER(\"{role_clean.lower()}\"); LOWER({{suggested_title}})) > 0',\n    f'SEARCH(LOWER(\"{department_clean.lower()}\"); LOWER({{keywords}})) > 0',\n] + [\n    f'SEARCH(LOWER(\"{skill}\"); LOWER({{keywords}})) > 0' for skill in skill_terms\n]\nairtable_formula = (\n    \"AND(\\n  OR(\\n    \"\n    + \",\\n    \".join(role_conditions)\n    + '\\n  ),\\n  OR({location} = \"France\", {location} = \"Portugal\", {location} = \"Spain\")\\n)'\n)\n\nmeetup_terms = skills[:2] + ([role] if role else [])\nmeetup_terms = meetup_terms[:3]\nmeetup_queries = \"\\n\".join(f'site:meetup.com \"{t}\" \"France\" \"members\"' for t in meetup_terms)\n\nCATEGORIES = [\n    (\"AI / ML / Data Science\", [\"ml\", \"machine learning\", \"data scien\", \"ai engineer\", \"ai researcher\", \"nlp\", \"llm\", \" ai \"]),\n    (\"Frontend / Mobile / Fullstack\", [\"frontend\", \"front-end\", \"front end\", \"mobile\", \"ios\", \"android\", \"fullstack\", \"full-stack\", \"full stack\"]),\n    (\"Backend\", [\"backend\", \"back-end\", \"back end\", \"api engineer\", \"server-side\"]),\n    (\"DevOps / SRE / Infrastructure\", [\"devops\", \"sre\", \"site reliability\", \"infrastructure\", \"platform engineer\", \"cloud engineer\", \"kubernetes\"]),\n    (\"Design\", [\"designer\", \"design\", \"ux\", \"ui \"]),\n    (\"Product\", [\"product manager\", \"product owner\", \" pm \", \"product lead\"]),\n    (\"Marketing / Growth\", [\"marketing\", \"growth\", \"seo\", \"content\"]),\n    (\"Sales / AE / BDR / SDR\", [\"sales\", \"account executive\", \" ae \", \"bdr\", \"sdr\"]),\n    (\"Customer Success / Enablement\", [\"customer success\", \"customer support\", \"enablement\", \"support\"]),\n    (\"Revenue / BizDev / Partnerships\", [\"revenue\", \"biz dev\", \"business development\", \"partnership\"]),\n    (\"Investor / VC / Advisor\", [\"investor\", \"vc\", \"venture\", \"advisor\"]),\n    (\"Other Engineering\", [\"engineer\", \"engineering\", \"qa\", \"test\", \"security\", \"embedded\", \"firmware\"]),\n]\n\ntext = f\" {role.lower()} {department.lower()} \"\nrole_bucket = \"Other / HR / Finance / Unknown\"\nfor name, kws in CATEGORIES:\n    if any(kw in text for kw in kws):\n        role_bucket = name\n        break\n\nresult = {\n    \"meetup_queries\": meetup_queries,\n    \"role_bucket\": role_bucket,\n    \"role_clean\": role_clean,\n    \"department_clean\": department_clean,\n    \"airtable_formula\": airtable_formula,\n}\n\nreturn result"
                 },
                 "module": "code:ExecuteCode",
                 "version": 1,
@@ -894,14 +933,14 @@
                       "role": "user",
                       "content": [
                         {
-                          "text": "Based on this role, generate the remaining parts of a Slack-ready sourcing brief using mrkdwn formatting (use *bold* not markdown **, use bullet points with •). Use web search to ground the market intelligence section in current, real sources — cite them inline as (Source: ...). The LinkedIn, Google X-ray, and Meetup search strings are generated separately by deterministic code and already default to France/Portugal/Spain — you do not need to write those.\n\nExisting job description for this role, if one was found (may be outdated — the intake meeting notes below take priority whenever they disagree with it):\n{{substring(ifempty(92.body; \"Not available\"); 0; 10000)}}\n\nWhen building the keyword list: treat the skills below (extracted from the intake meeting) as primary. Use the existing job description above only to ADD skills, tools, or requirements the meeting didn't mention — skip anything in it that conflicts with, or was clearly changed by, the meeting discussion.\n\nRole: {{4.role}}, Seniority: {{4.seniority}}, Department: {{4.department}}\nSkills mentioned: {{join(4.skills; \", \")}}\nTeam: {{4.team}}\n\nStructure the output exactly like this:\n\n*Keywords*\n[comma-separated deduplicated list of skills/tools/synonyms]\n\n*Tech stack alternatives*\n• [adjacent/equivalent tool 1] — instead of / alongside [named tool]\n• [adjacent/equivalent tool 2] — instead of / alongside [named tool]\n\n*Market intelligence — likely feeder companies*\n• [company 1] — [why]\n• [company 2] — [why]\n• [company 3] — [why]\n\nRules:\n- Output ONLY the brief, no preamble\n- Keep total length under 250 words\n- NO double quotes anywhere in the output\n- NO backslashes anywhere in the output",
+                          "text": "Based on this role, generate a Slack-ready sourcing brief using mrkdwn formatting (use *bold* not markdown **, use bullet points with •). Use web search to ground the market intelligence section in current, real sources — cite them inline as (Source: ...).\n\nExisting job description for this role, if one was found (may be outdated — the intake meeting notes below take priority whenever they disagree with it):\n{{substring(ifempty(221.json; \"Not available\"); 0; 10000)}}\n\nWhen building keywords: treat the skills below (extracted from the intake meeting) as primary. Use the existing job description above only to ADD skills, tools, or requirements the meeting didn't mention — skip anything in it that conflicts with, or was clearly changed by, the meeting discussion.\n\nRole: {{4.role}}, Seniority: {{4.seniority}}, Department: {{4.department}}\nSkills mentioned: {{join(4.skills; \", \")}}\nTeam: {{4.team}}\n\nStructure the output exactly like this:\n\n*Job titles*\n[3-6 plausible title variants for this role, comma-separated — synonyms, adjacent titles, seniority variants a real candidate might hold. Plain comma-separated list, no boolean syntax.]\n\n*Keywords*\nstrict: [term1 AND term2 AND term3] — core required skills only, real AND/OR words, plain double quotes only around multi-word terms\nbroad: [same structure but with 2-3 terms widened into an OR group using tech-stack alternatives, e.g. term1 AND (term2 OR alt2a OR alt2b) AND term3]\n\n*GitHub keywords*\n[5-8 specific words or short phrases someone would actually write in a public repo's README describing this kind of work — precise library/framework names, domain jargon, environment markers. NOT a boolean query, NOT the raw skill list restated.]\n\n*Tech stack alternatives*\n• [adjacent/equivalent tool 1] — instead of / alongside [named tool]\n• [adjacent/equivalent tool 2] — instead of / alongside [named tool]\n\n*Market intelligence — likely feeder companies*\n• [company 1] — [why] (Source: ...)\n• [company 2] — [why] (Source: ...)\n• [company 3] — [why] (Source: ...)\n\nRules:\n- Output ONLY the brief, no preamble\n- Keep total length under 300 words\n- Use real AND / OR words, never a function-style AND(...)/OR(...) notation\n- Do NOT include any location or country term anywhere in Job titles or Keywords — location gets added manually afterward\n- Plain straight double quotes only, never curly/smart quotes, never backslashes",
                           "type": "text"
                         }
                       ],
                       "inputType": "multiple"
                     }
                   ],
-                  "max_tokens": 1200,
+                  "max_tokens": 1400,
                   "temperature": 0
                 },
                 "module": "anthropic-claude:createAMessage",
@@ -975,7 +1014,7 @@
               {
                 "id": 81,
                 "mapper": {
-                  "text": ":mag: *Sourcing & Market Intelligence*\n\n*Boolean strings*\n• LinkedIn Recruiter: {{93.result.linkedin_query}}\n• Google X-ray: {{93.result.google_query}}\n• GitHub keywords: {{join(4.skills; \", \")}}\n• Meetup: {{93.result.meetup_query}}\n   (compare tools: https://freesourcingtools.com/tools/meetup/meetup-tools)\n\n{{80.textResponse}}",
+                  "text": ":mag: *Sourcing & Market Intelligence*\n\n{{80.textResponse}}\n\n*Meetup*\n{{93.result.meetup_queries}}\n   (compare tools: https://freesourcingtools.com/tools/meetup/meetup-tools)",
                   "parse": false,
                   "mrkdwn": true,
                   "channel": "{{7.body.channel.id}}",
@@ -1046,8 +1085,7 @@
                         "mapper": {
                           "base": "app5BF5NrOgR0kZIB",
                           "table": "tblAJIxcjQogp1Ltz",
-                          "formula": "SEARCH(LOWER(\"{{4.role}}\"), LOWER({latest_role_applied})) > 0",
-                          "maxRecords": "3",
+                          "formula": "{{93.result.airtable_formula}}",
                           "useColumnId": false
                         },
                         "module": "airtable:ActionSearchRecords",
@@ -1390,9 +1428,8 @@
                           "text": ":inbox_tray: *Already in Teamtailor* — {{103.name}} applied for _{{103.latest_role_applied}}_ ({{103.latest_stage}})\n{{103.profile_url}}",
                           "parse": false,
                           "mrkdwn": true,
-                          "channel": "{{7.body.channel.id}}",
+                          "channel": "C0BAD2GUQMR",
                           "username": "Hiring-Robot",
-                          "thread_ts": "{{12.ts}}",
                           "icon_emoji": ":wall-e:",
                           "channelType": "public",
                           "channelWType": "manualy"
@@ -1425,7 +1462,6 @@
                           ],
                           "table": "tbl01XKJ9ZQuADIcn",
                           "formula": "{role} = \"{{93.result.role_bucket}}\"",
-                          "maxRecords": "3",
                           "useColumnId": false
                         },
                         "module": "airtable:ActionSearchRecords",
@@ -1446,9 +1482,8 @@
                           "text": ":dart: *Already sourced* — {{104.fullName}} — {{104.linkedinJobTitle}} at {{104.companyName}}\n{{104.linkedinProfileUrl}}",
                           "parse": false,
                           "mrkdwn": true,
-                          "channel": "{{7.body.channel.id}}",
+                          "channel": "C0BAD2GUQMR",
                           "username": "Hiring-Robot",
-                          "thread_ts": "{{12.ts}}",
                           "icon_emoji": ":wall-e:",
                           "channelType": "public",
                           "channelWType": "manualy"
@@ -1728,6 +1763,31 @@
                   "bodyType": "raw"
                 },
                 "module": "notion:makeApiCall",
+                "onerror": [
+                  {
+                    "id": 501,
+                    "mapper": {
+                      "failNote": "\n⚠️ Content failed to save — this page may be blank, please check manually."
+                    },
+                    "module": "builtin:Resume",
+                    "version": 1,
+                    "metadata": {
+                      "expect": [
+                        {
+                          "name": "failNote",
+                          "type": "text",
+                          "label": "failNote"
+                        }
+                      ],
+                      "restore": {},
+                      "designer": {
+                        "x": 2723,
+                        "y": 130
+                      }
+                    },
+                    "parameters": {}
+                  }
+                ],
                 "version": 1,
                 "metadata": {
                   "designer": {
@@ -1742,7 +1802,7 @@
               {
                 "id": 17,
                 "mapper": {
-                  "text": "New TA screening kit created for *{{4.role}}* ({{4.seniority}})\n{{16.url}}",
+                  "text": "New TA screening kit created for *{{4.role}}* ({{4.seniority}})\n{{16.url}}{{ifempty(28.failNote; \"\")}}",
                   "parse": false,
                   "mrkdwn": true,
                   "channel": "C0BAD2GUQMR",
@@ -1914,6 +1974,45 @@
                 }
               },
               {
+                "id": 220,
+                "mapper": {
+                  "object": "{{22.body}}"
+                },
+                "module": "json:TransformToJSON",
+                "onerror": [
+                  {
+                    "id": 2200,
+                    "mapper": {
+                      "json": ""
+                    },
+                    "module": "builtin:Resume",
+                    "version": 1,
+                    "metadata": {
+                      "expect": [
+                        {
+                          "name": "json",
+                          "type": "text",
+                          "label": "JSON string"
+                        }
+                      ],
+                      "restore": {},
+                      "designer": {
+                        "x": 2890,
+                        "y": 520
+                      }
+                    },
+                    "parameters": {}
+                  }
+                ],
+                "version": 1,
+                "metadata": {
+                  "designer": {
+                    "x": 2900,
+                    "y": 407
+                  }
+                }
+              },
+              {
                 "id": 23,
                 "mapper": {
                   "model": "claude-haiku-4-5-20251001",
@@ -1922,14 +2021,14 @@
                       "role": "user",
                       "content": [
                         {
-                          "text": "You have two sources of context to write this job description.\n\n1. Role data extracted from the intake meeting:\nRole: {{4.role}}, Seniority: {{4.seniority}}, Department: {{4.department}}, HM: {{4.hm_name}}\nProject context: {{4.project_context}}\nTeam: {{4.team}}, Summary: {{4.summary}}\nKey responsibilities: {{join(4.key_responsibilities; newline)}}\n\n2. Additional context from the linked Notion page (JSON — extract the text content from rich_text fields). Ignore generic boilerplate sections if they appear — such as 'About PhantomBuster' / 'About Us', 'What's in it for you' / 'Benefits', or 'Hiring Process' / 'Recruitment Process'. These sections don't vary between roles and shouldn't factor into your comparison. Not every JD has these sections — only skip them when actually present. Focus your reading on role-specific content: responsibilities, requirements, team, and tech stack.\n{{substring(22.body; 0; 10000)}}\n\nOutput exactly 16 lines, one value per line, in this exact order:\n\nLine 1: [about the role — 1 sentence on the mission and opportunity, max 35 words]\nLine 2: [responsibility 1 — starts with action verb, max 15 words]\nLine 3: [responsibility 2 — starts with action verb, max 15 words]\nLine 4: [responsibility 3 — starts with action verb, max 15 words]\nLine 5: [responsibility 4 — starts with action verb, max 15 words]\nLine 6: [requirement 1 — skill or experience, max 12 words]\nLine 7: [requirement 2 — skill or experience, max 12 words]\nLine 8: [requirement 3 — skill or experience, max 12 words]\nLine 9: [requirement 4 — skill or experience, max 12 words]\nLine 10: [team context — 1 sentence on team impact, max 25 words]\nLine 11: [what makes this role exciting — 1 sentence, max 20 words]\nLine 12: [change 1 — a concrete difference between source 2 (the original JD) and this new JD v2, max 20 words. If nothing meaningfully changed, write 'No significant changes']\nLine 13: [change 2 — same format as line 12, or 'None' if fewer than 2 changes apply]\nLine 14: [change 3 — same format as line 12, or 'None' if fewer than 3 changes apply]\nLine 15: [incoherence 1 — something the hiring manager said in the intake meeting that conflicts with, or is missing from, the original JD, worth double-checking before publishing. Max 20 words. If none, write 'None identified']\nLine 16: [incoherence 2 — same format as line 15, or 'None' if only one incoherence applies]\n\nRules:\n- NO double quotes anywhere in the output\n- NO backslashes anywhere in the output\n- Each value MUST be on a single line, no line breaks within a value\n- Output ONLY the 16 values, nothing else",
+                          "text": "You have two sources of context.\n\n1. Role data extracted from the intake meeting:\nRole: {{4.role}}, Seniority: {{4.seniority}}, Department: {{4.department}}, HM: {{4.hm_name}}\nProject context: {{4.project_context}}\nTeam: {{4.team}}, Summary: {{4.summary}}\nKey responsibilities: {{join(4.key_responsibilities; newline)}}\n\n2. The ORIGINAL job description already published for this role (JSON — extract the text content from rich_text fields):\n{{substring(220.json; 0; 10000)}}\n\nYour job: produce an UPDATED version of this job description that incorporates what changed in the intake meeting, while keeping everything else — including generic boilerplate sections like 'About PhantomBuster' / 'About Us', 'What's in it for you' / 'Benefits', 'Hiring Process' / 'Recruitment Process' — exactly as in the original. Preserve the original's section order and headings. Only update role-specific content (responsibilities, requirements, team, seniority, tech stack) where the intake meeting notes indicate a change.\n\nRespond with ONLY a single valid JSON object, no markdown fences, no commentary, in exactly this shape:\n{\n  \"jd_blocks\": [\n    {\"type\": \"heading_2\", \"text\": \"Section heading\"},\n    {\"type\": \"paragraph\", \"text\": \"...\"},\n    {\"type\": \"bulleted_list_item\", \"text\": \"...\"},\n    {\"type\": \"numbered_list_item\", \"text\": \"...\"}\n  ],\n  \"changes_made\": [\"...\", \"...\"],\n  \"incoherencies\": [\"...\", \"...\"]\n}\n\nRules for \"jd_blocks\":\n- Reproduce the ENTIRE job description, section by section, in the original's own order — this is not a summary.\n- Use \"heading_2\" for section titles, \"paragraph\" for prose, \"bulleted_list_item\" / \"numbered_list_item\" for lists — match the original's own formatting choice per section where discernible.\n- Copy boilerplate sections verbatim (word-for-word) — do not alter or shorten them.\n- Only change the text of role-specific sections to reflect the intake meeting.\n- Each block's \"text\" max 1800 characters.\n\n\"changes_made\": one entry per concrete edit actually applied above, past tense, starting with what changed (e.g. \"Updated team from X to Y\", \"Added responsibility: ...\"). Max 20 words each. Include as many as genuinely apply — if truly nothing changed, use exactly one entry: \"No significant changes made\".\n\"incoherencies\": one entry per thing the hiring manager said in the intake meeting that conflicts with, or is missing from, the original JD and is worth double-checking before publishing. Max 20 words each. Include as many as genuinely apply — if none, use exactly one entry: \"None identified\".\n\nRules:\n- Output must be valid JSON — no trailing commas, use straight double quotes, escape any internal quotes properly\n- No text before or after the JSON object",
                           "type": "text"
                         }
                       ],
                       "inputType": "multiple"
                     }
                   ],
-                  "max_tokens": 900,
+                  "max_tokens": 4000,
                   "temperature": 0
                 },
                 "module": "anthropic-claude:createAMessage",
@@ -1966,298 +2065,18 @@
               {
                 "id": 96,
                 "mapper": {
-                  "object": {
-                    "children": [
-                      {
-                        "type": "heading_2",
-                        "heading_2": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "About the role"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "paragraph",
-                        "paragraph": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 1))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "heading_2",
-                        "heading_2": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "What you'll do"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 2))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 3))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 4))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 5))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "heading_2",
-                        "heading_2": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "What we're looking for"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 6))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 7))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 8))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 9))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "heading_2",
-                        "heading_2": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "Team & context"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "paragraph",
-                        "paragraph": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 10))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "paragraph",
-                        "paragraph": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 11))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "heading_2",
-                        "heading_2": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "Changes vs. JDv1"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 12))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 13))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 14))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "heading_2",
-                        "heading_2": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "Watch out — possible incoherencies"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 15))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "bulleted_list_item",
-                        "bulleted_list_item": {
-                          "rich_text": [
-                            {
-                              "text": {
-                                "content": "{{trim(get(split(23.textResponse; newline); 16))}}"
-                              },
-                              "type": "text"
-                            }
-                          ]
-                        }
-                      }
-                    ]
-                  }
+                  "input": [
+                    {
+                      "name": "claude_json",
+                      "value": "{{23.textResponse}}"
+                    }
+                  ],
+                  "language": "python",
+                  "inputFormat": "editor",
+                  "dependencies": [],
+                  "codeEditorPython": "import json\n\ndef block(btype, text):\n    return {\"type\": btype, btype: {\"rich_text\": [{\"type\": \"text\", \"text\": {\"content\": str(text)[:1900]}}]}}\n\ndef heading(text):\n    return block(\"heading_2\", text)\n\ndef paragraph(text):\n    return block(\"paragraph\", text)\n\ndef bullet(text):\n    return block(\"bulleted_list_item\", text)\n\nALLOWED_TYPES = {\"heading_1\", \"heading_2\", \"heading_3\", \"paragraph\", \"bulleted_list_item\", \"numbered_list_item\", \"quote\", \"to_do\"}\n\nclaude_raw = (input.get(\"claude_json\") or \"\").strip()\nif claude_raw.startswith(\"```\"):\n    claude_raw = claude_raw.strip(\"`\")\n    if claude_raw[:4].lower() == \"json\":\n        claude_raw = claude_raw[4:]\n    claude_raw = claude_raw.strip()\n\ntry:\n    parsed = json.loads(claude_raw)\nexcept Exception:\n    parsed = None\n\nif parsed is None:\n    jd_blocks_raw = []\n    changes_made = [\"(JD generation failed — check manually)\"]\n    incoherencies = [\"(JD generation failed — check manually)\"]\nelse:\n    jd_blocks_raw = parsed.get(\"jd_blocks\") or []\n    changes_made = parsed.get(\"changes_made\") or [\"No significant changes made\"]\n    incoherencies = parsed.get(\"incoherencies\") or [\"None identified\"]\n\njd_blocks = []\nfor b in jd_blocks_raw:\n    btype = b.get(\"type\") if isinstance(b, dict) else None\n    text = b.get(\"text\") if isinstance(b, dict) else None\n    if btype in ALLOWED_TYPES and text:\n        jd_blocks.append(block(btype, text))\n\nif not jd_blocks:\n    jd_blocks = [paragraph(\"(job description generation failed — check manually)\")]\n\nblocks = [heading(\"Job description\")]\nblocks += jd_blocks\nblocks.append(heading(\"What has been changed\"))\nblocks += [bullet(c) for c in changes_made]\nblocks.append(heading(\"Watch out — possible incoherencies\"))\nblocks += [bullet(i) for i in incoherencies]\n\nblocks = blocks[:100]\n\nresult = {\"children_json\": json.dumps({\"children\": blocks})}\n\nreturn result"
                 },
-                "module": "json:TransformToJSON",
+                "module": "code:ExecuteCode",
                 "version": 1,
                 "metadata": {
                   "designer": {
@@ -2272,7 +2091,7 @@
                 "mapper": {
                   "qs": [],
                   "url": "/v1/blocks/{{24.id}}/children",
-                  "body": "{{96.json}}",
+                  "body": "{{96.result.children_json}}",
                   "method": "PATCH",
                   "headers": [
                     {
@@ -2283,6 +2102,31 @@
                   "bodyType": "raw"
                 },
                 "module": "notion:makeApiCall",
+                "onerror": [
+                  {
+                    "id": 502,
+                    "mapper": {
+                      "failNote": "\n⚠️ Content failed to save — this page may be blank, please check manually."
+                    },
+                    "module": "builtin:Resume",
+                    "version": 1,
+                    "metadata": {
+                      "expect": [
+                        {
+                          "name": "failNote",
+                          "type": "text",
+                          "label": "failNote"
+                        }
+                      ],
+                      "restore": {},
+                      "designer": {
+                        "x": 4107,
+                        "y": 526
+                      }
+                    },
+                    "parameters": {}
+                  }
+                ],
                 "version": 1,
                 "metadata": {
                   "designer": {
@@ -2297,7 +2141,7 @@
               {
                 "id": 25,
                 "mapper": {
-                  "text": "New JD created for *{{4.role}}* ({{4.seniority}})\n{{24.url}}",
+                  "text": "New JD created for *{{4.role}}* ({{4.seniority}})\n{{24.url}}{{ifempty(30.failNote; \"\")}}",
                   "parse": false,
                   "mrkdwn": true,
                   "channel": "C0BAD2GUQMR",
