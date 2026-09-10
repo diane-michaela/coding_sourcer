@@ -1,7 +1,7 @@
 # Intake Meeting Automation — Make.com blueprints
 
 Two Make scenarios that automate the recruiter intake-meeting workflow. Last
-synced 2026-09-07 directly from Make's API (equivalent to Export Blueprint in
+synced 2026-09-10 directly from Make's API (equivalent to Export Blueprint in
 the UI). V1 is unchanged since the 2026-08-31 export; V2 was re-exported to
 capture the JD v2 rewrite and sourcing-brief overhaul below.
 
@@ -93,6 +93,19 @@ truth — these JSON files are a snapshot, re-export after making changes.
 - Modules 80/81 (V2) have `onerror → Resume` fallbacks added 2026-08-31 so a
   Claude/web_search or Slack post failure surfaces a diagnostic message in the
   thread instead of silently vanishing.
+- **Module 82 (V2, added 2026-09-10)** strips LLM reasoning/narration out of the
+  sourcing brief before it's posted. Module 80 uses Claude Sonnet with the
+  `web_search` tool, and its `textResponse` sometimes includes the model's own
+  planning text around the tool call (e.g. "I'll search for current market
+  intelligence... Now I'll create the Slack-ready sourcing brief...") — the
+  prompt's "Output ONLY the brief, no preamble" instruction isn't reliably
+  honored once tool use is involved. Rather than fight this with more prompt
+  wording, module 82 (`code:ExecuteCode`) deterministically finds the first
+  occurrence of `*Job titles*` (the brief's own required first line) in
+  `80.textResponse` and discards everything before it, with a regex fallback
+  (first `*bolded heading*`-shaped text) if that exact marker is missing.
+  Module 81 now reads `{{82.result.brief_clean}}` instead of
+  `{{80.textResponse}}` directly.
 - Modules 70/71 (V2, production only — not present on the test clone) auto-invite
   the hiring manager to the new Slack channel: module 70 lists all workspace
   members, module 71 filters on a diacritic-normalized, case-insensitive match
