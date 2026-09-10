@@ -1012,9 +1012,33 @@
                 }
               },
               {
+                "id": 82,
+                "mapper": {
+                  "input": [
+                    {
+                      "name": "brief_text",
+                      "value": "{{80.textResponse}}"
+                    }
+                  ],
+                  "language": "python",
+                  "inputFormat": "editor",
+                  "dependencies": [],
+                  "codeEditorPython": "raw = input.get(\"brief_text\") or \"\"\n\nmarker = \"*Job titles*\"\nidx = raw.find(marker)\nif idx == -1:\n    import re\n    m = re.search(r\"\\*[A-Za-z][^*\\n]{0,40}\\*\", raw)\n    idx = m.start() if m else 0\n\ncleaned = raw[idx:].strip()\n\nresult = {\"brief_clean\": cleaned}\n\nreturn result"
+                },
+                "module": "code:ExecuteCode",
+                "version": 1,
+                "metadata": {
+                  "designer": {
+                    "x": 5550,
+                    "y": -495
+                  }
+                },
+                "parameters": {}
+              },
+              {
                 "id": 81,
                 "mapper": {
-                  "text": ":mag: *Sourcing & Market Intelligence*\n\n{{80.textResponse}}\n\n*Meetup*\n{{93.result.meetup_queries}}\n   (compare tools: https://freesourcingtools.com/tools/meetup/meetup-tools)",
+                  "text": ":mag: *Sourcing & Market Intelligence*\n\n{{82.result.brief_clean}}\n\n*Meetup*\n{{93.result.meetup_queries}}\n   (compare tools: https://freesourcingtools.com/tools/meetup/meetup-tools)",
                   "parse": false,
                   "mrkdwn": true,
                   "channel": "{{7.body.channel.id}}",
