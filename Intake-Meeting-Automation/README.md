@@ -1,9 +1,10 @@
 # Intake Meeting Automation — Make.com blueprints
 
 Two Make scenarios that automate the recruiter intake-meeting workflow. Last
-synced 2026-09-10 directly from Make's API (equivalent to Export Blueprint in
+synced 2026-09-11 directly from Make's API (equivalent to Export Blueprint in
 the UI). V1 is unchanged since the 2026-08-31 export; V2 was re-exported to
-capture the JD v2 rewrite and sourcing-brief overhaul below.
+capture the already-sourced/already-in-TeamTailor redesign below (see
+"Architecture notes").
 
 These JSON files are the reproducible artifact of the automation logic. They are
 **not** plug-and-play — see "What you'll need to reconnect" below before importing
@@ -26,17 +27,66 @@ truth — these JSON files are a snapshot, re-export after making changes.
 
 - `blueprint_v2_intake-meeting-automation_6512042.json` — **V2, active build.**
   Triggered by a webhook fed from a Google Drive folder watch (new "Notes by
-  Gemini" doc after a Meet-recorded intake call). Extracts role data via Claude,
-  then in parallel: (a) creates a private Slack hiring channel, auto-invites the
-  hiring manager by matching `hm_name` against the workspace member list (diacritic-
-  normalized), invites a fixed recruiter user, posts a role recap + AI-generated
-  sourcing brief (job titles, boolean keywords, GitHub keywords, tech-stack
-  alternatives, market intel, already-sourced/TeamTailor candidates), (b) creates
-  a Notion "TA Screening Kit" page, (c) creates a Notion "JD v2" page containing
-  an updated job description merged from the original + the intake meeting.
+  Gemini" doc after a Meet-recorded intake call). Extracts role data via Claude
+  (role, department, skills, seniority, HM, **category** — see below), then in
+  parallel: (a) creates a private Slack hiring channel, auto-invites the hiring
+  manager by matching `hm_name` against the workspace member list (diacritic-
+  normalized), invites a fixed recruiter user, posts a role recap, then — behind
+  a router that splits so one branch's failure can't block the other — (a1) an
+  AI-generated sourcing brief (job titles, boolean keywords, GitHub keywords,
+  tech-stack alternatives, market intel) plus a keyword search against already-
+  in-TeamTailor candidates, and (a2) a Slack message linking to the pre-filtered
+  Airtable view of already-sourced candidates for that role's category, (b)
+  creates a Notion "TA Screening Kit" page, (c) creates a Notion "JD v2" page
+  containing an updated job description merged from the original + the intake
+  meeting.
 
 ## Architecture notes
 
+- **Already-sourced / already-in-TeamTailor lookup was redesigned on 2026-09-11**
+  (module 93, 103, 104→removed, 105, 106, plus a new router 111). The original
+  design searched Airtable with a role-title/department/`role_bucket` match
+  loosely OR'd together with every extracted skill — a single generic skill
+  match (e.g. "react") was enough to surface a candidate regardless of the
+  actual role, and the whole thing was gated behind Slack channel creation
+  succeeding, which silently killed both lookups whenever a same-day rerun hit
+  `name_taken` (see the `name_taken` note below — same root cause, this was the
+  second incident it caused). The new design:
+  - **Module 93** drops role-title/department matching entirely ("fuck les
+    jobs titles, je veux juste une recherche par mots clés" — 2026-09-11). It
+    sanitizes the extracted skills, filters out a hardcoded `WEAK_TERMS`
+    blocklist of generic/ubiquitous terms (javascript, react, git, agile,
+    communication, etc. — validated against real Airtable data: `pulumi`=1,
+    `ansible`=2, `aws`=284, `react`=518 out of ~6,400 candidates, confirming
+    rare terms are the strong signal), and **AND**s together the top 2-3
+    remaining ("strong") skills into the `teamtailor-candidates` formula —
+    a candidate must match all 2-3, not just one.
+  - **Already-sourced candidates (`sourced-targeted-companies`, module 104) no
+    longer runs an Airtable search at all.** That table has no per-candidate
+    skill/keyword field worth searching (only `linkedinSkillsLabel`/
+    `linkedinHeadline`, sparse); it already has a `role` singleSelect
+    "category" field though (13 values: DevOps/SRE/Infrastructure, Backend,
+    Frontend/Mobile/Fullstack, AI/ML/Data Science, Other Engineering, Product,
+    Design, Marketing/Growth, Sales/AE/BDR/SDR, Customer Success/Enablement,
+    Revenue/BizDev/Partnerships, Investor/VC/Advisor, Other/HR/Finance/Unknown).
+    Module 3's extraction prompt now also returns `category` (one of that
+    fixed list). Module 93 maps `category` → a pre-built Airtable **Interface**
+    page URL (base `app5BF5NrOgR0kZIB`, interface `pbd3HEd1NWAnjyxCl` "Sourced
+    Candidates by Category", one `visualization`/`grid` page per category with
+    a hard-set `recordScopeFilters` on `role`), and module 106 posts that single
+    link directly — no search, no per-record messages, no location filter
+    (sourcing is already country-scoped at collection time). Module 104 was
+    deleted from the blueprint.
+  - **A new router 111** splits Route 1 right after module 93 into two
+    independent branches: (A) the calendar/Notion JD lookup → Claude sourcing
+    brief → TeamTailor keyword search (modules 90/91/92/221/80/82/81/103/105),
+    and (B) the sourced-candidates link (module 106). Both branches still sit
+    behind Slack channel creation (module 7/14) — intentional now, since both
+    post into that per-role channel (`{{7.body.channel.id}}`, changed from the
+    old fixed `C0BAD2GUQMR` for modules 105/106) — but a failure in one branch
+    can no longer take out the other.
+  - `maxRecords` on the TeamTailor search (module 103) raised from the default
+    (10) to 50.
 - **JD v2 generation (module 23 + 96) rewrites and merges, it doesn't just diff.**
   Claude receives the original JD's content and the intake meeting's extracted
   data, and returns structured `jd_blocks` (typed `{type, text}` entries) that
@@ -52,7 +102,12 @@ truth — these JSON files are a snapshot, re-export after making changes.
   original JD verbatim and only appended a "what should be changed" suggestion
   list — the current version actually applies the changes into the JD body.
   Because Claude now regenerates the full JD text instead of a short diff list,
-  module 23's `max_tokens` is 4000 (was 1000).
+  module 23's `max_tokens` is 4000 (was 1000). Both module 15 (TA screening kit)
+  and module 23 (JD v2) explicitly instruct Claude to never name any person —
+  hiring manager, current team member, or anyone being replaced/reinforced —
+  and to describe the need functionally instead (e.g. "this role covers a
+  recent departure"). Added to module 23 on 2026-09-11 after a real generated
+  JD v2 named a departing employee; module 15 already had the equivalent rule.
 - Both scenarios build Notion page content via a **`json:TransformToJSON`**
   module (feeding a structured `object` mapper) rather than hand-typing raw JSON
   text with `{{}}` interpolations. This matters: Make's raw-body text fields have
@@ -132,10 +187,18 @@ Hardcoded IDs to replace for a different workspace:
 - Notion parent pages: `38bd3fc4251980db9253c0899aa483b9` (Interview Kit),
   `389d3fc42519803d9432cabafd45136e` (V2 JDs – Post-Intake),
   `3c1d3fc42519805a8969f37cf784cc11` (Past Intakes)
-- Slack: `C0BAD2GUQMR` (notifications test channel), `U02D68ST52S` (fixed invite
-  user)
+- Slack: `C0BAD2GUQMR` (fixed notifications channel — TA screening kit/JD v2
+  creation pings, modules 17/25 only; the already-sourced/already-in-TeamTailor
+  messages post into the dynamic per-role channel instead), `U02D68ST52S`
+  (fixed invite user)
 - Airtable: base `app5BF5NrOgR0kZIB`, tables `tblAJIxcjQogp1Ltz` (TeamTailor
   candidates) and `tbl01XKJ9ZQuADIcn` (sourced candidates)
+- Airtable **Interface** `pbd3HEd1NWAnjyxCl` ("Sourced Candidates by
+  Category") — 13 `visualization`/`grid` pages, one per `role` category value
+  on `tbl01XKJ9ZQuADIcn`, each with a hard-set `recordScopeFilters`. Module 93
+  hardcodes each page's URL in a `CATEGORY_LINKS` dict keyed by category name;
+  reproducing this elsewhere means recreating those 13 pages (or an equivalent
+  per-category filtered view/link) and updating that dict.
 - Google Calendar: `diane.rocher@thephantomcompany.com`
 - The webhook (V2, module 31) gets a brand-new URL on import — whatever posts to
   it (currently the Drive folder watch → Gemini notes pipeline) needs repointing.
