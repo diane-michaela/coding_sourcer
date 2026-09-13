@@ -19,15 +19,28 @@ for a `README.md` or `CLAUDE.md` inside before assuming behavior from folder nam
 | `coding_sourcer/` | Reusable template scripts for sourcing (GitHub, Hugging Face, Meetup, Make, TeamTailor) — starting points to adapt, not one-off scripts. |
 | `github_extraction/` | GitHub-based candidate/repo sourcing (production ML/NLP sourcer `lisp.py`). |
 | `Product Manager/` | Exploratory sourcing for PM/Designer/AI-Squad roles — no active req/budget as of 2026-07-27, nothing wired to production. Re-confirm scope before treating as real. |
-| `Intake meeting/` | Make.com scenario docs/blueprints for the hiring-intake automation. Live Make scenarios are the source of truth, not the JSON files here. |
-| `pb-daily-dashboard/` | Daily PhantomBuster dashboard (deployed via `render.yaml`). |
+| `Intake-Meeting-Automation/` | Make.com scenario docs/blueprints for the hiring-intake automation. Live Make scenarios are the source of truth, not the JSON files here. |
+| `pb-daily-dashboard/` | Daily PhantomBuster dashboard (scheduled via GitHub Actions, `.github/workflows/daily-dashboard.yml`). |
 | `Meetup/` | Meetup member/event extraction scripts. |
 | `huggingface/` | Hugging Face profile/model sourcing. |
 | `Agent Pierre-Richard DUPONT (PRD)/` | The `/PRD` Claude Code skill (prompt/brief sharpening) — installed globally via symlink at `~/.claude/skills/PRD`. |
+| `Agent Irina (LinkedIn Boolean Search)/` | Canonical source for the `Irina LinkedIn Lite` / `Irina LinkedIn Recruiter` Claude Code skills (JD/intake-notes → LinkedIn Boolean search) — `.claude/skills/Irina LinkedIn Lite` and `.claude/skills/Irina LinkedIn Recruiter` are symlinks into this folder, same pattern as the PRD skill above. |
+| `Agent Vlastelica (Intake Meeting Prep)/` | Canonical source for the `Vlastelica Intake Prep` Claude Code skill (JD → pre-intake-meeting advisory pass, distilled from John Vlastelica/Recruiting Toolbox's Talent Advisor material) — `.claude/skills/Vlastelica Intake Prep` is a symlink into this folder, same pattern as PRD/Irina above. Fires *before* an intake meeting exists (input is just a JD); complements, doesn't replace, the `Intake-Meeting-Automation/` Make scenarios. |
+| `Agent Bliard (X-Ray Search Beyond LinkedIn)/` | Canonical source for the `Agent Bliard` Claude Code skill (X-ray/Google search for sourcing outside LinkedIn — GitHub, Stack Overflow, Behance, Kaggle, Meetup, ADPList, Substack, company team pages, open-web resumes — named after Benoit Bliard/Search & Go, plus Glen Cathey and Irina Shamaeva) — `.claude/skills/Agent Bliard` is a symlink into this folder, same pattern as PRD/Irina/Vlastelica above. Defers to the Irina skills for anything LinkedIn-specific. |
+| `Agent Fortin (Market Mapping)/` | Canonical source for the `Fortin Market Mapping` Claude Code skill (maps a talent market — key employers, ecosystem, talent flow — before candidate-level sourcing starts, distilled from Pierre-André Fortin/Anara's published method) — `.claude/skills/Fortin Market Mapping` is a symlink into this folder, same pattern as PRD/Irina/Vlastelica/Bliard above. Sits upstream of Irina and Agent Bliard: produces a target-company list/market read, then hands off rather than building search strings itself. |
 | `LLM-wiki-vault/` | Symlink to the RecOps Obsidian vault (Google Drive) — gitignored, has its own `CLAUDE.md`. |
 
 ## Cross-cutting conventions
 
+- **LinkedIn Boolean search**: two tier-specific skills, canonically sourced from
+  `Agent Irina (LinkedIn Boolean Search)/` and symlinked into `.claude/skills/` (named after
+  Irina Shamaeva, co-author of the source book), turn a JD or intake-meeting brief into a search
+  string — **`Irina LinkedIn Lite`** (Diane's own account: no bulk import, no char-limit cap) and
+  **`Irina LinkedIn Recruiter`** (full Recruiter: has bulk CSV import for cross-referencing
+  external sources). Both cover the hidden operators (`headline:`, `summary:`, `skills:`...) and
+  why to avoid the Seniority/Function/Company-size/-type selection filters (50-80% of profiles
+  miss those values). Source material: `linkedin-advanced-search-techniques-ebook.md` in the
+  RecOps Obsidian wiki (`LLM-wiki-vault/2026/wiki/insights/`).
 - **Airtable writes**: generate a CSV for manual import rather than pushing via API directly,
   and split any import into batches of ≤1000 rows — Airtable silently drops fields beyond
   ~1100 rows in one batch.
