@@ -1,5 +1,15 @@
 # Reverse search — LinkedIn X-ray (monthly, GitHub Action)
 
+> **Status (2026-09-15): paused.** The pipeline is fully built and all 4 GitHub secrets
+> are set, but `GOOGLE_API_KEY` needs a GCP billing account linked to work — the Custom
+> Search JSON API returns `403 forbidden` without one, even within the free 100
+> queries/day quota. Decided not to add billing for now. The workflow's monthly
+> `schedule` trigger is commented out in `.github/workflows/reverse-search-linkedin-xray.yml`
+> so it doesn't fail-and-email every month — `workflow_dispatch` (manual run) still works
+> for testing. To resume: either link a GCP billing account (real cost should stay $0 at
+> this usage) or rework the search step to use PhantomBuster instead (see discussion in
+> git history / ask Diane), then uncomment the `schedule:` block.
+
 Veille mensuelle automatisee : X-ray Google (`site:linkedin.com/jobs/view ...`) via l'API
 Google Custom Search, dedoublonnage par ID LinkedIn, ecriture directe dans le Google Sheet
 ["AI Agent Framework — LinkedIn Job Leads (FR)"](https://docs.google.com/spreadsheets/d/1fkg2X10EHY6w4H1YLGjzWgZShX_5r6zWqc9dksAuecA/edit).

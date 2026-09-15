@@ -1,8 +1,12 @@
 name: Reverse Search — LinkedIn X-ray (Monthly)
 
 on:
-  schedule:
-    - cron: '0 6 1 * *'  # 1er de chaque mois, 06:00 UTC (~08:00 Paris en ete, ~07:00 en hiver)
+  # Schedule disabled 2026-09-15: blocked on GOOGLE_API_KEY requiring a GCP billing
+  # account (Custom Search JSON API returns 403 "forbidden" without one). Re-enable
+  # the schedule below once that's resolved (billing linked, or the search step is
+  # swapped to PhantomBuster). Manual runs via workflow_dispatch still work for testing.
+  # schedule:
+  #   - cron: '0 6 1 * *'  # 1er de chaque mois, 06:00 UTC (~08:00 Paris en ete, ~07:00 en hiver)
   workflow_dispatch: {}  # permet de le relancer manuellement depuis l'onglet Actions
 
 jobs:
