@@ -1,0 +1,29 @@
+name: Reverse Search — LinkedIn X-ray (Monthly)
+
+on:
+  schedule:
+    - cron: '0 6 1 * *'  # 1er de chaque mois, 06:00 UTC (~08:00 Paris en ete, ~07:00 en hiver)
+  workflow_dispatch: {}  # permet de le relancer manuellement depuis l'onglet Actions
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "reverse search (LinkedIn X-ray)"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install -r requirements.txt
+
+      - name: Run job watch
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          GOOGLE_SHEETS_CREDENTIALS_JSON: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS_JSON }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+        run: python scripts/linkedin_job_watch.py
