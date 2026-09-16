@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: "reverse search (LinkedIn X-ray)"
+        working-directory: "job_reversed_search"
     steps:
       - uses: actions/checkout@v4
 
@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - run: pip install -r requirements.txt
+      - run: pip install -r linkedin-xray-requirements.txt
 
       - name: Run job watch
         env:
@@ -30,4 +30,4 @@ jobs:
           GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
           GOOGLE_SHEETS_CREDENTIALS_JSON: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS_JSON }}
           SHEET_ID: ${{ secrets.SHEET_ID }}
-        run: python scripts/linkedin_job_watch.py
+        run: python linkedin-xray-scripts/linkedin_job_watch.py
