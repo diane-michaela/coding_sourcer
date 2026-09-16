@@ -57,9 +57,9 @@ TABS = {
     "Platform": {
         "range": "Platform!A:I",
         "queries": [
-            'site:linkedin.com/jobs/view Node.js TypeScript AWS Redis '
+            'site:fr.linkedin.com/jobs/view Node.js TypeScript AWS Redis '
             '(Pulumi OR Ansible OR Terraform OR "infrastructure as code") '
-            f'(PostgreSQL OR "relational database" OR Postgres) {FRANCE_KEYWORDS}'
+            '(PostgreSQL OR "relational database" OR Postgres)'
         ],
     },
     # "Frontend": {"range": "Frontend!A:I", "queries": [...]},   # TODO: define queries

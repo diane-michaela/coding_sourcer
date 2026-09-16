@@ -62,9 +62,11 @@ site:linkedin.com/jobs/view react figma (france OR paris OR bordeaux OR nantes O
 site:linkedin.com/jobs/view figma ("product manager" OR "chef de produit") (react OR frontend OR "product engineering") (france OR paris OR bordeaux OR nantes OR lyon OR toulouse OR "île-de-france")
 ```
 
-**Onglet Platform**
+**Onglet Platform** — restriction par sous-domaine `fr.linkedin.com` au lieu du groupe de
+mots-cles France (peut rater des offres francaises publiees sous `www.linkedin.com`, comme
+certaines lignes de l'onglet ML).
 ```
-site:linkedin.com/jobs/view Node.js TypeScript AWS Redis (Pulumi OR Ansible OR Terraform OR "infrastructure as code") (PostgreSQL OR "relational database" OR Postgres) (france OR paris OR bordeaux OR nantes OR lyon OR toulouse OR "île-de-france")
+site:fr.linkedin.com/jobs/view Node.js TypeScript AWS Redis (Pulumi OR Ansible OR Terraform OR "infrastructure as code") (PostgreSQL OR "relational database" OR Postgres)
 ```
 
 Toutes passent par `tbs: "qdr:m"` (dernier mois, equivalent Serper du `dateRestrict=m1` de
