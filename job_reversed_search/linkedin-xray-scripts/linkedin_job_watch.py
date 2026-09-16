@@ -82,9 +82,18 @@ TABS = {
 JOB_ID_RE = re.compile(r"-(\d{6,})(?:[/?#].*)?$")
 JOB_URL_RE = re.compile(r"linkedin\.com/jobs/view/", re.IGNORECASE)
 
+# Sous-domaines pays de LinkedIn (in.linkedin.com, uk.linkedin.com, ...) qui indiquent
+# une offre clairement hors France -- signal fiable (URL), contrairement au texte du
+# titre/extrait qui peut etre tronque par Serper avant de mentionner le pays.
+NON_FRANCE_SUBDOMAIN_RE = re.compile(
+    r"https?://(in|uk|us|ca|de|es|it|nl|au|ie|sg|ae|br|mx|jp|cn)\.linkedin\.com",
+    re.IGNORECASE,
+)
+
 # Seul vrai filtre job/France maintenant que `site:` n'est plus utilisable (voir plus
 # haut) : rejette les resultats dont le titre/extrait mentionne explicitement un pays
-# hors France.
+# hors France. Best-effort seulement -- un extrait tronque par Serper peut couper le
+# marqueur avant qu'il apparaisse en entier (ex. "United ..." avant "Kingdom").
 NON_FRANCE_MARKERS = (
     "united states", " usa", "united kingdom", "canada", "germany",
     "spain", "italy", "netherlands", "india", "poland",
@@ -101,6 +110,10 @@ def is_job_posting_url(url: str) -> bool:
     pages entreprise, etc.). C'est le seul filtre job/pas-job : `site:` n'est
     pas utilisable avec le forfait Serper gratuit (voir plus haut)."""
     return bool(JOB_URL_RE.search(url))
+
+
+def is_non_france_subdomain(url: str) -> bool:
+    return bool(NON_FRANCE_SUBDOMAIN_RE.match(url.strip()))
 
 
 def mentions_non_france_location(title: str, snippet: str) -> bool:
@@ -157,6 +170,8 @@ def search_all_results(query: str, max_results: int = 30):
         snippet = item.get("snippet", "")
 
         if not is_job_posting_url(link):
+            continue
+        if is_non_france_subdomain(link):
             continue
         if mentions_non_france_location(title, snippet):
             continue

@@ -23,12 +23,16 @@ dedoublonnage par ID LinkedIn, ecriture directe dans le Google Sheet
 **Limite a connaitre avant de laisser tourner ca en automatique :** le forfait Serper
 gratuit bloque `site:` et les guillemets, donc rien ne restreint la requete elle-meme a
 `linkedin.com/jobs/view` — tout le filtrage job/France se fait cote script
-(`is_job_posting_url` + `mentions_non_france_location`), pas garanti a 100%. Le script ne
-reproduit pas non plus le jugement applique a la main (reperer le bleed des blocs
-"Recherches similaires", distinguer une vraie offre Product Manager d'une simple mention
-en sidebar). Toute nouvelle ligne est donc ajoutee avec le statut
-`Needs review (auto-added)` plutot que d'etre silencieusement acceptee — a trancher une
-fois par mois, pas a relancer a la main.
+(`is_job_posting_url` + `is_non_france_subdomain` + `mentions_non_france_location`), pas
+garanti a 100%. Confirme sur le premier vrai run (2026-09-16) : deux offres en Inde ont
+été rattrapées par `is_non_france_subdomain` (sous-domaine `in.linkedin.com`, signal fiable
+cote URL), mais une offre US (San Jose, sans "United States" dans l'extrait) et une offre UK
+(extrait tronque par Serper avant que "United Kingdom" apparaisse en entier) sont quand meme
+passees — best-effort, pas parfait. Le script ne reproduit pas non plus le jugement applique
+a la main (reperer le bleed des blocs "Recherches similaires", distinguer une vraie offre
+Product Manager d'une simple mention en sidebar). Toute nouvelle ligne est donc ajoutee avec
+le statut `Needs review (auto-added)` plutot que d'etre silencieusement acceptee — a
+trancher une fois par mois, pas a relancer a la main.
 
 ## Onglets du Sheet
 
