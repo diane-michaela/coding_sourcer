@@ -6,7 +6,7 @@ both are visible at a glance instead of one hiding behind the other.
 
 | | Pipeline 1 — Company reverse-search | Pipeline 2 — Job Watch (ML & Product) |
 |---|---|---|
-| Covers | Figma+React France | ML + Product LinkedIn job postings, France |
+| Covers | Product France | ML + Product LinkedIn job postings, France |
 | Engine | PhantomBuster (LinkedIn Search Export) | Google Custom Search API (X-ray) |
 | Cadence | Weekly (Monday 09:00, Europe/Paris) | Monthly (GitHub Action, 1st of month) |
 | Output | CSV in this folder | Rows appended to a Google Sheet (2 tabs) |
