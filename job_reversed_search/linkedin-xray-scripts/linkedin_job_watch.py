@@ -1,6 +1,11 @@
 """
-Veille mensuelle LinkedIn (X-ray via Google Custom Search API) -> dedoublonnage ->
+Veille mensuelle LinkedIn (X-ray Google via l'API Serper) -> dedoublonnage ->
 ajout dans le Google Sheet "AI Agent Framework - LinkedIn Job Leads (FR)".
+
+Serper renvoie les vrais resultats de recherche Google (pas un index tiers comme
+Tavily) -- c'est un relais vers Google, pas un moteur de recherche independant.
+Utilise a la place de l'API officielle Google Custom Search JSON, fermee aux
+nouveaux clients et qui s'arrete le 1er janvier 2027 pour tout le monde.
 
 Toute nouvelle ligne est marquee "Needs review (auto-added)" : le filtrage fin
 qu'on applique a la main (bleed des blocs "Recherches similaires", distinguer
@@ -15,14 +20,13 @@ a completer dans TABS une fois les mots-cles choisis (voir README.md).
 import os
 import re
 import json
-import time
+import requests
 
 from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
 
 SHEET_ID = os.environ["SHEET_ID"]
-GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
-GOOGLE_CSE_ID = os.environ["GOOGLE_CSE_ID"]
+SERPER_API_KEY = os.environ["SERPER_API_KEY"]
 SHEETS_CREDENTIALS_JSON = os.environ["GOOGLE_SHEETS_CREDENTIALS_JSON"]
 
 SHEETS_SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
@@ -64,9 +68,9 @@ TABS = {
 JOB_ID_RE = re.compile(r"-(\d{6,})(?:[/?#].*)?$")
 JOB_URL_RE = re.compile(r"linkedin\.com/jobs/view/", re.IGNORECASE)
 
-# Garde-fou en plus du `site:linkedin.com/jobs/view` de la requete : au cas ou
-# Google laisse passer une page hors-sujet (profil, pages entreprise) ou hors
-# France, on filtre aussi cote script.
+# Garde-fou en plus du `site:linkedin.com/jobs/view` et du `gl: "fr"` de la
+# requete : au cas ou Google laisse passer une page hors-sujet (profil, pages
+# entreprise) ou hors France, on filtre aussi cote script.
 NON_FRANCE_MARKERS = (
     "united states", " usa", "united kingdom", "canada", "germany",
     "spain", "italy", "netherlands", "india", "poland",
@@ -96,10 +100,6 @@ def get_sheets_service():
     return build("sheets", "v4", credentials=creds)
 
 
-def get_search_service():
-    return build("customsearch", "v1", developerKey=GOOGLE_API_KEY)
-
-
 def read_existing_ids(sheets_service, sheet_range: str) -> set[str]:
     resp = (
         sheets_service.spreadsheets()
@@ -119,39 +119,34 @@ def read_existing_ids(sheets_service, sheet_range: str) -> set[str]:
     return ids
 
 
-def search_all_results(search_service, query: str, max_results: int = 30):
-    """Pagine sur l'API Custom Search (10 resultats par page, dateRestrict = dernier mois)."""
+def search_all_results(query: str, max_results: int = 30):
+    """Recherche Google (vrai SERP, via Serper) sur le dernier mois, France en priorite."""
+    response = requests.post(
+        "https://google.serper.dev/search",
+        headers={"X-API-KEY": SERPER_API_KEY, "Content-Type": "application/json"},
+        json={
+            "q": query,
+            "gl": "fr",
+            "num": max_results,
+            "tbs": "qdr:m",  # dernier mois, equivalent du dateRestrict=m1 de Google CSE
+        },
+        timeout=30,
+    )
+    response.raise_for_status()
+
     results = []
-    start = 1
-    while start <= max_results:
-        resp = (
-            search_service.cse()
-            .list(
-                q=query,
-                cx=GOOGLE_CSE_ID,
-                dateRestrict="m1",
-                start=start,
-            )
-            .execute()
-        )
-        items = resp.get("items", [])
-        if not items:
-            break
+    for item in response.json().get("organic", []):
+        link = item.get("link", "")
+        title = item.get("title", "")
+        snippet = item.get("snippet", "")
 
-        for item in items:
-            link = item.get("link", "")
-            title = item.get("title", "")
-            snippet = item.get("snippet", "")
+        if not is_job_posting_url(link):
+            continue
+        if mentions_non_france_location(title, snippet):
+            continue
 
-            if not is_job_posting_url(link):
-                continue
-            if mentions_non_france_location(title, snippet):
-                continue
+        results.append({"title": title, "link": link, "snippet": snippet})
 
-            results.append(item)
-
-        start += 10
-        time.sleep(1)  # reste sage vis-a-vis du quota
     return results
 
 
@@ -184,7 +179,6 @@ def build_row(item: dict) -> list[str]:
 
 def run():
     sheets_service = get_sheets_service()
-    search_service = get_search_service()
 
     summary = {}
 
@@ -194,7 +188,7 @@ def run():
         new_rows = []
 
         for query in cfg["queries"]:
-            for item in search_all_results(search_service, query):
+            for item in search_all_results(query):
                 link = item.get("link", "")
                 job_id = extract_job_id(link)
                 if not job_id or job_id in existing_ids or job_id in seen_this_run:
