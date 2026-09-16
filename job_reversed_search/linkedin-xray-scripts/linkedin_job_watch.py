@@ -1,5 +1,5 @@
 """
-Veille mensuelle LinkedIn (X-ray via l'API Tavily) -> dedoublonnage ->
+Veille mensuelle LinkedIn (X-ray via Google Custom Search API) -> dedoublonnage ->
 ajout dans le Google Sheet "AI Agent Framework - LinkedIn Job Leads (FR)".
 
 Toute nouvelle ligne est marquee "Needs review (auto-added)" : le filtrage fin
@@ -16,22 +16,17 @@ import os
 import re
 import json
 import time
-import requests
 
 from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
 
 SHEET_ID = os.environ["SHEET_ID"]
-TAVILY_API_KEY = os.environ["TAVILY_API_KEY"]
+GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
+GOOGLE_CSE_ID = os.environ["GOOGLE_CSE_ID"]
 SHEETS_CREDENTIALS_JSON = os.environ["GOOGLE_SHEETS_CREDENTIALS_JSON"]
 
 SHEETS_SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
-# Note : les prefixes "site:..." d'origine (herites de Google Custom Search) sont
-# inertes avec Tavily -- ce n'est pas un operateur qu'il comprend, juste du texte
-# libre. Le seul filtre de domaine reel est `include_domains` dans search_all_results.
-# Les mots-cles de localisation ci-dessous ne font que biaiser le classement par
-# pertinence de Tavily, ils ne garantissent pas l'exclusion des resultats hors France.
 FRANCE_KEYWORDS = '(france OR paris OR bordeaux OR nantes OR lyon OR toulouse OR "île-de-france")'
 
 # Noms d'onglet confirmes sur le Sheet lui-meme (tab bar) : ML, Product,
@@ -42,22 +37,24 @@ TABS = {
     "ML": {
         "range": "ML!A:I",
         "queries": [
-            '(bedrock agentcore OR langchain OR llamaindex OR langgraph OR crewai '
-            'OR autogen OR "semantic kernel" OR haystack OR dspy) ' + FRANCE_KEYWORDS
+            'site:linkedin.com/jobs/view (bedrock agentcore OR langchain OR llamaindex '
+            'OR langgraph OR crewai OR autogen OR "semantic kernel" OR haystack OR dspy) '
+            + FRANCE_KEYWORDS
         ],
     },
     "Product": {
         "range": "Product!A:I",
         "queries": [
-            f"react figma {FRANCE_KEYWORDS}",
-            'figma ("product manager" OR "chef de produit") '
+            f"site:linkedin.com/jobs/view react figma {FRANCE_KEYWORDS}",
+            'site:linkedin.com/jobs/view figma ("product manager" OR "chef de produit") '
             f'(react OR frontend OR "product engineering") {FRANCE_KEYWORDS}',
         ],
     },
     "Platform": {
         "range": "Platform!A:I",
         "queries": [
-            'Node.js TypeScript AWS Redis (Pulumi OR Ansible OR Terraform OR "infrastructure as code") '
+            'site:linkedin.com/jobs/view Node.js TypeScript AWS Redis '
+            '(Pulumi OR Ansible OR Terraform OR "infrastructure as code") '
             f'(PostgreSQL OR "relational database" OR Postgres) {FRANCE_KEYWORDS}'
         ],
     },
@@ -67,10 +64,9 @@ TABS = {
 JOB_ID_RE = re.compile(r"-(\d{6,})(?:[/?#].*)?$")
 JOB_URL_RE = re.compile(r"linkedin\.com/jobs/view/", re.IGNORECASE)
 
-# Best-effort seulement : Tavily n'a pas d'equivalent au `site:` de Google, donc rien
-# ne garantit que les resultats sont bases en France. On rejette au moins les cas ou
-# un marqueur de pays hors France apparait explicitement dans le titre/l'extrait
-# (ex. l'offre Figma US remontee le 2026-09-16 : "... in United States").
+# Garde-fou en plus du `site:linkedin.com/jobs/view` de la requete : au cas ou
+# Google laisse passer une page hors-sujet (profil, pages entreprise) ou hors
+# France, on filtre aussi cote script.
 NON_FRANCE_MARKERS = (
     "united states", " usa", "united kingdom", "canada", "germany",
     "spain", "italy", "netherlands", "india", "poland",
@@ -84,7 +80,8 @@ def extract_job_id(url: str) -> str | None:
 
 def is_job_posting_url(url: str) -> bool:
     """Rejette les pages LinkedIn qui ne sont pas des offres (profils /in/,
-    pages entreprise, etc.) -- Tavily ne filtre pas par chemin d'URL."""
+    pages entreprise, etc.), au cas ou `site:.../jobs/view` laisse passer une
+    exception."""
     return bool(JOB_URL_RE.search(url))
 
 
@@ -97,6 +94,10 @@ def get_sheets_service():
     info = json.loads(SHEETS_CREDENTIALS_JSON)
     creds = Credentials.from_service_account_info(info, scopes=SHEETS_SCOPES)
     return build("sheets", "v4", credentials=creds)
+
+
+def get_search_service():
+    return build("customsearch", "v1", developerKey=GOOGLE_API_KEY)
 
 
 def read_existing_ids(sheets_service, sheet_range: str) -> set[str]:
@@ -117,44 +118,41 @@ def read_existing_ids(sheets_service, sheet_range: str) -> set[str]:
             ids.add(job_id)
     return ids
 
-def search_all_results(query: str, max_results: int = 30):
-    """Recherche les offres LinkedIn via Tavily sur le dernier mois."""
 
-    response = requests.post(
-        "https://api.tavily.com/search",
-        json={
-            "api_key": TAVILY_API_KEY,
-                "query": query,
-            "search_depth": "advanced",
-            "max_results": max_results,
-            "include_domains": ["linkedin.com"],
-            "time_range": "month",
-        },
-        timeout=30,
-    )
-
-    response.raise_for_status()
-
+def search_all_results(search_service, query: str, max_results: int = 30):
+    """Pagine sur l'API Custom Search (10 resultats par page, dateRestrict = dernier mois)."""
     results = []
+    start = 1
+    while start <= max_results:
+        resp = (
+            search_service.cse()
+            .list(
+                q=query,
+                cx=GOOGLE_CSE_ID,
+                dateRestrict="m1",
+                start=start,
+            )
+            .execute()
+        )
+        items = resp.get("items", [])
+        if not items:
+            break
 
-    for item in response.json().get("results", []):
-        link = item.get("url", "")
-        title = item.get("title", "")
-        snippet = item.get("content", "")
+        for item in items:
+            link = item.get("link", "")
+            title = item.get("title", "")
+            snippet = item.get("snippet", "")
 
-        if not is_job_posting_url(link):
-            continue
-        if mentions_non_france_location(title, snippet):
-            continue
+            if not is_job_posting_url(link):
+                continue
+            if mentions_non_france_location(title, snippet):
+                continue
 
-        results.append({
-            "title": title,
-            "link": link,
-            "snippet": snippet,
-        })
+            results.append(item)
 
+        start += 10
+        time.sleep(1)  # reste sage vis-a-vis du quota
     return results
-
 
 
 def guess_company_and_title(raw_title: str) -> tuple[str, str]:
@@ -186,6 +184,7 @@ def build_row(item: dict) -> list[str]:
 
 def run():
     sheets_service = get_sheets_service()
+    search_service = get_search_service()
 
     summary = {}
 
@@ -195,7 +194,7 @@ def run():
         new_rows = []
 
         for query in cfg["queries"]:
-            for item in search_all_results(query):
+            for item in search_all_results(search_service, query):
                 link = item.get("link", "")
                 job_id = extract_job_id(link)
                 if not job_id or job_id in existing_ids or job_id in seen_this_run:

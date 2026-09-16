@@ -1,8 +1,13 @@
 name: Reverse Search — LinkedIn X-ray (Monthly)
 
 on:
-  schedule:
-    - cron: '0 6 1 * *'  # 1er de chaque mois, 06:00 UTC (~08:00 Paris en ete, ~07:00 en hiver)
+  # Schedule disabled again 2026-09-16: reverted the search step from Tavily back to
+  # Google Custom Search (Tavily's recall was too low vs Google's index for this
+  # site-scoped boolean). That means GOOGLE_API_KEY needs a GCP billing account linked
+  # again before this can run unattended — re-enable the schedule below once that's
+  # confirmed done. workflow_dispatch still works for manual testing in the meantime.
+  # schedule:
+  #   - cron: '0 6 1 * *'  # 1er de chaque mois, 06:00 UTC (~08:00 Paris en ete, ~07:00 en hiver)
   workflow_dispatch: {}  # permet de le relancer manuellement depuis l'onglet Actions
 
 jobs:
@@ -22,7 +27,8 @@ jobs:
 
       - name: Run job watch
         env:
-          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
           GOOGLE_SHEETS_CREDENTIALS_JSON: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS_JSON }}
           SHEET_ID: ${{ secrets.SHEET_ID }}
         run: python linkedin-xray-scripts/linkedin_job_watch.py
