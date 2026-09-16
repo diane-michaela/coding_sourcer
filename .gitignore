@@ -67,3 +67,16 @@ data.json.js
 /coding_sourcer/
 /pb-daily-dashboard/
 /Teamtailor-sourced-candidates-per-job/
+
+# Local-only, purged from history 2026-09-16 — keep on disk for VS Code, never push.
+/Google-Maps-Lycees-France/
+/Agent Pierre-Richard DUPONT (PRD)/
+/Teamtailor feedback extractions/
+/Teamtailor-make-weekly-analytics/
+/Teamtailor_candidate_profile_tool/
+/Teamtailor_quaterly_extraction/
+/X personal branding enricher/
+/Product Manager/
+
+# Medium article drafts — written for Medium.com, never for GitHub.
+*[Mm]edium*.md
