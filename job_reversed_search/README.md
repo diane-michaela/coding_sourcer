@@ -92,8 +92,10 @@ tourne mais echoue au premier appel API.
   (`... chez X`, `... at X`, `... - X`) — imparfait sur certains formats, a corriger a la volee
   si besoin.
 - Le plan Tavily utilise a un quota de requetes/mois a surveiller sur
-  [app.tavily.com](https://app.tavily.com) : avec 3 requetes par run mensuel, ca reste tres
-  large a l'usage actuel.
+  [app.tavily.com](https://app.tavily.com). `search_depth="advanced"` coute plus de credits
+  que `"basic"` (2 credits/requete au lieu d'1 sur le plan Tavily standard) — teste depuis le
+  2026-09-16 pour ameliorer le recall vs Google, a repasser en `"basic"` si le quota devient
+  serre. Avec 4 requetes par run mensuel ca reste large a l'usage actuel de toute facon.
 
 ## Pour aller plus loin (optionnel)
 

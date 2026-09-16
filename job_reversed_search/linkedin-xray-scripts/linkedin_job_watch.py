@@ -125,7 +125,7 @@ def search_all_results(query: str, max_results: int = 30):
         json={
             "api_key": TAVILY_API_KEY,
                 "query": query,
-            "search_depth": "basic",
+            "search_depth": "advanced",
             "max_results": max_results,
             "include_domains": ["linkedin.com"],
             "time_range": "month",
