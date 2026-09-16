@@ -85,24 +85,25 @@ def read_existing_ids(sheets_service, sheet_range: str) -> set[str]:
     return ids
 
 def search_all_results(query: str, max_results: int = 30):
-    """Recherche les offres LinkedIn via Tavily sur le dernier mois."""
+"""Recherche les offres LinkedIn via Tavily sur le dernier mois."""
 
-    response = requests.post(
-        "https://api.tavily.com/search",
-        json={
-            "api_key": TAVILY_API_KEY,
-            "query": query,
-            "search_depth": "basic",
-            "max_results": max_results,
-            "include_domains": ["linkedin.com"],
-            "time_range": "month",
-        },
-        timeout=30,
-    )
+response = requests.post(
+    "https://api.tavily.com/search",
+    json={
+        "api_key": TAVILY_API_KEY,
+        "query": query,
+        "search_depth": "basic",
+        "max_results": max_results,
+        "include_domains": ["linkedin.com"],
+        "time_range": "month",
+    },
+    timeout=30,
+)
 
-    response.raise_for_status()
+response.raise_for_status()
 
-    results = []
+results = []
+
     for item in response.json().get("results", []):
         results.append({
             "title": item.get("title", ""),
