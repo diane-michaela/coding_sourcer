@@ -80,3 +80,16 @@ data.json.js
 
 # Medium article drafts — written for Medium.com, never for GitHub.
 *[Mm]edium*.md
+
+# Claude Code skill symlinks — personal, local-only wiring into the canonical
+# skill-source folders (LinkedIn Boolean Search/, Intake Meeting Prep/, etc.),
+# never published to GitHub.
+/.claude/skills/
+
+# Skill persona avatars — kept locally, not published to GitHub
+bliard.png
+irina.png
+irina.svg
+vlastelica.png
+pierre-richard-dupont.png
+pierre-richard-dupont.svg
