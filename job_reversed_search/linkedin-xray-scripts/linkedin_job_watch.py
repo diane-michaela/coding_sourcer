@@ -132,6 +132,8 @@ def search_all_results(query: str, max_results: int = 30):
         },
         timeout=30,
     )
+    if not response.ok:
+        print(f"[debug] Serper {response.status_code} response body: {response.text}")
     response.raise_for_status()
 
     results = []
