@@ -8,7 +8,12 @@ on:
   # workflow_dispatch run confirms the Serper request format actually works.
   # schedule:
   #   - cron: '0 6 1 * *'  # 1er de chaque mois, 06:00 UTC (~08:00 Paris en ete, ~07:00 en hiver)
-  workflow_dispatch: {}  # permet de le relancer manuellement depuis l'onglet Actions
+  workflow_dispatch:
+    inputs:
+      test_query:
+        description: "Optional: run this single Serper query and print results only (no Sheet write) — for debugging query syntax"
+        required: false
+        type: string
 
 jobs:
   scan:
@@ -30,4 +35,5 @@ jobs:
           SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
           GOOGLE_SHEETS_CREDENTIALS_JSON: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS_JSON }}
           SHEET_ID: ${{ secrets.SHEET_ID }}
+          TEST_QUERY: ${{ inputs.test_query }}
         run: python linkedin-xray-scripts/linkedin_job_watch.py

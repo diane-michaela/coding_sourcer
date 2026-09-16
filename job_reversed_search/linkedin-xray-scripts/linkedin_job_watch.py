@@ -180,6 +180,15 @@ def build_row(item: dict) -> list[str]:
 
 
 def run():
+    test_query = os.environ.get("TEST_QUERY", "").strip()
+    if test_query:
+        print(f"[test_query mode] {test_query!r}")
+        results = search_all_results(test_query)
+        print(f"{len(results)} resultat(s) apres filtrage job/France :")
+        for item in results:
+            print(f"  - {item['title']} — {item['link']}")
+        return
+
     sheets_service = get_sheets_service()
 
     summary = {}
