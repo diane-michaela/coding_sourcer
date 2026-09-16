@@ -16,13 +16,13 @@ import os
 import re
 import json
 import time
+import requests
 
 from googleapiclient.discovery import build
 from google.oauth2.service_account import Credentials
 
 SHEET_ID = os.environ["SHEET_ID"]
-GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
-GOOGLE_CSE_ID = os.environ["GOOGLE_CSE_ID"]
+TAVILY_API_KEY = os.environ["TAVILY_API_KEY"]
 SHEETS_CREDENTIALS_JSON = os.environ["GOOGLE_SHEETS_CREDENTIALS_JSON"]
 
 SHEETS_SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
@@ -66,10 +66,6 @@ def get_sheets_service():
     return build("sheets", "v4", credentials=creds)
 
 
-def get_search_service():
-    return build("customsearch", "v1", developerKey=GOOGLE_API_KEY)
-
-
 def read_existing_ids(sheets_service, sheet_range: str) -> set[str]:
     resp = (
         sheets_service.spreadsheets()
@@ -88,29 +84,34 @@ def read_existing_ids(sheets_service, sheet_range: str) -> set[str]:
             ids.add(job_id)
     return ids
 
+def search_all_results(query: str, max_results: int = 30):
+    """Recherche les offres LinkedIn via Tavily sur le dernier mois."""
 
-def search_all_results(search_service, query: str, max_results: int = 30):
-    """Pagine sur l'API Custom Search (10 resultats par page, dateRestrict = dernier mois)."""
-    results = []
-    start = 1
-    while start <= max_results:
-        resp = (
-            search_service.cse()
-            .list(
-                q=query,
-                cx=GOOGLE_CSE_ID,
-                dateRestrict="m1",
-                start=start,
-            )
-            .execute()
-        )
-        items = resp.get("items", [])
-        if not items:
-            break
-        results.extend(items)
-        start += 10
-        time.sleep(1)  # reste sage vis-a-vis du quota
-    return results
+    response = requests.post(
+        "https://api.tavily.com/search",
+        json={
+            "api_key": TAVILY_API_KEY,
+            "query": query,
+            "search_depth": "basic",
+            "max_results": max_results,
+            "include_domains": ["linkedin.com"],
+            "time_range": "month",
+        },
+        timeout=30,
+    )
+
+    response.raise_for_status()
+
+    results = []
+    for item in response.json().get("results", []):
+        results.append({
+            "title": item.get("title", ""),
+            "link": item.get("url", ""),
+            "snippet": item.get("content", ""),
+        })
+
+    return results
+
 
 
 def guess_company_and_title(raw_title: str) -> tuple[str, str]:
@@ -142,7 +143,6 @@ def build_row(item: dict) -> list[str]:
 
 def run():
     sheets_service = get_sheets_service()
-    search_service = get_search_service()
 
     summary = {}
 
@@ -152,7 +152,7 @@ def run():
         new_rows = []
 
         for query in cfg["queries"]:
-            for item in search_all_results(search_service, query):
+            for item in search_all_results(query):
                 link = item.get("link", "")
                 job_id = extract_job_id(link)
                 if not job_id or job_id in existing_ids or job_id in seen_this_run:
