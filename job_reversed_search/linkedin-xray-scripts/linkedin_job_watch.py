@@ -87,7 +87,7 @@ def read_existing_ids(sheets_service, sheet_range: str) -> set[str]:
 def search_all_results(query: str, max_results: int = 30):
     """Recherche les offres LinkedIn via Tavily sur le dernier mois."""
 
-        response = requests.post(
+    response = requests.post(
         "https://api.tavily.com/search",
         json={
             "api_key": TAVILY_API_KEY,
