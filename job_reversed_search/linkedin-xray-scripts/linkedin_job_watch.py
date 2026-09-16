@@ -7,9 +7,9 @@ qu'on applique a la main (bleed des blocs "Recherches similaires", distinguer
 une vraie offre d'une simple mention en sidebar) reste a faire a l'oeil, une
 fois par mois -> ne jamais accepter/rejeter automatiquement.
 
-Onglets couverts pour l'instant : ML, Product. Le sheet a aussi des onglets
-Platform et Frontend qui existent deja mais n'ont pas encore de requete definie
-ici -- a completer dans TABS une fois les mots-cles choisis (voir README.md).
+Onglets couverts pour l'instant : ML, Product, Platform. Le sheet a aussi un
+onglet Frontend qui existe deja mais n'a pas encore de requete definie ici --
+a completer dans TABS une fois les mots-cles choisis (voir README.md).
 """
 
 import os
@@ -54,7 +54,13 @@ TABS = {
             f'(react OR frontend OR "product engineering") {FRANCE_KEYWORDS}',
         ],
     },
-    # "Platform": {"range": "Platform!A:I", "queries": [...]},   # TODO: define queries
+    "Platform": {
+        "range": "Platform!A:I",
+        "queries": [
+            'Node.js TypeScript AWS Redis (Pulumi OR Ansible OR Terraform OR "infrastructure as code") '
+            f'(PostgreSQL OR "relational database" OR Postgres) {FRANCE_KEYWORDS}'
+        ],
+    },
     # "Frontend": {"range": "Frontend!A:I", "queries": [...]},   # TODO: define queries
 }
 

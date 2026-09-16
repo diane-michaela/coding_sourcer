@@ -1,4 +1,4 @@
-# LinkedIn Job Watch — ML & Product (monthly, GitHub Action)
+# LinkedIn Job Watch — ML, Product & Platform (monthly, GitHub Action)
 
 > **Status (2026-09-16): live.** Switched the search step from Google Custom Search to
 > the Tavily API — Google CSE was blocked on a GCP billing requirement (see git history
@@ -6,16 +6,19 @@
 > morning, and the monthly `schedule` trigger in
 > `.github/workflows/reverse-search-linkedin-xray.yml` is re-enabled.
 
-Veille mensuelle automatisee : X-ray Google (`site:linkedin.com/jobs/view ...`) via l'API
-Tavily, dedoublonnage par ID LinkedIn, ecriture directe dans le Google Sheet
+Veille mensuelle automatisee : X-ray via l'API Tavily (domaine `linkedin.com` uniquement),
+dedoublonnage par ID LinkedIn, ecriture directe dans le Google Sheet
 ["AI Agent Framework — LinkedIn Job Leads (FR)"](https://docs.google.com/spreadsheets/d/1fkg2X10EHY6w4H1YLGjzWgZShX_5r6zWqc9dksAuecA/edit).
 
-**Limite a connaitre avant de laisser tourner ca en automatique :** le script applique un
-filtrage minimal (dedoublonnage par ID LinkedIn + `dateRestrict` sur le dernier mois). Il ne
-reproduit pas le jugement applique a la main (reperer le bleed des blocs "Recherches
-similaires", distinguer une vraie offre Product Manager d'une simple mention en sidebar).
-Toute nouvelle ligne est donc ajoutee avec le statut `Needs review (auto-added)` plutot que
-d'etre silencieusement acceptee — a trancher une fois par mois, pas a relancer a la main.
+**Limite a connaitre avant de laisser tourner ca en automatique :** le script filtre les
+resultats qui ne sont pas des pages `/jobs/view/` (profils, pages entreprise) et ceux dont
+le titre/extrait mentionne explicitement un pays hors France (best-effort seulement — Tavily
+n'a pas d'equivalent au `site:` de Google, donc rien ne garantit que 100% des resultats sont
+bases en France). Il ne reproduit pas non plus le jugement applique a la main (reperer le
+bleed des blocs "Recherches similaires", distinguer une vraie offre Product Manager d'une
+simple mention en sidebar). Toute nouvelle ligne est donc ajoutee avec le statut
+`Needs review (auto-added)` plutot que d'etre silencieusement acceptee — a trancher une fois
+par mois, pas a relancer a la main.
 
 ## Onglets du Sheet
 
@@ -23,29 +26,38 @@ Confirmes sur le Sheet lui-meme : **ML**, **Product**, **Platform**, **Frontend*
 A-I : Company, Job Title, Location, Work Mode, Salary, Framework(s) Mentioned, Posted, Status,
 LinkedIn URL).
 
-Seuls **ML** et **Product** ont une requete definie dans `linkedin-xray-scripts/linkedin_job_watch.py`
-pour l'instant — voir "Les recherches" ci-dessous. **Platform** et **Frontend** existent deja
-dans le Sheet mais n'ont pas encore de mots-cles definis ici : a completer dans le dict
-`TABS` du script une fois decides.
+**ML**, **Product** et **Platform** ont une requete definie dans
+`linkedin-xray-scripts/linkedin_job_watch.py` — voir "Les recherches" ci-dessous.
+**Frontend** existe deja dans le Sheet mais n'a pas encore de mots-cles definis ici :
+a completer dans le dict `TABS` du script une fois decides.
 
 ## Les recherches
 
+Toutes utilisent le meme groupe de mots-cles France (`FRANCE_KEYWORDS` dans le script) pour
+biaiser le classement par pertinence de Tavily vers des postes bases en France — pas une
+garantie, voir la limite ci-dessus.
+
 **Onglet ML**
 ```
-site:linkedin.com/jobs/view (bedrock agentcore OR langchain OR llamaindex OR langgraph OR crewai OR autogen OR "semantic kernel" OR haystack OR dspy) (france OR paris OR bordeaux OR nantes OR lyon OR toulouse OR "île-de-france")
+(bedrock agentcore OR langchain OR llamaindex OR langgraph OR crewai OR autogen OR "semantic kernel" OR haystack OR dspy) (france OR paris OR bordeaux OR nantes OR lyon OR toulouse OR "île-de-france")
 ```
 
 **Onglet Product — requete principale**
 ```
-site:fr.linkedin.com/jobs/view react figma
+react figma (france OR paris OR bordeaux OR nantes OR lyon OR toulouse OR "île-de-france")
 ```
 
 **Onglet Product — requete bonus (roles Product Manager)**
 ```
-site:fr.linkedin.com/jobs/view figma ("product manager" OR "chef de produit") (react OR frontend OR "product engineering")
+figma ("product manager" OR "chef de produit") (react OR frontend OR "product engineering") (france OR paris OR bordeaux OR nantes OR lyon OR toulouse OR "île-de-france")
 ```
 
-Les trois passent par `time_range="month"` (dernier mois) puisque la tache tourne chaque
+**Onglet Platform**
+```
+Node.js TypeScript AWS Redis (Pulumi OR Ansible OR Terraform OR "infrastructure as code") (PostgreSQL OR "relational database" OR Postgres) (france OR paris OR bordeaux OR nantes OR lyon OR toulouse OR "île-de-france")
+```
+
+Toutes passent par `time_range="month"` (dernier mois) puisque la tache tourne chaque
 mois — pas besoin de re-scanner un an a chaque fois.
 
 ## Setup (a faire une fois)
