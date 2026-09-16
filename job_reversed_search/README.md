@@ -1,19 +1,14 @@
 # LinkedIn Job Watch — ML, Product & Platform (monthly, GitHub Action)
 
-> **Status (2026-09-16): Serper wired up, `site:` and quoted phrases don't work on the
-> free tier.** Went Google CSE → Tavily → back to Google CSE → now Serper, all in one day
-> (see git history for the Tavily-recall and Google-CSE-closure/billing reasons). Serper's
-> free tier rejects any query using the `site:` operator **or** a quoted phrase (`"..."`) —
-> both, independently — with `"Query pattern not allowed for free accounts."`, confirmed by
-> testing directly against the live API via the workflow's `test_query` input. `OR` and
-> parentheses grouping are fine. So all three tabs now query plain keywords (`linkedin
-> jobs ...`) instead of `site:linkedin.com/jobs/view`, and multi-word phrases that were
-> quoted (e.g. `"semantic kernel"`) are now hyphenated (`semantic-kernel`) to stay a single
-> token without needing quotes. This means `is_job_posting_url()` and
-> `mentions_non_france_location()` (below) are no longer just a safety net on top of a real
-> `site:` restriction — they're now the *only* job/France filtering happening, so expect
-> more manual review than before. Confirmed working end-to-end via `test_query` runs;
-> re-enable the monthly `schedule` once a full (non-test) `workflow_dispatch` run looks good.
+> **Status (2026-09-16): paused/asleep by design.** Working end-to-end on Serper's free
+> tier (confirmed via real runs), but with a known, permanent parity gap versus running the
+> same search manually in a logged-in browser (see "Historique des essais" below for the
+> full trail: Google CSE → Tavily → Google CSE → Serper → free-tier `site:`/quotes block →
+> paid-tier discussion). Decision: stop iterating on the automation for now, keep the
+> monthly `schedule` commented out (manual `workflow_dispatch` only), and default to
+> on-demand fetches (via Claude, using the `test_query` input or a real run) instead of a
+> recurring cron — revisit only if the free-tier gap becomes a real problem or Serper's
+> paid tier gets tested.
 
 Veille mensuelle automatisee : X-ray Google (mots-cles `linkedin jobs ...`, sans `site:` —
 voir la limite ci-dessous) via l'API Serper (vrais resultats Google, sans index tiers),
@@ -120,6 +115,62 @@ tourne mais echoue au premier appel API.
 - Le forfait gratuit Serper (2 500 requetes a l'inscription) est tres large pour ce volume
   (~4 requetes/mois) ; au-dela, facturation a l'usage — a surveiller sur
   [serper.dev](https://serper.dev) si le volume augmente un jour.
+
+## Historique des essais (2026-09-16)
+
+Journal complet de la journee ou tout ce qui suit a ete teste, dans l'ordre, pour que
+personne n'ait a refaire le meme chemin :
+
+1. **Google Custom Search API (setup d'origine).** Bloque : `GOOGLE_API_KEY` necessite un
+   compte de facturation GCP lie au projet, meme pour rester dans le quota gratuit de
+   100 requetes/jour (`403 forbidden` sans ca). Decision initiale : ne pas ajouter de
+   facturation, `schedule` mis en pause.
+2. **Tavily API** (essai pour contourner le blocage GCP). Fonctionnel mais recall bien plus
+   faible que Google sur une recherche site-scoped comme celle-ci — Tavily a son propre
+   index/crawler, pas celui de Google. Une requete Platform large n'a renvoye qu'un seul
+   resultat (et hors France). En plus, `include_domains` ne restreint qu'au niveau du domaine,
+   pas du chemin `/jobs/view/` — bleed de pages profil et de pages hors sujet observe en
+   sheet (ex. une page profil LinkedIn `/in/...`, une offre Figma basee aux Etats-Unis).
+3. **Retour a Google CSE**, en ajoutant `is_job_posting_url` / `mentions_non_france_location`
+   comme garde-fous supplementaires. A ce moment-la, deux nouveaux blocages sont decouverts :
+   - L'API Custom Search JSON **est fermee aux nouveaux clients et s'arrete completement le
+     1er janvier 2027** — solution a duree de vie limitee de toute facon.
+   - Le projet GCP/la cle CSE avaient ete crees sous l'adresse e-mail professionnelle de
+     Diane (compte Google Workspace de l'entreprise) : lier une carte bancaire personnelle a
+     ce projet pose un risque de perte de controle si elle change un jour d'entreprise (l'IT
+     recupere/coupe l'acces au compte au depart).
+4. **Serper** (proxy vers les vrais resultats Google, pas un index tiers comme Tavily) —
+   choisi pour eviter les deux blocages ci-dessus : pas de projet/facturation GCP, 2 500
+   requetes gratuites a l'inscription sans carte bancaire. Mais decouverte en testant en
+   conditions reelles (via le champ `test_query` du workflow, teste requete par requete
+   contre l'API live) : **le forfait gratuit Serper rejette `site:` ET les phrases entre
+   guillemets** (`"Query pattern not allowed for free accounts."`), chacun independamment de
+   l'autre. `OR` et les parentheses de groupement passent bien. Consequence : toutes les
+   requetes ont ete reecrites en mots-cles simples (`linkedin jobs ...`) sans `site:`, et les
+   phrases entre guillemets remplacees par des equivalents trait-d'union
+   (`semantic-kernel`, `product-manager`, etc.).
+5. **Premier vrai run reussi** (8 nouvelles lignes : 1 ML, 5 Product, 2 Platform) mais avec du
+   bleed reel puisque plus rien ne restreint la requete a `linkedin.com/jobs/view` :
+   2 offres en Inde (`in.linkedin.com`), 1 offre US (San Jose, sans "United States" dans
+   l'extrait visible), 1 offre UK (extrait tronque par Serper avant que "United Kingdom"
+   apparaisse en entier). Ajout de `is_non_france_subdomain` (signal URL fiable) qui rattrape
+   les cas `in.`/`uk.`/etc. — mais pas les cas sans marqueur de pays du tout, ni les extraits
+   tronques.
+6. **Question de fond : est-ce que payer Serper (ou repasser sur CSE) donnerait exactement
+   les memes resultats qu'une recherche Google manuelle dans le navigateur ?** Reponse : non,
+   dans aucun des deux cas. Une recherche manuelle est **personnalisee** (compte Google
+   connecte, historique, localisation reelle de l'appareil) — ni l'API Serper ni l'API
+   Google CSE ne peuvent reproduire cette personnalisation, quel que soit le prix payé. Payer
+   Serper leverait bien le blocage `site:`/guillemets (donc recupererait la *forme* de la
+   requete d'origine), mais ne donnerait pas une correspondance 1:1 garantie avec le
+   navigateur — et CSE a en plus son propre index/classement distinct de la recherche web
+   principale de Google, donc un ecart de parite supplementaire qui lui est propre.
+7. **Decision (2026-09-16) : mettre le pipeline en pause plutot que de continuer a
+   l'optimiser.** Le `schedule` mensuel reste desactive. Plutot que de chercher a boucher
+   completement l'ecart de recall/precision (payer Serper, revenir a CSE, etc.), les
+   recherches ponctuelles se font desormais a la demande via Claude (mode `test_query` pour
+   un aperçu sans ecriture, ou un vrai `workflow_dispatch` pour ecrire dans le Sheet) plutot
+   que via un cron automatique.
 
 ## Pour aller plus loin (optionnel)
 
