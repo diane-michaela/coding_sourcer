@@ -26,8 +26,7 @@ jobs:
 
       - name: Run job watch
         env:
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
           GOOGLE_SHEETS_CREDENTIALS_JSON: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS_JSON }}
           SHEET_ID: ${{ secrets.SHEET_ID }}
         run: python linkedin-xray-scripts/linkedin_job_watch.py
