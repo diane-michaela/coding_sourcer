@@ -7,6 +7,11 @@ Tavily) -- c'est un relais vers Google, pas un moteur de recherche independant.
 Utilise a la place de l'API officielle Google Custom Search JSON, fermee aux
 nouveaux clients et qui s'arrete le 1er janvier 2027 pour tout le monde.
 
+Le forfait Serper gratuit rejette `site:` et les phrases entre guillemets
+("Query pattern not allowed for free accounts.") -- pas de restriction par
+domaine/chemin possible dans la requete, tout le filtrage job/France se fait
+cote script (voir `is_job_posting_url` / `mentions_non_france_location`).
+
 Toute nouvelle ligne est marquee "Needs review (auto-added)" : le filtrage fin
 qu'on applique a la main (bleed des blocs "Recherches similaires", distinguer
 une vraie offre d'une simple mention en sidebar) reste a faire a l'oeil, une
@@ -31,7 +36,16 @@ SHEETS_CREDENTIALS_JSON = os.environ["GOOGLE_SHEETS_CREDENTIALS_JSON"]
 
 SHEETS_SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
-FRANCE_KEYWORDS = '(france OR paris OR bordeaux OR nantes OR lyon OR toulouse OR "île-de-france")'
+# IMPORTANT (decouvert 2026-09-16 par tatonnement) : le forfait Serper gratuit rejette
+# toute requete utilisant l'operateur `site:` OU une phrase entre guillemets ("...")
+# avec "Query pattern not allowed for free accounts.", meme separement l'un de l'autre.
+# OR et les parentheses de groupement passent tres bien. Consequence : impossible de
+# restreindre par domaine/chemin dans la requete elle-meme -- c'est `is_job_posting_url()`
+# et `mentions_non_france_location()` ci-dessous qui font tout le travail de filtrage
+# job/France, pas juste un garde-fou en plus comme avant. Les phrases multi-mots qui
+# etaient entre guillemets sont remplacees par leur equivalent trait-d'union
+# (ex. "semantic kernel" -> semantic-kernel) pour rester un terme unique sans guillemets.
+FRANCE_KEYWORDS = "(france OR paris OR bordeaux OR nantes OR lyon OR toulouse OR île-de-france)"
 
 # Noms d'onglet confirmes sur le Sheet lui-meme (tab bar) : ML, Product,
 # Platform, Frontend. Colonnes A-I : Company, Job Title, Location, Work Mode,
@@ -41,25 +55,25 @@ TABS = {
     "ML": {
         "range": "ML!A:I",
         "queries": [
-            'site:linkedin.com/jobs/view (bedrock agentcore OR langchain OR llamaindex '
-            'OR langgraph OR crewai OR autogen OR "semantic kernel" OR haystack OR dspy) '
+            "linkedin jobs (bedrock agentcore OR langchain OR llamaindex "
+            "OR langgraph OR crewai OR autogen OR semantic-kernel OR haystack OR dspy) "
             + FRANCE_KEYWORDS
         ],
     },
     "Product": {
         "range": "Product!A:I",
         "queries": [
-            f"site:linkedin.com/jobs/view react figma {FRANCE_KEYWORDS}",
-            'site:linkedin.com/jobs/view figma ("product manager" OR "chef de produit") '
-            f'(react OR frontend OR "product engineering") {FRANCE_KEYWORDS}',
+            f"linkedin jobs react figma {FRANCE_KEYWORDS}",
+            "linkedin jobs figma (product-manager OR chef-de-produit) "
+            f"(react OR frontend OR product-engineering) {FRANCE_KEYWORDS}",
         ],
     },
     "Platform": {
         "range": "Platform!A:I",
         "queries": [
-            'site:fr.linkedin.com/jobs/view Node.js TypeScript AWS Redis '
-            '(Pulumi OR Ansible OR Terraform OR "infrastructure as code") '
-            '(PostgreSQL OR "relational database" OR Postgres)'
+            "linkedin jobs Node.js TypeScript AWS Redis "
+            "(Pulumi OR Ansible OR Terraform OR infrastructure-as-code) "
+            f"(PostgreSQL OR relational-database OR Postgres) {FRANCE_KEYWORDS}"
         ],
     },
     # "Frontend": {"range": "Frontend!A:I", "queries": [...]},   # TODO: define queries
@@ -68,9 +82,9 @@ TABS = {
 JOB_ID_RE = re.compile(r"-(\d{6,})(?:[/?#].*)?$")
 JOB_URL_RE = re.compile(r"linkedin\.com/jobs/view/", re.IGNORECASE)
 
-# Garde-fou en plus du `site:linkedin.com/jobs/view` et du `gl: "fr"` de la
-# requete : au cas ou Google laisse passer une page hors-sujet (profil, pages
-# entreprise) ou hors France, on filtre aussi cote script.
+# Seul vrai filtre job/France maintenant que `site:` n'est plus utilisable (voir plus
+# haut) : rejette les resultats dont le titre/extrait mentionne explicitement un pays
+# hors France.
 NON_FRANCE_MARKERS = (
     "united states", " usa", "united kingdom", "canada", "germany",
     "spain", "italy", "netherlands", "india", "poland",
@@ -84,8 +98,8 @@ def extract_job_id(url: str) -> str | None:
 
 def is_job_posting_url(url: str) -> bool:
     """Rejette les pages LinkedIn qui ne sont pas des offres (profils /in/,
-    pages entreprise, etc.), au cas ou `site:.../jobs/view` laisse passer une
-    exception."""
+    pages entreprise, etc.). C'est le seul filtre job/pas-job : `site:` n'est
+    pas utilisable avec le forfait Serper gratuit (voir plus haut)."""
     return bool(JOB_URL_RE.search(url))
 
 
