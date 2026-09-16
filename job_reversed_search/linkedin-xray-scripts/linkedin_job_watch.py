@@ -1,5 +1,5 @@
 """
-Veille mensuelle LinkedIn (X-ray via Google Custom Search API) -> dedoublonnage ->
+Veille mensuelle LinkedIn (X-ray via l'API Tavily) -> dedoublonnage ->
 ajout dans le Google Sheet "AI Agent Framework - LinkedIn Job Leads (FR)".
 
 Toute nouvelle ligne est marquee "Needs review (auto-added)" : le filtrage fin
@@ -27,6 +27,13 @@ SHEETS_CREDENTIALS_JSON = os.environ["GOOGLE_SHEETS_CREDENTIALS_JSON"]
 
 SHEETS_SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
+# Note : les prefixes "site:..." d'origine (herites de Google Custom Search) sont
+# inertes avec Tavily -- ce n'est pas un operateur qu'il comprend, juste du texte
+# libre. Le seul filtre de domaine reel est `include_domains` dans search_all_results.
+# Les mots-cles de localisation ci-dessous ne font que biaiser le classement par
+# pertinence de Tavily, ils ne garantissent pas l'exclusion des resultats hors France.
+FRANCE_KEYWORDS = '(france OR paris OR bordeaux OR nantes OR lyon OR toulouse OR "île-de-france")'
+
 # Noms d'onglet confirmes sur le Sheet lui-meme (tab bar) : ML, Product,
 # Platform, Frontend. Colonnes A-I : Company, Job Title, Location, Work Mode,
 # Salary, Framework(s) Mentioned, Posted, Status, LinkedIn URL. Adapte les
@@ -35,17 +42,16 @@ TABS = {
     "ML": {
         "range": "ML!A:I",
         "queries": [
-            'site:linkedin.com/jobs/view (bedrock agentcore OR langchain OR llamaindex '
-            'OR langgraph OR crewai OR autogen OR "semantic kernel" OR haystack OR dspy) '
-            '(france OR paris OR bordeaux OR nantes OR lyon OR toulouse OR "île-de-france")'
+            '(bedrock agentcore OR langchain OR llamaindex OR langgraph OR crewai '
+            'OR autogen OR "semantic kernel" OR haystack OR dspy) ' + FRANCE_KEYWORDS
         ],
     },
     "Product": {
         "range": "Product!A:I",
         "queries": [
-            "site:fr.linkedin.com/jobs/view react figma",
-            'site:fr.linkedin.com/jobs/view figma ("product manager" OR "chef de produit") '
-            '(react OR frontend OR "product engineering")',
+            f"react figma {FRANCE_KEYWORDS}",
+            'figma ("product manager" OR "chef de produit") '
+            f'(react OR frontend OR "product engineering") {FRANCE_KEYWORDS}',
         ],
     },
     # "Platform": {"range": "Platform!A:I", "queries": [...]},   # TODO: define queries
@@ -53,11 +59,32 @@ TABS = {
 }
 
 JOB_ID_RE = re.compile(r"-(\d{6,})(?:[/?#].*)?$")
+JOB_URL_RE = re.compile(r"linkedin\.com/jobs/view/", re.IGNORECASE)
+
+# Best-effort seulement : Tavily n'a pas d'equivalent au `site:` de Google, donc rien
+# ne garantit que les resultats sont bases en France. On rejette au moins les cas ou
+# un marqueur de pays hors France apparait explicitement dans le titre/l'extrait
+# (ex. l'offre Figma US remontee le 2026-09-16 : "... in United States").
+NON_FRANCE_MARKERS = (
+    "united states", " usa", "united kingdom", "canada", "germany",
+    "spain", "italy", "netherlands", "india", "poland",
+)
 
 
 def extract_job_id(url: str) -> str | None:
     match = JOB_ID_RE.search(url.strip())
     return match.group(1) if match else None
+
+
+def is_job_posting_url(url: str) -> bool:
+    """Rejette les pages LinkedIn qui ne sont pas des offres (profils /in/,
+    pages entreprise, etc.) -- Tavily ne filtre pas par chemin d'URL."""
+    return bool(JOB_URL_RE.search(url))
+
+
+def mentions_non_france_location(title: str, snippet: str) -> bool:
+    text = f"{title} {snippet}".lower()
+    return any(marker in text for marker in NON_FRANCE_MARKERS)
 
 
 def get_sheets_service():
@@ -105,12 +132,21 @@ def search_all_results(query: str, max_results: int = 30):
     results = []
 
     for item in response.json().get("results", []):
+        link = item.get("url", "")
+        title = item.get("title", "")
+        snippet = item.get("content", "")
+
+        if not is_job_posting_url(link):
+            continue
+        if mentions_non_france_location(title, snippet):
+            continue
+
         results.append({
-            "title": item.get("title", ""),
-            "link": item.get("url", ""),
-            "snippet": item.get("content", ""),
+            "title": title,
+            "link": link,
+            "snippet": snippet,
         })
-    
+
     return results
 
 

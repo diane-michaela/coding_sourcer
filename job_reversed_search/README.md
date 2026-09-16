@@ -1,17 +1,13 @@
 # LinkedIn Job Watch — ML & Product (monthly, GitHub Action)
 
-> **Status (2026-09-15): paused.** The pipeline is fully built and all 4 GitHub secrets
-> are set, but `GOOGLE_API_KEY` needs a GCP billing account linked to work — the Custom
-> Search JSON API returns `403 forbidden` without one, even within the free 100
-> queries/day quota. Decided not to add billing for now. The workflow's monthly
-> `schedule` trigger is commented out in `.github/workflows/reverse-search-linkedin-xray.yml`
-> so it doesn't fail-and-email every month — `workflow_dispatch` (manual run) still works
-> for testing. To resume: either link a GCP billing account (real cost should stay $0 at
-> this usage) or rework the search step to use PhantomBuster instead, then uncomment the
-> `schedule:` block.
+> **Status (2026-09-16): live.** Switched the search step from Google Custom Search to
+> the Tavily API — Google CSE was blocked on a GCP billing requirement (see git history
+> for the old setup). Confirmed working via a manual `workflow_dispatch` run this
+> morning, and the monthly `schedule` trigger in
+> `.github/workflows/reverse-search-linkedin-xray.yml` is re-enabled.
 
 Veille mensuelle automatisee : X-ray Google (`site:linkedin.com/jobs/view ...`) via l'API
-Google Custom Search, dedoublonnage par ID LinkedIn, ecriture directe dans le Google Sheet
+Tavily, dedoublonnage par ID LinkedIn, ecriture directe dans le Google Sheet
 ["AI Agent Framework — LinkedIn Job Leads (FR)"](https://docs.google.com/spreadsheets/d/1fkg2X10EHY6w4H1YLGjzWgZShX_5r6zWqc9dksAuecA/edit).
 
 **Limite a connaitre avant de laisser tourner ca en automatique :** le script applique un
@@ -49,22 +45,17 @@ site:fr.linkedin.com/jobs/view react figma
 site:fr.linkedin.com/jobs/view figma ("product manager" OR "chef de produit") (react OR frontend OR "product engineering")
 ```
 
-Les trois passent par `dateRestrict=m1` (dernier mois) puisque la tache tourne chaque mois —
-pas besoin de re-scanner un an a chaque fois.
+Les trois passent par `time_range="month"` (dernier mois) puisque la tache tourne chaque
+mois — pas besoin de re-scanner un an a chaque fois.
 
-## Setup Google Cloud (a faire une fois)
+## Setup (a faire une fois)
 
-1. **API Key pour Custom Search** : [console.cloud.google.com](https://console.cloud.google.com)
-   → active l'API "Custom Search API" → cree une cle API (Identifiants → Creer des identifiants
-   → Cle API).
-2. **Moteur de recherche personnalise** :
-   [programmablesearchengine.google.com](https://programmablesearchengine.google.com/controlpanel/create)
-   → cree un moteur → dans ses parametres, active **"Search the entire web"** (sinon il reste
-   limite aux sites listes) → recupere le **Search engine ID** (`cx`).
-3. **Compte de service pour Sheets** : dans le meme projet GCP, active l'API "Google Sheets API"
+1. **Cle API Tavily** : [app.tavily.com](https://app.tavily.com) → cree un compte → recupere
+   la cle API depuis le dashboard.
+2. **Compte de service pour Sheets** : dans un projet GCP, active l'API "Google Sheets API"
    → IAM & Admin → Comptes de service → Creer → genere une cle JSON (bouton "Gerer les cles" →
    Ajouter une cle → JSON).
-4. **Partage du Sheet** : ouvre le Google Sheet, clique Partager, ajoute l'adresse e-mail du
+3. **Partage du Sheet** : ouvre le Google Sheet, clique Partager, ajoute l'adresse e-mail du
    compte de service (visible dans le JSON, champ `client_email`) en **Editeur**.
 
 ## Secrets GitHub a creer
@@ -73,12 +64,11 @@ Dans le repo → Settings → Secrets and variables → Actions :
 
 | Secret | Valeur |
 |---|---|
-| `GOOGLE_API_KEY` | La cle API Custom Search (etape 1) |
-| `GOOGLE_CSE_ID` | Le `cx` du moteur de recherche (etape 2) |
-| `GOOGLE_SHEETS_CREDENTIALS_JSON` | Le contenu **complet** du fichier JSON du compte de service (etape 3), colle tel quel |
+| `TAVILY_API_KEY` | La cle API Tavily (etape 1) |
+| `GOOGLE_SHEETS_CREDENTIALS_JSON` | Le contenu **complet** du fichier JSON du compte de service (etape 2), colle tel quel |
 | `SHEET_ID` | `1fkg2X10EHY6w4H1YLGjzWgZShX_5r6zWqc9dksAuecA` |
 
-Sans ces 4 secrets configures, le workflow `.github/workflows/reverse-search-linkedin-xray.yml`
+Sans ces 3 secrets configures, le workflow `.github/workflows/reverse-search-linkedin-xray.yml`
 tourne mais echoue au premier appel API.
 
 ## Verifications apres le premier run
@@ -89,8 +79,9 @@ tourne mais echoue au premier appel API.
 - Les colonnes Company / Job Title sont decoupees automatiquement a partir du titre Google
   (`... chez X`, `... at X`, `... - X`) — imparfait sur certains formats, a corriger a la volee
   si besoin.
-- Le quota gratuit de l'API Custom Search est de 100 requetes/jour : avec 3 requetes ×
-  ~30 resultats (pagine par 10 = 3 appels API) ca reste tres large pour un run mensuel.
+- Le plan Tavily utilise a un quota de requetes/mois a surveiller sur
+  [app.tavily.com](https://app.tavily.com) : avec 3 requetes par run mensuel, ca reste tres
+  large a l'usage actuel.
 
 ## Pour aller plus loin (optionnel)
 
