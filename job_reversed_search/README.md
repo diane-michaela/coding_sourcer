@@ -1,14 +1,14 @@
-# LinkedIn Job Watch — ML, Product & Platform (monthly, GitHub Action)
+# LinkedIn Job Watch — ML, Product, Platform & Frontend (monthly)
 
-> **Status (2026-09-16): paused/asleep by design.** Working end-to-end on Serper's free
-> tier (confirmed via real runs), but with a known, permanent parity gap versus running the
-> same search manually in a logged-in browser (see "Historique des essais" below for the
-> full trail: Google CSE → Tavily → Google CSE → Serper → free-tier `site:`/quotes block →
-> paid-tier discussion). Decision: stop iterating on the automation for now, keep the
-> monthly `schedule` commented out (manual `workflow_dispatch` only), and default to
-> on-demand fetches (via Claude, using the `test_query` input or a real run) instead of a
-> recurring cron — revisit only if the free-tier gap becomes a real problem or Serper's
-> paid tier gets tested.
+> **Status (2026-09-17): manual-search workflow, Slack-reminded.** The GitHub Actions /
+> Serper pipeline below is paused/legacy — see "Historique des essais" for the full trail
+> (Google CSE → Tavily → Google CSE → Serper → free-tier `site:`/quotes block). Instead of
+> automating the search itself, a monthly Claude routine posts the 4 canonical queries to
+> **#hiring-test** on Slack as a reminder; Diane runs them herself in her logged-in browser
+> (the only way to get `site:` + quoted phrases, and the only way to get Google's real
+> personalization — neither is reproducible via API) and shares the resulting job links
+> with Claude to dedupe and append to the Sheet. See "Workflow actuel" below for the full
+> loop and the 4 queries.
 
 Veille mensuelle automatisee : X-ray Google (mots-cles `linkedin jobs ...`, sans `site:` —
 voir la limite ci-dessous) via l'API Serper (vrais resultats Google, sans index tiers),
@@ -35,12 +35,75 @@ Confirmes sur le Sheet lui-meme : **ML**, **Product**, **Platform**, **Frontend*
 A-I : Company, Job Title, Location, Work Mode, Salary, Framework(s) Mentioned, Posted, Status,
 LinkedIn URL).
 
-**ML**, **Product** et **Platform** ont une requete definie dans
-`linkedin-xray-scripts/linkedin_job_watch.py` — voir "Les recherches" ci-dessous.
-**Frontend** existe deja dans le Sheet mais n'a pas encore de mots-cles definis ici :
-a completer dans le dict `TABS` du script une fois decides.
+## Workflow actuel (2026-09-17) : veille manuelle + rappel Slack mensuel
 
-## Les recherches
+Decision (2026-09-17) : plutot que de continuer a boucher l'ecart de recall/precision de
+l'automatisation Serper (voir "Historique des essais" ci-dessous), la veille mensuelle
+repose desormais sur une recherche manuelle dans le navigateur (session LinkedIn/Google
+connectee de Diane — la seule facon d'obtenir `site:` et les phrases entre guillemets, que
+Serper gratuit rejette, et la seule a beneficier de la personnalisation Google impossible a
+reproduire via API de toute facon, voir point 6 de l'historique) :
+
+1. Un routine Claude planifie (mensuel, le 1er du mois) poste dans **#hiring-test** (Slack)
+   les 4 requetes ci-dessous, lues directement depuis ce README pour ne jamais etre
+   perimees.
+2. Diane lance chacune des 4 requetes elle-meme dans son navigateur (session connectee),
+   et partage dans une session Claude Code normale les liens d'offres qu'elle retient,
+   groupes par onglet (ML / Product / Platform / Frontend).
+3. Claude dedoublonne ces liens contre les IDs LinkedIn deja presents dans le Sheet et
+   ajoute les nouvelles lignes (statut `Needs review (auto-added)`, memes colonnes que le
+   script — voir "Les recherches (script Serper, legacy/on-demand)" plus bas pour le detail
+   des colonnes).
+
+**Le routine Slack** : "LinkedIn Job Watch — Monthly Slack Reminder"
+(`trig_013UyDa7fQ9XpEU7Qh6kWfvo`, geree depuis
+[claude.ai/code/routines](https://claude.ai/code/routines)), cron `0 6 1 * *` (1er du mois,
+06:00 UTC ≈ 08:00 Paris en ete / 07:00 en hiver — meme decalage DST que l'ancien cron GitHub
+Actions ci-dessous), poste dans le canal Slack prive `#hiring-test` (`C0BAD2GUQMR`). Elle lit
+les 4 requetes directement dans ce README a chaque execution — les modifier ici suffit, pas
+besoin de recreer le routine. L'etape 3 (dedoublonnage + ecriture Sheet) n'est pas geree par
+le routine : les routines sont des sessions cloud isolees, sans acces au Sheet ni au moment
+ou Diane repond — cette etape se fait dans une session Claude Code normale, quand Diane
+partage les liens.
+
+Ces 4 requetes utilisent `site:fr.linkedin.com/jobs/view` (donc pas besoin du groupe de
+mots-cles France separe : le sous-domaine `fr.` fait deja le filtrage geographique) et des
+phrases entre guillemets la ou c'est naturel — les deux sont bloques sur le forfait Serper
+gratuit (voir plus bas) mais fonctionnent normalement dans un vrai navigateur.
+
+**ML**
+```
+site:fr.linkedin.com/jobs/view (bedrock agentcore OR langchain OR llamaindex OR langgraph OR crewai OR autogen OR "semantic kernel" OR haystack OR dspy)
+```
+
+**Product — requete principale**
+```
+site:fr.linkedin.com/jobs/view react figma
+```
+
+**Product — requete bonus (roles Product Manager)**
+```
+site:fr.linkedin.com/jobs/view figma ("product manager" OR "chef de produit") (react OR frontend OR "product engineering")
+```
+
+**Platform**
+```
+site:fr.linkedin.com/jobs/view Node.js TypeScript AWS Redis (Pulumi OR Ansible OR Terraform OR "infrastructure as code") (PostgreSQL OR "relational database" OR Postgres)
+```
+
+**Frontend**
+```
+site:fr.linkedin.com/jobs/view (React OR "React.js") TypeScript (Storybook OR "design system") (Jest OR Cypress OR Tailwind) (Node.js OR Redis OR PostgreSQL OR AWS OR Docker OR Ansible)
+```
+
+## Les recherches (script Serper, legacy/on-demand)
+
+Le script `linkedin-xray-scripts/linkedin_job_watch.py` et le workflow GitHub Actions
+restent en place pour des verifications ponctuelles via `test_query` (voir plus bas), mais
+ne couvrent que ML/Product/Platform (pas Frontend) et n'utilisent pas les requetes
+ci-dessus telles quelles : Serper gratuit rejette `site:` et les guillemets, donc ces
+requetes ont ete reecrites en mots-cles simples pour cet usage precis. Le cron mensuel
+qui aurait fait tourner ce script reste desactive (voir "Historique des essais").
 
 Toutes commencent par `linkedin jobs` (biais mots-cles, pas une restriction reelle — voir
 la limite ci-dessus) + le meme groupe de mots-cles France (`FRANCE_KEYWORDS` dans le
