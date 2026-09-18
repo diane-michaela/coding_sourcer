@@ -63,10 +63,15 @@ in Excel or Google Sheets.
 - If Google briefly blocks the requests or shows a CAPTCHA, wait a
   minute before trying again -- this can happen after many fast
   automated requests in a row.
-- The CSV currently has two columns: Title (the raw link text from the
-  search result) and URL. It does not include location, work mode, or
-  posting date -- that would require opening each job listing
-  individually.
+- The CSV has five columns: Title (the raw link text from the search
+  result), Company, Role, Location, and URL. Company/Role/Location are
+  parsed out of Title with a regex, since Google's title text for a
+  LinkedIn job listing is normally either "<Company> hiring <Role> in
+  <Location> | LinkedIn" or "<Role> - <Company> | LinkedIn". If a title
+  doesn't match either pattern, Company and Location are left blank and
+  Role falls back to the full raw title -- check those rows manually.
+  It does not include work mode or posting date -- that would require
+  opening each job listing individually.
 - To adjust how many pages it checks or how long it waits between
   requests, open `bookmarklet.js`, change the `maxPages` and `delayMs`
   values near the top of the readable source, then regenerate a single
