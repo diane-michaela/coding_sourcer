@@ -64,24 +64,33 @@ in Excel or Google Sheets.
   minute before trying again -- this can happen after many fast
   automated requests in a row.
 - The CSV has five columns: Title (the raw link text from the search
-  result), Company, Role, Location, and URL. Company/Role/Location are
-  parsed out of Title with a regex. Google's title text for a LinkedIn
-  job listing depends on result locale:
-  - English: "<Company> hiring <Role> in <Location> | LinkedIn" or
-    "<Role> at <Company> | LinkedIn"
-  - French: "<Role> chez <Company>" (sometimes with " -- <Location>"
-    appended) " | LinkedIn", or "<Company> recrute [pour un poste de |
-    pour des postes de | un | une] <Role> | LinkedIn"
-  - Less often: "<Role> - <Company> | LinkedIn"
+  result), Company, Role, Location, and URL. Company and Role are
+  extracted two ways, in this order:
+  1. **From the URL itself.** LinkedIn job URLs encode
+     "<role-slug>-at-<company-slug>-<jobId>" in the path, e.g.
+     `/jobs/view/ingénieur-ia-at-kiiro-4465100210`. That slug is part of
+     the canonical URL, not a Google-rendered title, so it's the same
+     regardless of the result's display language -- this is the
+     primary source and covers English, French, and any other locale
+     without needing a language-specific pattern.
+  2. **From Title, as a fallback**, when a URL has no slug (bare
+     numeric job IDs) or no "-at-" segment. Google's title text for a
+     LinkedIn job listing depends on result locale:
+     - English: "<Company> hiring <Role> in <Location> | LinkedIn" or
+       "<Role> at <Company> | LinkedIn"
+     - French: "<Role> chez <Company>" (sometimes with " -- <Location>"
+       appended) " | LinkedIn", or "<Company> recrute [pour un poste de
+       | pour des postes de | un | une] <Role> | LinkedIn"
+     - Less often: "<Role> - <Company> | LinkedIn"
 
-  The English "at" pattern hasn't been checked against real UK/English
-  search results yet (a live pull was blocked by Google's consent
-  wall) -- if Company still comes back blank on UK rows, paste a couple
-  of the raw Title values here so the pattern can be corrected. If a
-  title doesn't match any of the patterns above, Company and Location
-  are left blank and Role falls back to the full raw title -- check
-  those rows manually. It does not include work mode or posting date --
-  that would require opening each job listing individually.
+  Location only ever comes from Title parsing (method 2) -- it isn't in
+  the URL slug. If a title doesn't match any of the patterns above and
+  the URL has no usable slug either, Company and Location are left
+  blank and Role falls back to the full raw title -- check those rows
+  manually. None of this includes work mode, salary, posted date, or
+  framework mentions -- those aren't on the Google results page at all
+  and would require a second pass that opens each job's own LinkedIn
+  page individually, which this bookmarklet doesn't do.
 - Google occasionally injects unrelated UI links (e.g. "AI Mode",
   "Translate this page") into the results page whose href happens to
   carry a linkedin.com/jobs/view URL as a tracking/wrapper parameter
