@@ -66,14 +66,22 @@ in Excel or Google Sheets.
 - The CSV has five columns: Title (the raw link text from the search
   result), Company, Role, Location, and URL. Company/Role/Location are
   parsed out of Title with a regex. Google's title text for a LinkedIn
-  job listing depends on result locale -- English: "<Company> hiring
-  <Role> in <Location> | LinkedIn"; French: "<Role> chez <Company>"
-  (sometimes with " -- <Location>" appended) " | LinkedIn"; less often:
-  "<Role> - <Company> | LinkedIn". If a title doesn't match any of
-  these, Company and Location are left blank and Role falls back to the
-  full raw title -- check those rows manually. It does not include work
-  mode or posting date -- that would require opening each job listing
-  individually.
+  job listing depends on result locale:
+  - English: "<Company> hiring <Role> in <Location> | LinkedIn" or
+    "<Role> at <Company> | LinkedIn"
+  - French: "<Role> chez <Company>" (sometimes with " -- <Location>"
+    appended) " | LinkedIn", or "<Company> recrute [pour un poste de |
+    pour des postes de | un | une] <Role> | LinkedIn"
+  - Less often: "<Role> - <Company> | LinkedIn"
+
+  The English "at" pattern hasn't been checked against real UK/English
+  search results yet (a live pull was blocked by Google's consent
+  wall) -- if Company still comes back blank on UK rows, paste a couple
+  of the raw Title values here so the pattern can be corrected. If a
+  title doesn't match any of the patterns above, Company and Location
+  are left blank and Role falls back to the full raw title -- check
+  those rows manually. It does not include work mode or posting date --
+  that would require opening each job listing individually.
 - Google occasionally injects unrelated UI links (e.g. "AI Mode",
   "Translate this page") into the results page whose href happens to
   carry a linkedin.com/jobs/view URL as a tracking/wrapper parameter
