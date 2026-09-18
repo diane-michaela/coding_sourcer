@@ -72,7 +72,11 @@ in Excel or Google Sheets.
      the canonical URL, not a Google-rendered title, so it's the same
      regardless of the result's display language -- this is the
      primary source and covers English, French, and any other locale
-     without needing a language-specific pattern.
+     without needing a language-specific pattern. Accented characters
+     and punctuation come through the anchor's raw href still
+     percent-encoded (e.g. "%C3%A9" for "é"), so the slug is run through
+     `decodeURIComponent` before being split into words -- without that
+     step those percent codes would show up literally in Company/Role.
   2. **From Title, as a fallback**, when a URL has no slug (bare
      numeric job IDs) or no "-at-" segment. Google's title text for a
      LinkedIn job listing depends on result locale:
