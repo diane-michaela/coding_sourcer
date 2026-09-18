@@ -63,9 +63,9 @@ in Excel or Google Sheets.
 - If Google briefly blocks the requests or shows a CAPTCHA, wait a
   minute before trying again -- this can happen after many fast
   automated requests in a row.
-- The CSV has five columns: Title (the raw link text from the search
-  result), Company, Role, Location, and URL. Company and Role are
-  extracted two ways, in this order:
+- The CSV has four columns: Title (the raw link text from the search
+  result), Company, Role, and URL. Company and Role are extracted two
+  ways, in this order:
   1. **From the URL itself.** LinkedIn job URLs encode
      "<role-slug>-at-<company-slug>-<jobId>" in the path, e.g.
      `/jobs/view/ingénieur-ia-at-kiiro-4465100210`. That slug is part of
@@ -83,14 +83,16 @@ in Excel or Google Sheets.
        | pour des postes de | un | une] <Role> | LinkedIn"
      - Less often: "<Role> - <Company> | LinkedIn"
 
-  Location only ever comes from Title parsing (method 2) -- it isn't in
-  the URL slug. If a title doesn't match any of the patterns above and
-  the URL has no usable slug either, Company and Location are left
-  blank and Role falls back to the full raw title -- check those rows
-  manually. None of this includes work mode, salary, posted date, or
-  framework mentions -- those aren't on the Google results page at all
-  and would require a second pass that opens each job's own LinkedIn
-  page individually, which this bookmarklet doesn't do.
+  If a title doesn't match any of the patterns above and the URL has no
+  usable slug either, Company is left blank and Role falls back to the
+  full raw title -- check those rows manually. There's no Location
+  column: it only ever showed up in a couple of the title patterns
+  above and was blank or wrong everywhere else, so it wasn't reliable
+  enough to expose as its own field. None of this includes work mode,
+  salary, posted date, or framework mentions -- those aren't on the
+  Google results page at all and would require a second pass that
+  opens each job's own LinkedIn page individually, which this
+  bookmarklet doesn't do.
 - Google occasionally injects unrelated UI links (e.g. "AI Mode",
   "Translate this page") into the results page whose href happens to
   carry a linkedin.com/jobs/view URL as a tracking/wrapper parameter
