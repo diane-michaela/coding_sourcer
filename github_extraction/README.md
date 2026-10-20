@@ -149,6 +149,50 @@ python figma_react_candidates.py
 
 ---
 
+## Proof-of-work variant (figma_react_candidates_pow.py) — trial, 2026-10-19
+
+Same target and the same 8 repo queries as `figma_react_candidates.py`, rebuilt around Kathy
+Baptista's proof-of-work method (Sourcing Summit 2026): read what people build, not what they
+write about themselves. It reuses the old script's helpers (HTTP, email fallback, README
+summary), so the differences below are the whole change.
+
+```mermaid
+flowchart LR
+    A["Door 1: repo search<br/>(same 8 queries)"] --> P["People<br/>one row per login"]
+    B["Door 2: code search<br/>package.json depends on<br/>Code Connect, Figma MCP,<br/>Tokens Studio, addon-designs,<br/>plugin-typings"] --> P
+    C["Door 3: issue authors<br/>on the tools' own repos"] --> P
+    P --> E["Evidence per person<br/>• merged PRs with Figma in title<br/>• distinct external projects<br/>• top repo package.json stack<br/>• tests / CI / Storybook"]
+    E --> S["pow_score + evidence columns"]
+```
+
+- **Merged PRs only.** Contributors come from the default branch (merged by definition); PR
+  authors count only if `merged_at` is set. The old script took the latest 5 PRs in any state.
+- **Company accounts skipped.** Repo owners are kept only when the owner is a user, not an org.
+- **Bots filtered** (`[bot]`, `-bot`, `bot-`, `robot` logins and accounts of type Bot).
+- **Score, by weight:** merged PRs with "figma" in the title (×3, cap 10), issues opened on the
+  Figma tools (×4, cap 3), Figma dependencies in the top repo (×3 if the person owns it, ×1.5 if
+  they also have Figma PRs, else 0), distinct external owners that accepted their PRs (×1, cap
+  10), tests/CI/Storybook signals on an owned repo (×0.5).
+- **Output:** `figma_react_candidates_pow.csv` (gitignored). Extra columns: `discovery`,
+  `pow_score`, `merged_figma_prs`, `figma_pr_examples`, `merged_external_prs`,
+  `external_owners`, `merged_external_pr_repos`, `top_repo_owned`, `stack_figma`, `stack_ui`,
+  `stack_quality`, `hygiene`, `issues_on_tools`, `company`.
+- **Runtime:** ~25–30 min for ~400 people, bounded by GitHub's search limits (30 req/min, code
+  search 10 req/min). Needs a valid `GITHUB_TOKEN`; `GITHUB_TOKEN=$(gh auth token)` works.
+
+**Trial results vs the old script (same day):** 404 people vs 195; 8 France-based vs 3, 93
+France + rest of Europe vs 30; none of the top 15 are company accounts (old: 9 of 15). The
+v1 score saturated on raw PR volume and credited a repo's Figma dependencies to every
+contributor; v2 moved to person-level Figma PRs and project breadth; v3 matches "figma" in PR
+titles only, because PR templates with a "Figma link" field polluted body matches. Email
+coverage is unchanged (~34–40%). Not yet validated by a human review of the profiles.
+
+```bash
+python figma_react_candidates_pow.py
+```
+
+---
+
 ## Career Page Scraping (Teamtailor)
 
 Two scripts work together to discover and scrape tech company team pages hosted on the **Teamtailor** career platform (the same platform used by PhantomBuster, Klarna, Trustpilot, and hundreds of other tech companies).
