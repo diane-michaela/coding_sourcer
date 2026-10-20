@@ -1,153 +1,88 @@
 /*
  * LinkedIn Job Search Extractor -- bookmarklet
- * ---------------------------------------------
+ * --------------------------------------------
  * Paginates through a Google search of LinkedIn job postings
- * (site:linkedin.com/jobs/view ...), collects every unique job
- * link it finds, and downloads them as a CSV file (Title, URL).
+ * (site:fr.linkedin.com/jobs/view ...), collects every unique job
+ * link, and downloads a CSV: ID, Title, Company, Role, Location,
+ * Pays, Stack, Source, URL.
  *
  * See README.md in this folder for installation instructions
  * (macOS and Windows) and usage steps.
  */
 
-(async function () {
-  const linksMap = new Map();
-  const url = new URL(location.href);
-  const maxPages = 30;   // safety cap on number of result pages to fetch
-  const delayMs = 1200;  // pause between page requests, in milliseconds
-
-  // LinkedIn job URLs encode "<role-slug>-at-<company-slug>-<jobId>" in
-  // the path itself, e.g. /jobs/view/ingénieur-ia-at-kiiro-4465100210.
-  // That slug is part of the canonical URL, not a Google-rendered,
-  // locale-dependent title, so it's a more reliable source for Company
-  // than parsing the title text -- use it as the primary source and
-  // fall back to title parsing (parseTitle, below) when a URL has no
-  // slug (bare numeric job IDs) or no "-at-" segment.
-  const slugToWords = (slug) =>
-    slug
-      .split('-')
-      .filter(Boolean)
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' ');
-
-  const parseUrlSlug = (pathname) => {
-    let slug = pathname.replace(/^\/jobs\/view\//, '').replace(/\/$/, '');
-    // pathname keeps accented/punctuation characters percent-encoded
-    // (e.g. "%C3%A9" for "é", "%E2%80%93" for "–") -- decode before
-    // splitting on hyphens, otherwise those show up literally in Role/
-    // Company.
-    try {
-      slug = decodeURIComponent(slug);
-    } catch (e) {
-      // malformed escape sequence -- fall back to the raw slug
-    }
-    const m = slug.match(/^(.+)-at-(.+)-\d+$/i);
-    if (!m) return null;
-    return { role: slugToWords(m[1]), company: slugToWords(m[2]) };
-  };
-
-  for (let page = 0; page < maxPages; page++) {
-    url.searchParams.set('start', page * 10);
-    const res = await fetch(url.toString(), { credentials: 'include' });
-    const html = await res.text();
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const anchors = [...doc.querySelectorAll('a[href*="linkedin.com/jobs/view"]')];
-
-    const before = linksMap.size;
-    anchors.forEach((a) => {
-      // Google's "Translate this page" links wrap the real result URL
-      // inside a translate.goog host, and unrelated UI links (e.g. "AI
-      // Mode") can carry it as a tracking param -- unwrap/reject those
-      // so only genuine linkedin.com/jobs/view pages get through.
-      let parsed;
-      try {
-        parsed = new URL(a.href);
-      } catch (e) {
-        return;
-      }
-      if (/\.translate\.goog$/i.test(parsed.hostname)) {
-        const inner = parsed.searchParams.get('u');
-        if (!inner) return;
-        try {
-          parsed = new URL(inner);
-        } catch (e) {
-          return;
-        }
-      }
-      if (!parsed.hostname.endsWith('linkedin.com') || !parsed.pathname.startsWith('/jobs/view')) {
-        return;
-      }
-      const clean = parsed.origin + parsed.pathname;
-      if (!linksMap.has(clean)) {
-        const slugInfo = parseUrlSlug(parsed.pathname);
-        linksMap.set(clean, {
-          title: (a.textContent || '').trim().replace(/\s+/g, ' '),
-          slugRole: slugInfo ? slugInfo.role : '',
-          slugCompany: slugInfo ? slugInfo.company : '',
-        });
-      }
-    });
-
-    if (anchors.length === 0 || linksMap.size === before) break; // reached end of results
-    await new Promise((r) => setTimeout(r, delayMs));
+(async function(){
+const FR_PLACES = ['paris', 'île-de-france', 'ile-de-france', 'lyon', 'marseille', 'toulouse', 'bordeaux', 'nantes', 'lille', 'rennes', 'montpellier', 'strasbourg', 'nice', 'grenoble', 'sophia antipolis', 'villeurbanne', 'boulogne-billancourt', 'levallois-perret', 'puteaux', 'courbevoie', 'nanterre', 'montrouge', 'issy-les-moulineaux', 'la défense', 'clermont-ferrand', 'rouen', 'tours', 'le mans', 'angers', 'dijon', 'brest', 'aix-en-provence', 'metz', 'nancy', 'orléans', 'reims', 'caen', 'cesson-sévigné', 'malakoff', 'france'];
+const OUT_PLACES = ['united states', 'usa', 'canada', 'toronto', 'montréal', 'montreal', 'new york', 'san francisco', 'seattle', 'austin', 'boston', 'chicago', 'salt lake city', 'mountain view', 'london', 'united kingdom', 'berlin', 'munich', 'münchen', 'germany', 'deutschland', 'amsterdam', 'netherlands', 'madrid', 'barcelona', 'tarragona', 'spain', 'lisbon', 'portugal', 'warsaw', 'poland', 'budapest', 'bangalore', 'bengaluru', 'india', 'brazil', 'são paulo', 'mexico', 'costa rica', 'singapore', 'dubai', 'tel aviv', 'israel', 'athens', 'greece'];
+const FR_HINTS = /(^|[^a-zà-ÿ])(h\/f|f\/h|h-f|f-h|cdi|cdd|télétravail|alternance|ingénieur|développeur|confirmé|expérimenté)([^a-zà-ÿ]|$)/i;
+const hasPlace = (text, list) => list.find(p => new RegExp('(^|[^a-zà-ÿ])' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '($|[^a-zà-ÿ])', 'i').test(text));
+const QWORDS = new Set((new URL(location.href).searchParams.get('q') || '').toLowerCase().split(/[^a-zà-ÿ0-9]+/).filter(Boolean));
+const isQueryBold = b => { const w = b.toLowerCase().split(/[^a-zà-ÿ0-9]+/).filter(Boolean); return w.length > 0 && w.every(x => QWORDS.has(x)); };
+const isPlace = t => !!(hasPlace(t.toLowerCase(), FR_PLACES.concat(OUT_PLACES)) || /\d{5}|\d+\s*(av|rue|bd|boulevard|avenue)\b/i.test(t));
+const locate = (title, snippet, src, bolds = [], url = '') => {
+  let loc = '';
+  const mm = title.match(/\s[—–]\s([^|—–]+?)\s*(\||$)/) || title.match(/\b(?:CDI|CDD|Stage|Freelance|Alternance)\s+à\s+([^|\-–—]+)/i) || title.match(/\shiring\s.+?\sin\s(.+?)\s*\|/i);
+  if (mm) loc = mm[1].replace(/\s*-\s*Welcome to the Jungle.*$/i, '').trim();
+  if (loc && src !== 'LinkedIn' && !isPlace(loc)) loc = '';
+  if (!loc && src === 'WTTJ') { const w = url.match(/\/jobs\/[^/?#]*?_([a-z-]+?)(?:_[a-z0-9]{6,})?\/?$/i); if (w) loc = w[1].replace(/-/g, ' '); }
+  let clean = snippet;
+  bolds.filter(isQueryBold).forEach(b => { clean = clean.split(b).join(' '); });
+  if (!loc) loc = (bolds.find(b => isPlace(b) && !isQueryBold(b)) || '').trim();
+  const text = (title + ' ' + clean).toLowerCase();
+  const fr = hasPlace(loc.toLowerCase(), FR_PLACES) || hasPlace(text, FR_PLACES);
+  const out = hasPlace(loc.toLowerCase(), OUT_PLACES) || hasPlace(text, OUT_PLACES);
+  if (!loc) loc = fr || out || '';
+  loc = loc.replace(/^./, c => c.toUpperCase());
+  let pays = '?';
+  if (hasPlace(loc.toLowerCase(), FR_PLACES) || /\b\d{5}\b/.test(loc)) pays = 'France';
+  else if (hasPlace(loc.toLowerCase(), OUT_PLACES)) pays = 'Hors France';
+  else if (fr && !out) pays = 'France';
+  else if (out && !fr) pays = 'Hors France';
+  else if (!fr && !out && (src === 'LinkedIn' || FR_HINTS.test(title))) pays = 'France';
+  return { loc, pays };
+};
+const STACK = ['bedrock', 'agentcore', 'langchain', 'langgraph', 'llamaindex', 'crewai', 'autogen', 'dspy', 'semantic kernel', 'haystack', 'rag', 'llm', 'sagemaker', 'mlflow', 'mlops', 'llmops', 'aws', 'azure', 'gcp', 'python', 'typescript', 'node.js', 'react', 'next.js', 'terraform', 'pulumi', 'ansible', 'kubernetes', 'docker', 'postgresql', 'redis', 'kafka', 'databricks', 'figma', 'storybook', 'tailwind', 'cypress', 'jest'];
+const stackOf = (title, snippet, bolds) => {
+  const text = (title + ' ' + snippet + ' ' + bolds.join(' ')).toLowerCase();
+  return STACK.filter(x => hasPlace(text, [x])).join(', ');
+};
+const blockOf = a => a.closest('div.g, div.MjjYud, div[data-hveid]') || a.parentElement || a;
+const SUFFIX = /\s*(\|\s*LinkedIn.*|-\s*Welcome to the Jungle.*|-\s*Recruitee|-\s*Teamtailor|-\s*Application|\|\s*Jobs (at|bei) .*|\.\.\.)\s*$/i;
+const splitParts = t => t.split(/\s+[-–—|]\s+|\s+-(?=\S)|(?<=\S)-\s+/).map(x => x.trim()).filter(Boolean);
+const compact = x => (x || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const stripCompany = (t, company) => {
+  const c = compact(company);
+  const words = t.split(/\s+/);
+  let acc = '', i = 0;
+  while (i < words.length) {
+    const w = compact(words[i]);
+    if (w && c.startsWith(acc + w)) { acc += w; i++; }
+    else if (acc && /^\d+$/.test(w)) i++;
+    else break;
   }
-
-  // Google's title text for a LinkedIn job listing depends on the
-  // result's locale:
-  //   English: "<Company> hiring <Role> in <Location> | LinkedIn"
-  //         or "<Role> at <Company> | LinkedIn"
-  //   French:  "<Role> chez <Company>" (optionally " — <Location>") " | LinkedIn"
-  //         or "<Company> recrute [pour un poste de|pour des postes de|un|une] <Role> | LinkedIn"
-  // Less often: "<Role> - <Company> | LinkedIn". Parse all of these;
-  // anything else leaves Company blank rather than guessing. Location
-  // isn't reliable enough across these patterns to expose as its own
-  // column, so it's stripped out here rather than reported.
-  const parseTitle = (title) => {
-    let m = title.match(/^(.*?)\s+hiring\s+(.*?)\s+in\s+(.*?)\s*\|\s*LinkedIn\s*$/i);
-    if (m) return { company: m[1].trim(), role: m[2].trim() };
-
-    m = title.match(/^(.*?)\schez\s(.*?)\s*\|\s*LinkedIn\s*$/i);
-    if (m) return { company: m[2].split(/\s[—–]\s/)[0].trim(), role: m[1].trim() };
-
-    m = title.match(/^(.*?)\srecrute\s(?:pour\s(?:un poste|des postes)\sde\s|une?\s)?(.*?)\s*\|\s*LinkedIn\s*$/i);
-    if (m) return { company: m[1].trim(), role: m[2].split(/\s[—–]\s/)[0].trim() };
-
-    m = title.match(/^(.*?)\sat\s(.*?)\s*\|\s*LinkedIn\s*$/i);
-    if (m) return { company: m[2].trim(), role: m[1].trim() };
-
-    m = title.match(/^(.*?)\s-\s(.*?)\s*\|\s*LinkedIn\s*$/i);
-    if (m) return { company: m[2].trim(), role: m[1].trim() };
-
-    return { company: '', role: title };
-  };
-
-  const esc = (s) => '"' + String(s).replace(/"/g, '""') + '"';
-  const rows = [['Title', 'Company', 'Role', 'URL'].map(esc).join(',')];
-  linksMap.forEach((info, link) => {
-    const fromTitle = parseTitle(info.title);
-    const company = info.slugCompany || fromTitle.company;
-    const role = info.slugRole || fromTitle.role;
-    rows.push([info.title, company, role, link].map(esc).join(','));
-  });
-  const csv = rows.join('\r\n');
-
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const blobUrl = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = blobUrl;
-  a.download = 'linkedin-jobs-' + Date.now() + '.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
-
-  alert('Done: ' + linksMap.size + ' unique job listings exported to CSV.');
-})();
+  return acc.length >= 2 && i < words.length ? words.slice(i).join(' ').replace(/^[,.\s]+/, '') : t;
+};
+const dropCompanyPart = (parts, company) => {
+  const c = compact(company);
+  const kept = c.length >= 3 ? parts.filter(x => { const k = compact(x); return !(k.includes(c) || c.startsWith(k)); }) : parts;
+  return kept.length ? kept : parts;
+};
+const roleOf = (title, company, src) => {
+  const t = title.replace(SUFFIX, '').trim();
+  if (src === 'Greenhouse') { const g = t.match(/^Job Application for\s+(.+?)\s+at\s+.+$/i); if (g) return g[1].trim(); }
+  if (src === 'Ashby' && t.includes('@')) return t.split(/\s+@\s*/)[0].trim();
+  if (src === 'Personio') return t.split('|')[0].trim();
+  const parts = dropCompanyPart(splitParts(t), company);
+  if (parts.length === 1) return stripCompany(parts[0], company).replace(/^[-–—|,.\s]+/, '').trim();
+  return (src === 'Lever' ? parts.join(' - ') : parts[0]).trim();
+};
+const m=new Map();const u=new URL(location.href);const maxPages=30,delayMs=1200;const s2w=s=>s.split('-').filter(Boolean).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');const pus=p=>{let slug=p.replace(/^\/jobs\/view\//,'').replace(/\/$/,'');try{slug=decodeURIComponent(slug)}catch(e){}const mm=slug.match(/^(.+)-at-(.+)-\d+$/i);if(!mm)return null;return{role:s2w(mm[1]),company:s2w(mm[2])}};for(let p=0;p<maxPages;p++){u.searchParams.set('start',p*10);const r=await fetch(u.toString(),{credentials:'include'});const h=await r.text();const d=new DOMParser().parseFromString(h,'text/html');const as=[...d.querySelectorAll('a[href*="linkedin.com/jobs/view"]')];const b=m.size;as.forEach(a=>{let pu;try{pu=new URL(a.href)}catch(e){return}if(/\.translate\.goog$/i.test(pu.hostname)){const inner=pu.searchParams.get('u');if(!inner)return;try{pu=new URL(inner)}catch(e){return}}if(!pu.hostname.endsWith('linkedin.com')||!pu.pathname.startsWith('/jobs/view'))return;const c=pu.origin+pu.pathname;if(!m.has(c)){const si=pus(pu.pathname);m.set(c,{title:((a.querySelector('h3')||a).textContent||'').trim().replace(/\s+/g,' '),snippet:(blockOf(a).textContent||'').replace(/\s+/g,' '),bolds:[...blockOf(a).querySelectorAll('em, b')].map(e=>e.textContent||''),sr:si?si.role:'',sc:si?si.company:''})}});if(as.length===0||m.size===b)break;await new Promise(res=>setTimeout(res,delayMs))}const pt=t=>{let mm=t.match(/^(.*?)\s+hiring\s+(.*?)\s+in\s+(.*?)\s*\|\s*LinkedIn\s*$/i);if(mm)return{c:mm[1].trim(),r:mm[2].trim()};mm=t.match(/^(.*?)\schez\s(.*?)\s*\|\s*LinkedIn\s*$/i);if(mm)return{c:mm[2].split(/\s[—–]\s/)[0].trim(),r:mm[1].trim()};mm=t.match(/^(.*?)\srecrute\s(?:pour\s(?:un poste|des postes)\sde\s|une?\s)?(.*?)\s*\|\s*LinkedIn\s*$/i);if(mm)return{c:mm[1].trim(),r:mm[2].split(/\s[—–]\s/)[0].trim()};mm=t.match(/^(.*?)\sat\s(.*?)\s*\|\s*LinkedIn\s*$/i);if(mm)return{c:mm[2].trim(),r:mm[1].trim()};mm=t.match(/^(.*?)\s-\s(.*?)\s*\|\s*LinkedIn\s*$/i);if(mm)return{c:mm[2].trim(),r:mm[1].trim()};return{c:'',r:t}};const esc=s=>'"'+String(s).replace(/"/g,'""')+'"';const ts=Date.now();let n=0;const rows=[['ID','Title','Company','Role','Location','Pays','Stack','Source','URL'].map(esc).join(',')];m.forEach((info,l)=>{const ft=pt(info.title);const c=info.sc||ft.c;const r=info.sr||ft.r;const g=locate(info.title,info.snippet,'LinkedIn',info.bolds,l);rows.push([ts+'-'+String(++n).padStart(3,'0'),info.title,c,r,g.loc,g.pays,stackOf(info.title,info.snippet,info.bolds),'LinkedIn',l].map(esc).join(','))});const csv=rows.join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const bu=URL.createObjectURL(blob);const a=document.createElement('a');a.href=bu;a.download='linkedin-jobs-'+ts+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(bu),5000);alert('Done: '+m.size+' unique job listings exported to CSV.')})();
 
 /* ---------------------------------------------------------------------
    READY-TO-PASTE BOOKMARKLET
    Copy the single line below (starting with "javascript:") in full,
    and paste it into the URL field when creating a new bookmark.
+   It is URL-encoded, which is normal: the browser decodes it on click.
    See README.md for step-by-step instructions.
 --------------------------------------------------------------------- */
 
-javascript:(async function(){const m=new Map();const u=new URL(location.href);const maxPages=30,delayMs=1200;const s2w=s=>s.split('-').filter(Boolean).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');const pus=p=>{let slug=p.replace(/^\/jobs\/view\//,'').replace(/\/$/,'');try{slug=decodeURIComponent(slug)}catch(e){}const mm=slug.match(/^(.+)-at-(.+)-\d+$/i);if(!mm)return null;return{role:s2w(mm[1]),company:s2w(mm[2])}};for(let p=0;p<maxPages;p++){u.searchParams.set('start',p*10);const r=await fetch(u.toString(),{credentials:'include'});const h=await r.text();const d=new DOMParser().parseFromString(h,'text/html');const as=[...d.querySelectorAll('a[href*="linkedin.com/jobs/view"]')];const b=m.size;as.forEach(a=>{let pu;try{pu=new URL(a.href)}catch(e){return}if(/\.translate\.goog$/i.test(pu.hostname)){const inner=pu.searchParams.get('u');if(!inner)return;try{pu=new URL(inner)}catch(e){return}}if(!pu.hostname.endsWith('linkedin.com')||!pu.pathname.startsWith('/jobs/view'))return;const c=pu.origin+pu.pathname;if(!m.has(c)){const si=pus(pu.pathname);m.set(c,{title:(a.textContent||'').trim().replace(/\s+/g,' '),sr:si?si.role:'',sc:si?si.company:''})}});if(as.length===0||m.size===b)break;await new Promise(res=>setTimeout(res,delayMs))}const pt=t=>{let mm=t.match(/^(.*?)\s+hiring\s+(.*?)\s+in\s+(.*?)\s*\|\s*LinkedIn\s*$/i);if(mm)return{c:mm[1].trim(),r:mm[2].trim()};mm=t.match(/^(.*?)\schez\s(.*?)\s*\|\s*LinkedIn\s*$/i);if(mm)return{c:mm[2].split(/\s[—–]\s/)[0].trim(),r:mm[1].trim()};mm=t.match(/^(.*?)\srecrute\s(?:pour\s(?:un poste|des postes)\sde\s|une?\s)?(.*?)\s*\|\s*LinkedIn\s*$/i);if(mm)return{c:mm[1].trim(),r:mm[2].split(/\s[—–]\s/)[0].trim()};mm=t.match(/^(.*?)\sat\s(.*?)\s*\|\s*LinkedIn\s*$/i);if(mm)return{c:mm[2].trim(),r:mm[1].trim()};mm=t.match(/^(.*?)\s-\s(.*?)\s*\|\s*LinkedIn\s*$/i);if(mm)return{c:mm[2].trim(),r:mm[1].trim()};return{c:'',r:t}};const esc=s=>'"'+String(s).replace(/"/g,'""')+'"';const rows=[['Title','Company','Role','URL'].map(esc).join(',')];m.forEach((info,l)=>{const ft=pt(info.title);const c=info.sc||ft.c;const r=info.sr||ft.r;rows.push([info.title,c,r,l].map(esc).join(','))});const csv=rows.join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const bu=URL.createObjectURL(blob);const a=document.createElement('a');a.href=bu;a.download='linkedin-jobs-'+Date.now()+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(bu),5000);alert('Done: '+m.size+' unique job listings exported to CSV.')})();
+javascript:%28async%20function%28%29%7B%20const%20FR_PLACES%20%3D%20%5B%27paris%27%2C%20%27%C3%AEle-de-france%27%2C%20%27ile-de-france%27%2C%20%27lyon%27%2C%20%27marseille%27%2C%20%27toulouse%27%2C%20%27bordeaux%27%2C%20%27nantes%27%2C%20%27lille%27%2C%20%27rennes%27%2C%20%27montpellier%27%2C%20%27strasbourg%27%2C%20%27nice%27%2C%20%27grenoble%27%2C%20%27sophia%20antipolis%27%2C%20%27villeurbanne%27%2C%20%27boulogne-billancourt%27%2C%20%27levallois-perret%27%2C%20%27puteaux%27%2C%20%27courbevoie%27%2C%20%27nanterre%27%2C%20%27montrouge%27%2C%20%27issy-les-moulineaux%27%2C%20%27la%20d%C3%A9fense%27%2C%20%27clermont-ferrand%27%2C%20%27rouen%27%2C%20%27tours%27%2C%20%27le%20mans%27%2C%20%27angers%27%2C%20%27dijon%27%2C%20%27brest%27%2C%20%27aix-en-provence%27%2C%20%27metz%27%2C%20%27nancy%27%2C%20%27orl%C3%A9ans%27%2C%20%27reims%27%2C%20%27caen%27%2C%20%27cesson-s%C3%A9vign%C3%A9%27%2C%20%27malakoff%27%2C%20%27france%27%5D%3B%20const%20OUT_PLACES%20%3D%20%5B%27united%20states%27%2C%20%27usa%27%2C%20%27canada%27%2C%20%27toronto%27%2C%20%27montr%C3%A9al%27%2C%20%27montreal%27%2C%20%27new%20york%27%2C%20%27san%20francisco%27%2C%20%27seattle%27%2C%20%27austin%27%2C%20%27boston%27%2C%20%27chicago%27%2C%20%27salt%20lake%20city%27%2C%20%27mountain%20view%27%2C%20%27london%27%2C%20%27united%20kingdom%27%2C%20%27berlin%27%2C%20%27munich%27%2C%20%27m%C3%BCnchen%27%2C%20%27germany%27%2C%20%27deutschland%27%2C%20%27amsterdam%27%2C%20%27netherlands%27%2C%20%27madrid%27%2C%20%27barcelona%27%2C%20%27tarragona%27%2C%20%27spain%27%2C%20%27lisbon%27%2C%20%27portugal%27%2C%20%27warsaw%27%2C%20%27poland%27%2C%20%27budapest%27%2C%20%27bangalore%27%2C%20%27bengaluru%27%2C%20%27india%27%2C%20%27brazil%27%2C%20%27s%C3%A3o%20paulo%27%2C%20%27mexico%27%2C%20%27costa%20rica%27%2C%20%27singapore%27%2C%20%27dubai%27%2C%20%27tel%20aviv%27%2C%20%27israel%27%2C%20%27athens%27%2C%20%27greece%27%5D%3B%20const%20FR_HINTS%20%3D%20%2F%28%5E%7C%5B%5Ea-z%C3%A0-%C3%BF%5D%29%28h%5C%2Ff%7Cf%5C%2Fh%7Ch-f%7Cf-h%7Ccdi%7Ccdd%7Ct%C3%A9l%C3%A9travail%7Calternance%7Cing%C3%A9nieur%7Cd%C3%A9veloppeur%7Cconfirm%C3%A9%7Cexp%C3%A9riment%C3%A9%29%28%5B%5Ea-z%C3%A0-%C3%BF%5D%7C%24%29%2Fi%3B%20const%20hasPlace%20%3D%20%28text%2C%20list%29%20%3D%3E%20list.find%28p%20%3D%3E%20new%20RegExp%28%27%28%5E%7C%5B%5Ea-z%C3%A0-%C3%BF%5D%29%27%20%2B%20p.replace%28%2F%5B.%2A%2B%3F%5E%24%7B%7D%28%29%7C%5B%5C%5D%5C%5C%5D%2Fg%2C%20%27%5C%5C%24%26%27%29%20%2B%20%27%28%24%7C%5B%5Ea-z%C3%A0-%C3%BF%5D%29%27%2C%20%27i%27%29.test%28text%29%29%3B%20const%20QWORDS%20%3D%20new%20Set%28%28new%20URL%28location.href%29.searchParams.get%28%27q%27%29%20%7C%7C%20%27%27%29.toLowerCase%28%29.split%28%2F%5B%5Ea-z%C3%A0-%C3%BF0-9%5D%2B%2F%29.filter%28Boolean%29%29%3B%20const%20isQueryBold%20%3D%20b%20%3D%3E%20%7B%20const%20w%20%3D%20b.toLowerCase%28%29.split%28%2F%5B%5Ea-z%C3%A0-%C3%BF0-9%5D%2B%2F%29.filter%28Boolean%29%3B%20return%20w.length%20%3E%200%20%26%26%20w.every%28x%20%3D%3E%20QWORDS.has%28x%29%29%3B%20%7D%3B%20const%20isPlace%20%3D%20t%20%3D%3E%20%21%21%28hasPlace%28t.toLowerCase%28%29%2C%20FR_PLACES.concat%28OUT_PLACES%29%29%20%7C%7C%20%2F%5Cd%7B5%7D%7C%5Cd%2B%5Cs%2A%28av%7Crue%7Cbd%7Cboulevard%7Cavenue%29%5Cb%2Fi.test%28t%29%29%3B%20const%20locate%20%3D%20%28title%2C%20snippet%2C%20src%2C%20bolds%20%3D%20%5B%5D%2C%20url%20%3D%20%27%27%29%20%3D%3E%20%7B%20let%20loc%20%3D%20%27%27%3B%20const%20mm%20%3D%20title.match%28%2F%5Cs%5B%E2%80%94%E2%80%93%5D%5Cs%28%5B%5E%7C%E2%80%94%E2%80%93%5D%2B%3F%29%5Cs%2A%28%5C%7C%7C%24%29%2F%29%20%7C%7C%20title.match%28%2F%5Cb%28%3F%3ACDI%7CCDD%7CStage%7CFreelance%7CAlternance%29%5Cs%2B%C3%A0%5Cs%2B%28%5B%5E%7C%5C-%E2%80%93%E2%80%94%5D%2B%29%2Fi%29%20%7C%7C%20title.match%28%2F%5Cshiring%5Cs.%2B%3F%5Csin%5Cs%28.%2B%3F%29%5Cs%2A%5C%7C%2Fi%29%3B%20if%20%28mm%29%20loc%20%3D%20mm%5B1%5D.replace%28%2F%5Cs%2A-%5Cs%2AWelcome%20to%20the%20Jungle.%2A%24%2Fi%2C%20%27%27%29.trim%28%29%3B%20if%20%28loc%20%26%26%20src%20%21%3D%3D%20%27LinkedIn%27%20%26%26%20%21isPlace%28loc%29%29%20loc%20%3D%20%27%27%3B%20if%20%28%21loc%20%26%26%20src%20%3D%3D%3D%20%27WTTJ%27%29%20%7B%20const%20w%20%3D%20url.match%28%2F%5C%2Fjobs%5C%2F%5B%5E%2F%3F%23%5D%2A%3F_%28%5Ba-z-%5D%2B%3F%29%28%3F%3A_%5Ba-z0-9%5D%7B6%2C%7D%29%3F%5C%2F%3F%24%2Fi%29%3B%20if%20%28w%29%20loc%20%3D%20w%5B1%5D.replace%28%2F-%2Fg%2C%20%27%20%27%29%3B%20%7D%20let%20clean%20%3D%20snippet%3B%20bolds.filter%28isQueryBold%29.forEach%28b%20%3D%3E%20%7B%20clean%20%3D%20clean.split%28b%29.join%28%27%20%27%29%3B%20%7D%29%3B%20if%20%28%21loc%29%20loc%20%3D%20%28bolds.find%28b%20%3D%3E%20isPlace%28b%29%20%26%26%20%21isQueryBold%28b%29%29%20%7C%7C%20%27%27%29.trim%28%29%3B%20const%20text%20%3D%20%28title%20%2B%20%27%20%27%20%2B%20clean%29.toLowerCase%28%29%3B%20const%20fr%20%3D%20hasPlace%28loc.toLowerCase%28%29%2C%20FR_PLACES%29%20%7C%7C%20hasPlace%28text%2C%20FR_PLACES%29%3B%20const%20out%20%3D%20hasPlace%28loc.toLowerCase%28%29%2C%20OUT_PLACES%29%20%7C%7C%20hasPlace%28text%2C%20OUT_PLACES%29%3B%20if%20%28%21loc%29%20loc%20%3D%20fr%20%7C%7C%20out%20%7C%7C%20%27%27%3B%20loc%20%3D%20loc.replace%28%2F%5E.%2F%2C%20c%20%3D%3E%20c.toUpperCase%28%29%29%3B%20let%20pays%20%3D%20%27%3F%27%3B%20if%20%28hasPlace%28loc.toLowerCase%28%29%2C%20FR_PLACES%29%20%7C%7C%20%2F%5Cb%5Cd%7B5%7D%5Cb%2F.test%28loc%29%29%20pays%20%3D%20%27France%27%3B%20else%20if%20%28hasPlace%28loc.toLowerCase%28%29%2C%20OUT_PLACES%29%29%20pays%20%3D%20%27Hors%20France%27%3B%20else%20if%20%28fr%20%26%26%20%21out%29%20pays%20%3D%20%27France%27%3B%20else%20if%20%28out%20%26%26%20%21fr%29%20pays%20%3D%20%27Hors%20France%27%3B%20else%20if%20%28%21fr%20%26%26%20%21out%20%26%26%20%28src%20%3D%3D%3D%20%27LinkedIn%27%20%7C%7C%20FR_HINTS.test%28title%29%29%29%20pays%20%3D%20%27France%27%3B%20return%20%7B%20loc%2C%20pays%20%7D%3B%20%7D%3B%20const%20STACK%20%3D%20%5B%27bedrock%27%2C%20%27agentcore%27%2C%20%27langchain%27%2C%20%27langgraph%27%2C%20%27llamaindex%27%2C%20%27crewai%27%2C%20%27autogen%27%2C%20%27dspy%27%2C%20%27semantic%20kernel%27%2C%20%27haystack%27%2C%20%27rag%27%2C%20%27llm%27%2C%20%27sagemaker%27%2C%20%27mlflow%27%2C%20%27mlops%27%2C%20%27llmops%27%2C%20%27aws%27%2C%20%27azure%27%2C%20%27gcp%27%2C%20%27python%27%2C%20%27typescript%27%2C%20%27node.js%27%2C%20%27react%27%2C%20%27next.js%27%2C%20%27terraform%27%2C%20%27pulumi%27%2C%20%27ansible%27%2C%20%27kubernetes%27%2C%20%27docker%27%2C%20%27postgresql%27%2C%20%27redis%27%2C%20%27kafka%27%2C%20%27databricks%27%2C%20%27figma%27%2C%20%27storybook%27%2C%20%27tailwind%27%2C%20%27cypress%27%2C%20%27jest%27%5D%3B%20const%20stackOf%20%3D%20%28title%2C%20snippet%2C%20bolds%29%20%3D%3E%20%7B%20const%20text%20%3D%20%28title%20%2B%20%27%20%27%20%2B%20snippet%20%2B%20%27%20%27%20%2B%20bolds.join%28%27%20%27%29%29.toLowerCase%28%29%3B%20return%20STACK.filter%28x%20%3D%3E%20hasPlace%28text%2C%20%5Bx%5D%29%29.join%28%27%2C%20%27%29%3B%20%7D%3B%20const%20blockOf%20%3D%20a%20%3D%3E%20a.closest%28%27div.g%2C%20div.MjjYud%2C%20div%5Bdata-hveid%5D%27%29%20%7C%7C%20a.parentElement%20%7C%7C%20a%3B%20const%20SUFFIX%20%3D%20%2F%5Cs%2A%28%5C%7C%5Cs%2ALinkedIn.%2A%7C-%5Cs%2AWelcome%20to%20the%20Jungle.%2A%7C-%5Cs%2ARecruitee%7C-%5Cs%2ATeamtailor%7C-%5Cs%2AApplication%7C%5C%7C%5Cs%2AJobs%20%28at%7Cbei%29%20.%2A%7C%5C.%5C.%5C.%29%5Cs%2A%24%2Fi%3B%20const%20splitParts%20%3D%20t%20%3D%3E%20t.split%28%2F%5Cs%2B%5B-%E2%80%93%E2%80%94%7C%5D%5Cs%2B%7C%5Cs%2B-%28%3F%3D%5CS%29%7C%28%3F%3C%3D%5CS%29-%5Cs%2B%2F%29.map%28x%20%3D%3E%20x.trim%28%29%29.filter%28Boolean%29%3B%20const%20compact%20%3D%20x%20%3D%3E%20%28x%20%7C%7C%20%27%27%29.toLowerCase%28%29.replace%28%2F%5B%5Ea-z0-9%5D%2Fg%2C%20%27%27%29%3B%20const%20stripCompany%20%3D%20%28t%2C%20company%29%20%3D%3E%20%7B%20const%20c%20%3D%20compact%28company%29%3B%20const%20words%20%3D%20t.split%28%2F%5Cs%2B%2F%29%3B%20let%20acc%20%3D%20%27%27%2C%20i%20%3D%200%3B%20while%20%28i%20%3C%20words.length%29%20%7B%20const%20w%20%3D%20compact%28words%5Bi%5D%29%3B%20if%20%28w%20%26%26%20c.startsWith%28acc%20%2B%20w%29%29%20%7B%20acc%20%2B%3D%20w%3B%20i%2B%2B%3B%20%7D%20else%20if%20%28acc%20%26%26%20%2F%5E%5Cd%2B%24%2F.test%28w%29%29%20i%2B%2B%3B%20else%20break%3B%20%7D%20return%20acc.length%20%3E%3D%202%20%26%26%20i%20%3C%20words.length%20%3F%20words.slice%28i%29.join%28%27%20%27%29.replace%28%2F%5E%5B%2C.%5Cs%5D%2B%2F%2C%20%27%27%29%20%3A%20t%3B%20%7D%3B%20const%20dropCompanyPart%20%3D%20%28parts%2C%20company%29%20%3D%3E%20%7B%20const%20c%20%3D%20compact%28company%29%3B%20const%20kept%20%3D%20c.length%20%3E%3D%203%20%3F%20parts.filter%28x%20%3D%3E%20%7B%20const%20k%20%3D%20compact%28x%29%3B%20return%20%21%28k.includes%28c%29%20%7C%7C%20c.startsWith%28k%29%29%3B%20%7D%29%20%3A%20parts%3B%20return%20kept.length%20%3F%20kept%20%3A%20parts%3B%20%7D%3B%20const%20roleOf%20%3D%20%28title%2C%20company%2C%20src%29%20%3D%3E%20%7B%20const%20t%20%3D%20title.replace%28SUFFIX%2C%20%27%27%29.trim%28%29%3B%20if%20%28src%20%3D%3D%3D%20%27Greenhouse%27%29%20%7B%20const%20g%20%3D%20t.match%28%2F%5EJob%20Application%20for%5Cs%2B%28.%2B%3F%29%5Cs%2Bat%5Cs%2B.%2B%24%2Fi%29%3B%20if%20%28g%29%20return%20g%5B1%5D.trim%28%29%3B%20%7D%20if%20%28src%20%3D%3D%3D%20%27Ashby%27%20%26%26%20t.includes%28%27%40%27%29%29%20return%20t.split%28%2F%5Cs%2B%40%5Cs%2A%2F%29%5B0%5D.trim%28%29%3B%20if%20%28src%20%3D%3D%3D%20%27Personio%27%29%20return%20t.split%28%27%7C%27%29%5B0%5D.trim%28%29%3B%20const%20parts%20%3D%20dropCompanyPart%28splitParts%28t%29%2C%20company%29%3B%20if%20%28parts.length%20%3D%3D%3D%201%29%20return%20stripCompany%28parts%5B0%5D%2C%20company%29.replace%28%2F%5E%5B-%E2%80%93%E2%80%94%7C%2C.%5Cs%5D%2B%2F%2C%20%27%27%29.trim%28%29%3B%20return%20%28src%20%3D%3D%3D%20%27Lever%27%20%3F%20parts.join%28%27%20-%20%27%29%20%3A%20parts%5B0%5D%29.trim%28%29%3B%20%7D%3B%20const%20m%3Dnew%20Map%28%29%3Bconst%20u%3Dnew%20URL%28location.href%29%3Bconst%20maxPages%3D30%2CdelayMs%3D1200%3Bconst%20s2w%3Ds%3D%3Es.split%28%27-%27%29.filter%28Boolean%29.map%28w%3D%3Ew.charAt%280%29.toUpperCase%28%29%2Bw.slice%281%29%29.join%28%27%20%27%29%3Bconst%20pus%3Dp%3D%3E%7Blet%20slug%3Dp.replace%28%2F%5E%5C%2Fjobs%5C%2Fview%5C%2F%2F%2C%27%27%29.replace%28%2F%5C%2F%24%2F%2C%27%27%29%3Btry%7Bslug%3DdecodeURIComponent%28slug%29%7Dcatch%28e%29%7B%7Dconst%20mm%3Dslug.match%28%2F%5E%28.%2B%29-at-%28.%2B%29-%5Cd%2B%24%2Fi%29%3Bif%28%21mm%29return%20null%3Breturn%7Brole%3As2w%28mm%5B1%5D%29%2Ccompany%3As2w%28mm%5B2%5D%29%7D%7D%3Bfor%28let%20p%3D0%3Bp%3CmaxPages%3Bp%2B%2B%29%7Bu.searchParams.set%28%27start%27%2Cp%2A10%29%3Bconst%20r%3Dawait%20fetch%28u.toString%28%29%2C%7Bcredentials%3A%27include%27%7D%29%3Bconst%20h%3Dawait%20r.text%28%29%3Bconst%20d%3Dnew%20DOMParser%28%29.parseFromString%28h%2C%27text%2Fhtml%27%29%3Bconst%20as%3D%5B...d.querySelectorAll%28%27a%5Bhref%2A%3D%22linkedin.com%2Fjobs%2Fview%22%5D%27%29%5D%3Bconst%20b%3Dm.size%3Bas.forEach%28a%3D%3E%7Blet%20pu%3Btry%7Bpu%3Dnew%20URL%28a.href%29%7Dcatch%28e%29%7Breturn%7Dif%28%2F%5C.translate%5C.goog%24%2Fi.test%28pu.hostname%29%29%7Bconst%20inner%3Dpu.searchParams.get%28%27u%27%29%3Bif%28%21inner%29return%3Btry%7Bpu%3Dnew%20URL%28inner%29%7Dcatch%28e%29%7Breturn%7D%7Dif%28%21pu.hostname.endsWith%28%27linkedin.com%27%29%7C%7C%21pu.pathname.startsWith%28%27%2Fjobs%2Fview%27%29%29return%3Bconst%20c%3Dpu.origin%2Bpu.pathname%3Bif%28%21m.has%28c%29%29%7Bconst%20si%3Dpus%28pu.pathname%29%3Bm.set%28c%2C%7Btitle%3A%28%28a.querySelector%28%27h3%27%29%7C%7Ca%29.textContent%7C%7C%27%27%29.trim%28%29.replace%28%2F%5Cs%2B%2Fg%2C%27%20%27%29%2Csnippet%3A%28blockOf%28a%29.textContent%7C%7C%27%27%29.replace%28%2F%5Cs%2B%2Fg%2C%27%20%27%29%2Cbolds%3A%5B...blockOf%28a%29.querySelectorAll%28%27em%2C%20b%27%29%5D.map%28e%3D%3Ee.textContent%7C%7C%27%27%29%2Csr%3Asi%3Fsi.role%3A%27%27%2Csc%3Asi%3Fsi.company%3A%27%27%7D%29%7D%7D%29%3Bif%28as.length%3D%3D%3D0%7C%7Cm.size%3D%3D%3Db%29break%3Bawait%20new%20Promise%28res%3D%3EsetTimeout%28res%2CdelayMs%29%29%7Dconst%20pt%3Dt%3D%3E%7Blet%20mm%3Dt.match%28%2F%5E%28.%2A%3F%29%5Cs%2Bhiring%5Cs%2B%28.%2A%3F%29%5Cs%2Bin%5Cs%2B%28.%2A%3F%29%5Cs%2A%5C%7C%5Cs%2ALinkedIn%5Cs%2A%24%2Fi%29%3Bif%28mm%29return%7Bc%3Amm%5B1%5D.trim%28%29%2Cr%3Amm%5B2%5D.trim%28%29%7D%3Bmm%3Dt.match%28%2F%5E%28.%2A%3F%29%5Cschez%5Cs%28.%2A%3F%29%5Cs%2A%5C%7C%5Cs%2ALinkedIn%5Cs%2A%24%2Fi%29%3Bif%28mm%29return%7Bc%3Amm%5B2%5D.split%28%2F%5Cs%5B%E2%80%94%E2%80%93%5D%5Cs%2F%29%5B0%5D.trim%28%29%2Cr%3Amm%5B1%5D.trim%28%29%7D%3Bmm%3Dt.match%28%2F%5E%28.%2A%3F%29%5Csrecrute%5Cs%28%3F%3Apour%5Cs%28%3F%3Aun%20poste%7Cdes%20postes%29%5Csde%5Cs%7Cune%3F%5Cs%29%3F%28.%2A%3F%29%5Cs%2A%5C%7C%5Cs%2ALinkedIn%5Cs%2A%24%2Fi%29%3Bif%28mm%29return%7Bc%3Amm%5B1%5D.trim%28%29%2Cr%3Amm%5B2%5D.split%28%2F%5Cs%5B%E2%80%94%E2%80%93%5D%5Cs%2F%29%5B0%5D.trim%28%29%7D%3Bmm%3Dt.match%28%2F%5E%28.%2A%3F%29%5Csat%5Cs%28.%2A%3F%29%5Cs%2A%5C%7C%5Cs%2ALinkedIn%5Cs%2A%24%2Fi%29%3Bif%28mm%29return%7Bc%3Amm%5B2%5D.trim%28%29%2Cr%3Amm%5B1%5D.trim%28%29%7D%3Bmm%3Dt.match%28%2F%5E%28.%2A%3F%29%5Cs-%5Cs%28.%2A%3F%29%5Cs%2A%5C%7C%5Cs%2ALinkedIn%5Cs%2A%24%2Fi%29%3Bif%28mm%29return%7Bc%3Amm%5B2%5D.trim%28%29%2Cr%3Amm%5B1%5D.trim%28%29%7D%3Breturn%7Bc%3A%27%27%2Cr%3At%7D%7D%3Bconst%20esc%3Ds%3D%3E%27%22%27%2BString%28s%29.replace%28%2F%22%2Fg%2C%27%22%22%27%29%2B%27%22%27%3Bconst%20ts%3DDate.now%28%29%3Blet%20n%3D0%3Bconst%20rows%3D%5B%5B%27ID%27%2C%27Title%27%2C%27Company%27%2C%27Role%27%2C%27Location%27%2C%27Pays%27%2C%27Stack%27%2C%27Source%27%2C%27URL%27%5D.map%28esc%29.join%28%27%2C%27%29%5D%3Bm.forEach%28%28info%2Cl%29%3D%3E%7Bconst%20ft%3Dpt%28info.title%29%3Bconst%20c%3Dinfo.sc%7C%7Cft.c%3Bconst%20r%3Dinfo.sr%7C%7Cft.r%3Bconst%20g%3Dlocate%28info.title%2Cinfo.snippet%2C%27LinkedIn%27%2Cinfo.bolds%2Cl%29%3Brows.push%28%5Bts%2B%27-%27%2BString%28%2B%2Bn%29.padStart%283%2C%270%27%29%2Cinfo.title%2Cc%2Cr%2Cg.loc%2Cg.pays%2CstackOf%28info.title%2Cinfo.snippet%2Cinfo.bolds%29%2C%27LinkedIn%27%2Cl%5D.map%28esc%29.join%28%27%2C%27%29%29%7D%29%3Bconst%20csv%3Drows.join%28%27%5Cr%5Cn%27%29%3Bconst%20blob%3Dnew%20Blob%28%5Bcsv%5D%2C%7Btype%3A%27text%2Fcsv%3Bcharset%3Dutf-8%3B%27%7D%29%3Bconst%20bu%3DURL.createObjectURL%28blob%29%3Bconst%20a%3Ddocument.createElement%28%27a%27%29%3Ba.href%3Dbu%3Ba.download%3D%27linkedin-jobs-%27%2Bts%2B%27.csv%27%3Bdocument.body.appendChild%28a%29%3Ba.click%28%29%3Bdocument.body.removeChild%28a%29%3BsetTimeout%28%28%29%3D%3EURL.revokeObjectURL%28bu%29%2C5000%29%3Balert%28%27Done%3A%20%27%2Bm.size%2B%27%20unique%20job%20listings%20exported%20to%20CSV.%27%29%7D%29%28%29%3B

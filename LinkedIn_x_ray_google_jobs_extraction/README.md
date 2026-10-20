@@ -1,114 +1,120 @@
-# LinkedIn Job Search Extractor
+# Google Jobs X-Ray Extractors
 
-A browser bookmarklet that scans a Google search of LinkedIn job postings
-(a query using `site:linkedin.com/jobs/view`), collects every unique job
-link on every results page, and exports them to a CSV file you can open
-in Excel or Google Sheets.
+Two browser bookmarklets that page through a Google search of job
+postings, collect every unique job link on every results page, and export
+them to a CSV file you can open in Excel or Google Sheets.
+
+| Bookmarklet | Use it on | Keeps |
+|---|---|---|
+| `bookmarklet.js` (LinkedIn) | `site:fr.linkedin.com/jobs/view <keywords>` | LinkedIn job pages only |
+| `any_site_bookmarklet.js` (any site) | any job search, e.g. `site:jobs.lever.co OR site:welcometothejungle.com <keywords>` | every organic result |
 
 ## What's in this folder
 
-- `bookmarklet.js` -- the tool's source code, with a ready-to-paste
-  one-line version at the bottom of the file.
+- `bookmarklet.js` -- the LinkedIn extractor's source code, with a
+  ready-to-paste one-line version at the bottom of the file.
+- `any_site_bookmarklet.js` -- the any-site extractor, same layout.
 - `README.md` -- this file.
 
 ## Requirements
 
 - A Chromium-based browser: Google Chrome, Microsoft Edge, or Brave.
   Works the same way on macOS and Windows.
-- A Google search results page using the pattern:
-  `site:linkedin.com/jobs/view <your keywords>`
+- A Google search results page (see the table above for the query pattern).
 
 ## Installation
+
+Repeat for each bookmarklet you want.
 
 ### macOS (Google Chrome)
 
 1. Show the bookmarks bar if it's hidden: `Cmd + Shift + B`.
-2. Open `bookmarklet.js` in any text editor (TextEdit, VS Code, etc.).
+2. Open `bookmarklet.js` (or `any_site_bookmarklet.js`) in any text
+   editor (TextEdit, VS Code, etc.).
 3. Scroll to the bottom, under "READY-TO-PASTE BOOKMARKLET", and copy
-   the entire line that starts with `javascript:`.
+   the entire line that starts with `javascript:`. It is URL-encoded
+   (lots of `%20`, `%3D`...), which is normal.
 4. Right-click anywhere on the bookmarks bar and choose "Add Page...".
-5. Name it, for example `Export LinkedIn Jobs CSV`.
+5. Name it, for example `linkedin jobs` or `alljobs`.
 6. In the URL field, paste the `javascript:...` line you copied.
 7. Save.
+
+If you had an older version installed, delete the old bookmark first.
 
 ### Windows (Google Chrome or Microsoft Edge)
 
 1. Show the bookmarks/favorites bar if it's hidden: `Ctrl + Shift + B`.
-2. Open `bookmarklet.js` in any text editor (Notepad, VS Code, etc.).
+2. Open `bookmarklet.js` (or `any_site_bookmarklet.js`) in any text
+   editor (Notepad, VS Code, etc.).
 3. Scroll to the bottom, under "READY-TO-PASTE BOOKMARKLET", and copy
    the entire line that starts with `javascript:`.
 4. Right-click the bookmarks/favorites bar and choose "Add page"
    (Chrome) or "Add favorite" (Edge).
-5. Name it, for example `Export LinkedIn Jobs CSV`.
+5. Name it, for example `linkedin jobs` or `alljobs`.
 6. Paste the `javascript:...` line into the URL/address field.
 7. Save.
 
 ## How to use it
 
 1. Go to Google and run a search such as:
-   `site:linkedin.com/jobs/view langchain OR langgraph OR crewai`
+   `site:fr.linkedin.com/jobs/view langchain OR langgraph OR crewai`
 2. Click the bookmark you created above.
 3. Wait -- it pages silently through the results (roughly 1.5 seconds
    per page, so a 10-15 page search takes 20-40 seconds). Nothing
    visible happens on screen until it's done.
-4. A browser alert appears when finished: "Done: X unique job
-   listings exported to CSV."
-5. A file named `linkedin-jobs-<timestamp>.csv` downloads automatically
-   to your Downloads folder. Open it in Excel or Google Sheets.
+4. A browser alert appears when finished: "Done: X unique ... exported
+   to CSV."
+5. A CSV downloads automatically to your Downloads folder:
+   `linkedin-jobs-<timestamp>.csv` or `google-jobs-<timestamp>.csv`.
+
+## CSV columns
+
+| Column | LinkedIn | Any site | How it's filled |
+|---|---|---|---|
+| ID | yes | -- | Export timestamp + row number (e.g. `1760870000000-001`), so rows from different exports stay distinct after merging. |
+| Title | yes | yes | The result's heading text on Google. |
+| Company | yes | yes | LinkedIn: from the URL slug (see below), else from the title. Any site: from the ATS URL (Lever/Greenhouse/Ashby path, Teamtailor/Recruitee/Personio subdomain, WTTJ `/companies/<name>`...); other sites fall back to the domain name. |
+| Role | yes | yes | LinkedIn: URL slug, else title. Any site: the title with the company name and site suffix (`| LinkedIn`, `- Welcome to the Jungle`...) removed. |
+| Location | yes | yes | Best guess from the title (`— Paris`, `CDI à Lyon`, `hiring ... in ...`), then from bold place names in the snippet, then from a known-places list. Can be blank. |
+| Pays | yes | yes | `France`, `Hors France`, or `?`, from a list of French cities vs. places outside France. LinkedIn results with no place found default to `France` (the search targets `fr.linkedin.com`). |
+| Stack | yes | yes | Tools found in the title/snippet, from a fixed list of ~40 (Bedrock, LangChain, AWS, Python, React, Terraform, Kubernetes, Figma...). Edit the `STACK` array to change it. |
+| Source | yes | yes | `LinkedIn`, or the ATS / site name (Lever, Greenhouse, Ashby, Teamtailor, Workable, WTTJ, Other...). |
+| URL | yes | yes | The cleaned job link (tracking parameters removed). |
+
+### How LinkedIn Company/Role are extracted
+
+1. **From the URL itself.** LinkedIn job URLs encode
+   "<role-slug>-at-<company-slug>-<jobId>" in the path, e.g.
+   `/jobs/view/ingénieur-ia-at-kiiro-4465100210`. That slug doesn't
+   depend on the result's display language, so it's the primary source.
+   Percent-encoded characters (`%C3%A9` for "é") are decoded first.
+2. **From Title, as a fallback**, when a URL has no slug or no "-at-"
+   segment. Google's title text depends on locale:
+   - English: "<Company> hiring <Role> in <Location> | LinkedIn" or
+     "<Role> at <Company> | LinkedIn"
+   - French: "<Role> chez <Company>" " | LinkedIn", or "<Company> recrute
+     [pour un poste de | pour des postes de | un | une] <Role> | LinkedIn"
+   - Less often: "<Role> - <Company> | LinkedIn"
+
+   If nothing matches, Company is left blank and Role is the raw title --
+   check those rows manually.
 
 ## Notes and troubleshooting
 
-- The script checks up to 30 result pages by default and stops on its
-  own as soon as a page returns no new links.
+- Both scripts check up to 30 result pages and stop as soon as a page
+  returns no new links.
 - If Google briefly blocks the requests or shows a CAPTCHA, wait a
-  minute before trying again -- this can happen after many fast
-  automated requests in a row.
-- The CSV has four columns: Title (the raw link text from the search
-  result), Company, Role, and URL. Company and Role are extracted two
-  ways, in this order:
-  1. **From the URL itself.** LinkedIn job URLs encode
-     "<role-slug>-at-<company-slug>-<jobId>" in the path, e.g.
-     `/jobs/view/ingénieur-ia-at-kiiro-4465100210`. That slug is part of
-     the canonical URL, not a Google-rendered title, so it's the same
-     regardless of the result's display language -- this is the
-     primary source and covers English, French, and any other locale
-     without needing a language-specific pattern. Accented characters
-     and punctuation come through the anchor's raw href still
-     percent-encoded (e.g. "%C3%A9" for "é"), so the slug is run through
-     `decodeURIComponent` before being split into words -- without that
-     step those percent codes would show up literally in Company/Role.
-  2. **From Title, as a fallback**, when a URL has no slug (bare
-     numeric job IDs) or no "-at-" segment. Google's title text for a
-     LinkedIn job listing depends on result locale:
-     - English: "<Company> hiring <Role> in <Location> | LinkedIn" or
-       "<Role> at <Company> | LinkedIn"
-     - French: "<Role> chez <Company>" (sometimes with " -- <Location>"
-       appended) " | LinkedIn", or "<Company> recrute [pour un poste de
-       | pour des postes de | un | une] <Role> | LinkedIn"
-     - Less often: "<Role> - <Company> | LinkedIn"
-
-  If a title doesn't match any of the patterns above and the URL has no
-  usable slug either, Company is left blank and Role falls back to the
-  full raw title -- check those rows manually. There's no Location
-  column: it only ever showed up in a couple of the title patterns
-  above and was blank or wrong everywhere else, so it wasn't reliable
-  enough to expose as its own field. None of this includes work mode,
-  salary, posted date, or framework mentions -- those aren't on the
-  Google results page at all and would require a second pass that
-  opens each job's own LinkedIn page individually, which this
-  bookmarklet doesn't do.
-- Google occasionally injects unrelated UI links (e.g. "AI Mode",
-  "Translate this page") into the results page whose href happens to
-  carry a linkedin.com/jobs/view URL as a tracking/wrapper parameter
-  rather than being the job link itself. The script resolves each
-  anchor's real target (unwrapping translate.goog links) and only keeps
-  it if that target's host is linkedin.com and its path starts with
-  /jobs/view, so these show up as their real listing (deduped against
-  the direct link) instead of as junk rows.
-- To adjust how many pages it checks or how long it waits between
-  requests, open `bookmarklet.js`, change the `maxPages` and `delayMs`
-  values near the top of the readable source, then regenerate a single
-  line `javascript:` version from the edited code (remove line breaks
-  and comments) before pasting it into a bookmark.
-- This bookmarklet only reads the current Google search results page;
-  it does not log in to LinkedIn or access any private data.
+  minute before trying again.
+- Location, Pays and Stack only use what's visible on the Google results
+  page (title, snippet, bold words). They're a first-pass triage, not
+  verified data. Work mode, salary and posted date aren't on the results
+  page at all and would need a second pass that opens each job page.
+- Google's "Translate this page" links (`translate.goog`) are unwrapped
+  to the real job URL, and links pointing back to Google itself are
+  dropped, so you don't get junk rows.
+- To change the page cap or delay, edit `maxPages` / `delayMs` in the
+  readable code, then rebuild the one-line version: join the non-empty
+  lines with spaces, URL-encode the result, and prefix it with
+  `javascript:`.
+- These bookmarklets only read the current Google search results page;
+  they do not log in to LinkedIn or access any private data.
