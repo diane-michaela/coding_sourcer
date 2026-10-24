@@ -18,6 +18,7 @@ for a `README.md` or `CLAUDE.md` inside before assuming behavior from folder nam
 | `teamtailor_career_scrapping/` | Scraping TeamTailor-hosted career pages / company discovery. |
 | `coding_sourcer/` | Reusable template scripts for sourcing (GitHub, Hugging Face, Meetup, Make, TeamTailor) — starting points to adapt, not one-off scripts. |
 | `github_extraction/` | GitHub-based candidate/repo sourcing (production ML/NLP sourcer `lisp.py`). |
+| `li-git-bookmarklets/` | LinkedIn → GitHub and GitHub → LinkedIn bookmarklets (moved here from `github_extraction/bookmarklets/` on 2026-10-24). Edit the `.js`, run `build.py`, re-drag from `install_local.html`. `.env` and `*_local.*` hold the GitHub token and are gitignored. No `//` comments in the `.js` (the build joins it into one line). |
 | `Product Manager/` | Exploratory sourcing for PM/Designer/AI-Squad roles — no active req/budget as of 2026-07-27, nothing wired to production. Re-confirm scope before treating as real. |
 | `Intake-Meeting-Automation/` | Make.com scenario docs/blueprints for the hiring-intake automation. Live Make scenarios are the source of truth, not the JSON files here. |
 | `pb-daily-dashboard/` | Daily PhantomBuster dashboard (scheduled via GitHub Actions, `.github/workflows/daily-dashboard.yml`). |

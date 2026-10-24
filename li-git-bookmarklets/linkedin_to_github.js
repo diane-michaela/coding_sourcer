@@ -1,0 +1,175 @@
+(function(){
+const OLD = document.getElementById('li2gh');
+if (OLD) { OLD.remove(); return; }
+const clean = s => (s || '').replace(/\s+/g, ' ').trim();
+const noAccents = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+const norm = s => noAccents(clean(s)).toLowerCase();
+const fromTitle = clean(document.title.replace(/^\(\d+\)\s*/, '').split(/\s\|\s/)[0]);
+const h1 = clean((document.querySelector('main h1') || {}).innerText);
+let name = fromTitle && !/^linkedin$/i.test(fromTitle) ? fromTitle : h1;
+name = clean(name.replace(/\s*\(.*?\)\s*/g, ' ').replace(/,.*$/, '').replace(/[\p{Extended_Pictographic}\p{So}‍️]/gu, ' '));
+const contact = document.querySelector('a[href*="/overlay/contact-info"]');
+const contactP = contact && contact.closest('p');
+const locRow = contactP && contactP.parentElement;
+const locP = locRow && locRow.querySelector('p');
+const city = clean(clean(locP && locP !== contactP ? locP.innerText : '').split(',')[0].replace(/^(Greater|Région de|Region de)\s+/i, '').replace(/\s+(Metropolitan Area|Area|et périphérie)$/i, ''));
+const companyP = locRow && locRow.previousElementSibling;
+const hasCompany = companyP && companyP.tagName === 'P' && companyP.previousElementSibling && companyP.previousElementSibling.tagName === 'P';
+const companyLine = clean(hasCompany ? companyP.innerText : '');
+const company = companyLine.startsWith('·') ? '' : companyLine.split(' · ')[0];
+const headlineP = hasCompany ? companyP.previousElementSibling : companyP;
+const headline = clean(headlineP && headlineP.tagName === 'P' ? headlineP.innerText : '');
+const vanity = decodeURIComponent((location.pathname.match(/\/in\/([^/]+)/) || [])[1] || '');
+const vanityBase = vanity.replace(/-[0-9a-f]{5,}$/i, '').replace(/-\d+$/, '');
+const STACK = ['c#', 'c++', 'python', 'java', 'javascript', 'typescript', 'go', 'golang', 'rust', 'ruby', 'php', 'kotlin', 'swift', 'scala', 'elixir', 'dart', 'r'];
+const stack = STACK.filter(k => new RegExp('(^|[^a-z0-9+#])' + k.replace(/[+#]/g, '\\$&') + '($|[^a-z0-9+#])', 'i').test(headline)).map(k => k === 'golang' ? 'go' : k);
+const unwrap = href => { try { const u = new URL(href); return /linkedin\.com$/.test(u.hostname) && u.searchParams.get('url') ? u.searchParams.get('url') : href; } catch (e) { return href; } };
+const RESERVED = /^(orgs|topics|features|about|pricing|sponsors|login|join|search|marketplace|collections|apps|site|settings|enterprise)$/i;
+const found = new Set();
+document.querySelectorAll('a[href]').forEach(a => {
+  const m = unwrap(a.href).match(/github\.com\/([A-Za-z0-9-]{1,39})(?=[/?#]|$)/i);
+  if (m && !RESERVED.test(m[1])) found.add('https://github.com/' + m[1]);
+});
+(document.body.innerText.match(/github\.com\/[A-Za-z0-9-]{1,39}/gi) || []).forEach(x => {
+  const u = x.split('/')[1];
+  if (!RESERVED.test(u)) found.add('https://github.com/' + u);
+});
+const el = (tag, css, text) => { const e = document.createElement(tag); if (css) e.style.cssText = css; if (text) e.textContent = text; return e; };
+const link = (label, url) => { const a = el('a', 'display:block;padding:6px 8px;margin:4px 0;background:#f2f4f7;border-radius:6px;color:#0a58ca;text-decoration:none', label); a.href = url; a.target = '_blank'; a.rel = 'noopener'; return a; };
+const field = (label, value) => { const l = el('label', 'display:block', label); const i = el('input', 'width:100%;box-sizing:border-box;padding:4px;margin:2px 0 6px'); i.value = value; l.appendChild(i); return [l, i]; };
+const box = el('div', 'position:fixed;top:80px;right:16px;z-index:99999;width:360px;max-height:80vh;overflow:auto;background:#fff;color:#111;border:1px solid #ccc;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.2);padding:14px;font:14px/1.45 -apple-system,sans-serif');
+box.id = 'li2gh';
+const head = el('div', 'display:flex;justify-content:space-between;align-items:center;margin-bottom:8px');
+head.appendChild(el('b', '', 'LinkedIn → GitHub'));
+const x = el('span', 'cursor:pointer;font-size:18px', '×'); x.onclick = () => box.remove(); head.appendChild(x);
+box.appendChild(head);
+const [nL, nIn] = field('Nom', name), [lL, lIn] = field('Lieu', city || 'France'), [cL, cIn] = field('Entreprise', company);
+[nL, lL, cL].forEach(e => box.appendChild(e));
+const foundDiv = el('div'), apiDiv = el('div'), searchDiv = el('div');
+box.appendChild(foundDiv);
+if (found.size) { foundDiv.appendChild(el('b', '', 'Trouvé sur la page :')); found.forEach(u => foundDiv.appendChild(link(u.replace('https://', ''), u))); }
+else foundDiv.appendChild(el('div', 'color:#666', 'Aucun lien GitHub sur la page.'));
+const nameParts = () => noAccents(clean(nIn.value)).toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(Boolean);
+let loginBase = '';
+const apiBtn = el('button', 'margin:8px 0;padding:6px 10px;border:0;border-radius:6px;background:#0a66c2;color:#fff;cursor:pointer;width:100%', 'Classer les comptes GitHub (API)');
+box.appendChild(apiBtn);
+box.appendChild(apiDiv);
+box.appendChild(searchDiv);
+box.appendChild(el('div', 'color:#666;font-size:12px;margin-top:8px', 'Astuce : ouvre « Coordonnées » avant de cliquer le favori, les liens GitHub qui y sont listés seront détectés.'));
+document.body.appendChild(box);
+const PRESET = '__GH_TOKEN__';
+const store = { get: () => { try { return localStorage.getItem('li2gh_token') || (PRESET.startsWith('__') ? '' : PRESET); } catch (e) { return PRESET.startsWith('__') ? '' : PRESET; } }, set: v => { try { localStorage.setItem('li2gh_token', v); } catch (e) {} } };
+const cache = new Map();
+const api = (path, token) => {
+  if (!cache.has(path)) cache.set(path, apiRaw(path, token).catch(e => { cache.delete(path); throw e; }));
+  return cache.get(path);
+};
+const orgMembers = new Set();
+const commitAuthors = new Map();
+const apiRaw = async (path, token) => {
+  const r = await fetch('https://api.github.com' + path, { headers: { Accept: 'application/vnd.github+json', Authorization: 'Bearer ' + token } });
+  if (r.status === 401) { store.set(''); throw new Error('Token refusé, il sera redemandé au prochain clic.'); }
+  if (!r.ok) throw new Error('GitHub ' + r.status + (r.status === 403 ? ' (limite atteinte, réessaie dans une minute)' : ''));
+  return r.json();
+};
+const score = u => {
+  const why = [];
+  let s = 0;
+  const n = norm(nIn.value), l = norm(lIn.value), c = norm(cIn.value);
+  const text = norm([u.bio, u.company, u.blog, u.twitter_username].join(' '));
+  if (vanity && (text.includes('linkedin.com/in/' + vanity.toLowerCase()) || norm(u.blog).includes(vanity.toLowerCase()))) { s += 5; why.push('lien LinkedIn'); }
+  const login = u.login.toLowerCase().replace(/-/g, '');
+  if (vanityBase.length >= 4 && login === vanityBase.toLowerCase().replace(/-/g, '')) { s += 4; why.push('login = URL LinkedIn'); }
+  else if (loginBase.length >= 5 && login.startsWith(loginBase)) { s += 1; why.push('login ≈ nom'); }
+  if (n && norm(u.name) === n) { s += 3; why.push('nom exact'); }
+  if (l && norm(u.location).includes(l)) { s += 2; why.push('lieu'); }
+  if (c.length >= 3 && text.includes(c)) { s += 3; why.push('entreprise'); }
+  if (orgMembers.has(u.login.toLowerCase())) { s += 2; why.push('membre org GitHub'); }
+  const nc = commitAuthors.get(u.login.toLowerCase());
+  if (nc) { s += 4; why.push(nc + ' commit(s) signé(s) du nom'); }
+  const langs = (u.langs || []).filter(x => stack.includes(x));
+  if (langs.length) { s += 2; why.push('stack ' + langs.join('/')); }
+  return { s, why };
+};
+apiBtn.onclick = async () => {
+  let token = store.get();
+  if (!token) { token = clean(prompt('Token GitHub (classic, aucune case cochée) :') || ''); if (!token) return; store.set(token); }
+  apiDiv.textContent = 'Recherche…';
+  const parts = nameParts();
+  loginBase = parts.length >= 2 ? parts[0] + parts[1] : '';
+  try {
+    const n = clean(nIn.value), l = clean(lIn.value), q = loc => 'fullname:"' + n + '"' + (loc ? ' location:"' + loc + '"' : '');
+    let res = await api('/search/users?per_page=6&q=' + encodeURIComponent(q(l)), token);
+    if (!res.items.length && l) res = await api('/search/users?per_page=6&q=' + encodeURIComponent(q('')), token);
+    if (!res.items.length && noAccents(n) !== n) res = await api('/search/users?per_page=6&q=' + encodeURIComponent('fullname:"' + noAccents(n) + '"'), token);
+    const logins = res.items.map(i => i.login);
+    if (loginBase.length >= 5) {
+      const lq = loc => loginBase + ' in:login' + (loc ? ' location:"' + loc + '"' : '');
+      let lr = l ? await api('/search/users?per_page=5&q=' + encodeURIComponent(lq(l)), token).catch(() => ({ items: [] })) : { items: [] };
+      if (!lr.items.length) lr = await api('/search/users?per_page=5&q=' + encodeURIComponent(lq('')), token).catch(() => ({ items: [] }));
+      lr.items.forEach(i => { if (!logins.some(x => x.toLowerCase() === i.login.toLowerCase())) logins.push(i.login); });
+    }
+    commitAuthors.clear();
+    if (parts.length >= 2 && parts.every(x => x.length >= 3)) {
+      const cr = await api('/search/commits?per_page=50&q=' + encodeURIComponent('author-name:"' + n + '"'), token).catch(() => ({ items: [] }));
+      cr.items.forEach(i => { const lg = i.author && i.author.login; if (lg) commitAuthors.set(lg.toLowerCase(), (commitAuthors.get(lg.toLowerCase()) || 0) + 1); });
+      [...commitAuthors.keys()].slice(0, 5).forEach(lg => { if (!logins.some(x => x.toLowerCase() === lg)) logins.push(lg); });
+    }
+    const orgSlug = norm(cIn.value).replace(/[^a-z0-9]/g, '');
+    orgMembers.clear();
+    if (orgSlug.length >= 3 && parts[0]) {
+      const members = await api('/orgs/' + orgSlug + '/public_members?per_page=100', token).catch(() => []);
+      const details = await Promise.all(members.slice(0, 30).map(m => api('/users/' + m.login, token).catch(() => null)));
+      details.filter(u => u && (norm(u.name).split(' ').includes(parts[0]) || u.login.toLowerCase().includes(parts[0]))).forEach(u => {
+        orgMembers.add(u.login.toLowerCase());
+        if (!logins.some(x => x.toLowerCase() === u.login.toLowerCase())) logins.push(u.login);
+      });
+    }
+    if (vanityBase.length >= 4) {
+      for (const v of new Set([vanityBase, vanityBase.replace(/-/g, '')])) {
+        const direct = await api('/users/' + encodeURIComponent(v), token).catch(() => null);
+        if (direct && !logins.some(x => x.toLowerCase() === direct.login.toLowerCase())) logins.unshift(direct.login);
+      }
+    }
+    const users = await Promise.all(logins.map(async login => {
+      const u = await api('/users/' + login, token);
+      const repos = await api('/users/' + login + '/repos?per_page=30&sort=pushed', token).catch(() => []);
+      u.langs = [...new Set(repos.map(r => (r.language || '').toLowerCase()).filter(Boolean))];
+      return u;
+    }));
+    const ranked = users.map(u => Object.assign(u, score(u))).sort((a, b) => b.s - a.s);
+    apiDiv.textContent = '';
+    if (!ranked.length) { apiDiv.appendChild(el('div', 'color:#666', 'Aucun compte trouvé via l’API.')); return; }
+    apiDiv.appendChild(el('b', '', ranked.length + ' compte(s), du plus probable au moins probable :'));
+    ranked.forEach(u => {
+      const a = link(u.login + (u.name ? ' – ' + u.name : '') + '  [' + u.s + ']', u.html_url);
+      a.appendChild(el('div', 'color:#444;font-size:12px', [u.location, u.company, u.public_repos + ' repos', u.langs.slice(0, 4).join('/'), u.why.join(', ')].filter(Boolean).join(' · ')));
+      apiDiv.appendChild(a);
+    });
+  } catch (e) {
+    apiDiv.textContent = '';
+    apiDiv.appendChild(el('div', 'color:#b00', /Failed to fetch|NetworkError|Content Security/i.test(e.message) ? 'LinkedIn bloque l’appel à GitHub depuis la page. Utilise les recherches ci-dessous.' : e.message));
+  }
+};
+const render = () => {
+  const n = clean(nIn.value), l = clean(lIn.value), n2 = noAccents(n);
+  const loc = l ? (/\s/.test(l) ? '"' + l + '"' : l) : '';
+  const g = q => 'https://www.google.com/search?q=' + encodeURIComponent(q);
+  const gh = q => 'https://github.com/search?type=users&q=' + encodeURIComponent(q);
+  searchDiv.textContent = '';
+  searchDiv.appendChild(el('b', 'display:block;margin-top:8px', 'Rechercher :'));
+  searchDiv.appendChild(link('GitHub : fullname + lieu', gh('fullname:"' + n + '"' + (loc ? ' location:' + loc : ''))));
+  searchDiv.appendChild(link('GitHub : fullname seul', gh('fullname:"' + n + '"')));
+  searchDiv.appendChild(link('GitHub : commits signés de ce nom', 'https://github.com/search?type=commits&q=' + encodeURIComponent('author-name:"' + n + '"')));
+  searchDiv.appendChild(link('Google : site:github.com + lieu', g('site:github.com "' + n + '" ' + loc + ' -topics -orgs')));
+  searchDiv.appendChild(link('Google : "nom" github (tout le web)', g('"' + n + '" github')));
+  if (n2 !== n) searchDiv.appendChild(link('GitHub : nom sans accents', gh('fullname:"' + n2 + '"' + (loc ? ' location:' + loc : ''))));
+  if (vanityBase.length >= 4) searchDiv.appendChild(link('GitHub : github.com/' + vanityBase + ' (même pseudo que LinkedIn)', 'https://github.com/' + vanityBase));
+  const p = nameParts();
+  if (p.length >= 2) searchDiv.appendChild(link('GitHub : pseudo commençant par ' + p[0] + p[1] + (loc ? ' + lieu' : ''), gh(p[0] + p[1] + ' in:login' + (loc ? ' location:' + loc : ''))));
+  if (vanity) searchDiv.appendChild(link('Google : profils GitHub qui pointent vers ce LinkedIn', g('site:github.com "linkedin.com/in/' + vanity + '"')));
+};
+nIn.oninput = render;
+lIn.oninput = render;
+render();
+})();

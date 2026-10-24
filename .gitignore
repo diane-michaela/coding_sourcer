@@ -93,3 +93,6 @@ irina.svg
 vlastelica.png
 pierre-richard-dupont.png
 pierre-richard-dupont.svg
+
+# Bookmarklet builds with an embedded GitHub token
+li-git-bookmarklets/*_local.*
