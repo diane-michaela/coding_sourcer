@@ -25,17 +25,23 @@ const x = el('span', 'cursor:pointer;font-size:18px', '×'); x.onclick = () => b
 box.appendChild(head);
 const [nL, nIn] = field('Nom', pageName), [lL, lIn] = field('Lieu', pageLoc.split(',')[0] || ''), [cL, cIn] = field('Entreprise', pageCompany);
 [nL, lL, cL].forEach(e => box.appendChild(e));
-const foundDiv = el('div'), apiDiv = el('div'), searchDiv = el('div');
+const foundDiv = el('div'), apiDiv = el('div'), sigDiv = el('div'), searchDiv = el('div');
 box.appendChild(foundDiv);
+let grav = [];
 const showFound = () => {
   foundDiv.textContent = '';
   if (found.size) { foundDiv.appendChild(el('b', '', 'LinkedIn trouvé :')); found.forEach(u => foundDiv.appendChild(link(u.replace('https://www.', ''), u))); }
   else foundDiv.appendChild(el('div', 'color:#666', 'Aucun lien LinkedIn sur la page.'));
+  if (grav.length) {
+    foundDiv.appendChild(el('b', 'display:block;margin-top:6px', 'LinkedIn possible via Gravatar (cherche « Verified accounts », 404 = pas de Gravatar) :'));
+    grav.forEach(g => foundDiv.appendChild(link('Gravatar : ' + g.email, g.url)));
+  }
 };
 showFound();
 const apiBtn = el('button', 'margin:8px 0;padding:6px 10px;border:0;border-radius:6px;background:#0a66c2;color:#fff;cursor:pointer;width:100%', 'Relancer la recherche du vrai nom');
 box.appendChild(apiBtn);
 box.appendChild(apiDiv);
+box.appendChild(sigDiv);
 box.appendChild(searchDiv);
 box.appendChild(el('div', 'color:#666;font-size:12px;margin-top:8px', 'Le nom vient des commits (auteur git, comme dans un .patch) : vérifie-le avant de contacter.'));
 document.body.appendChild(box);
@@ -52,14 +58,19 @@ const api = async (path, token) => {
   return r.json();
 };
 const isNoreply = e => /noreply|users\.noreply\.github\.com/i.test(e || '');
+const WEBMAIL = new Set('gmail.com googlemail.com yahoo.com yahoo.fr ymail.com hotmail.com hotmail.fr outlook.com outlook.fr live.com live.fr msn.com icloud.com me.com mac.com aol.com gmx.com gmx.de gmx.fr web.de protonmail.com proton.me pm.me free.fr orange.fr wanadoo.fr laposte.net sfr.fr neuf.fr bbox.fr yandex.ru yandex.com mail.ru qq.com 163.com 126.com zoho.com tutanota.com fastmail.com hey.com'.split(' '));
+const isWorkDomain = d => /\./.test(d) && !WEBMAIL.has(d) && !/\.(local|localdomain|lan|home|internal)$/.test(d) && !/^(localhost|example\.)/.test(d);
+const domainName = d => { const p = d.split('.'); const s = p.length > 2 && p[p.length - 2].length <= 3 ? p[p.length - 3] : p[p.length - 2]; return s.charAt(0).toUpperCase() + s.slice(1); };
+const sha256 = async s => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map(b => b.toString(16).padStart(2, '0')).join('');
 apiBtn.onclick = async () => {
   const token = store.get();
   apiDiv.textContent = 'Recherche…';
   try {
-    const [u, socials, commits] = await Promise.all([
+    const [u, socials, commits, orgs] = await Promise.all([
       api('/users/' + login, token),
       api('/users/' + login + '/social_accounts', token).catch(() => []),
-      api('/search/commits?per_page=100&sort=author-date&q=' + encodeURIComponent('author:' + login), token).catch(() => ({ items: [] }))
+      api('/search/commits?per_page=100&sort=author-date&q=' + encodeURIComponent('author:' + login), token).catch(() => ({ items: [] })),
+      api('/users/' + login + '/orgs', token).catch(() => [])
     ]);
     socials.filter(s => /linkedin\.com\/in\//i.test(s.url)).forEach(s => found.add(s.url.replace(/^http:/, 'https:').replace(/\/$/, '')));
     [u.blog, u.bio].join(' ').replace(/https?:\/\/[^\s]*linkedin\.com\/in\/[^\s/?#]+/gi, m => { found.add(m.replace(/^http:/, 'https:')); return m; });
@@ -94,6 +105,23 @@ apiBtn.onclick = async () => {
     if (lastPatch) apiDiv.appendChild(link('Vérifier à la main : dernier commit en .patch', lastPatch));
     if (!clean(cIn.value) && u.company) cIn.value = clean(u.company).replace(/^@/, '');
     if (!clean(lIn.value) && u.location) lIn.value = clean(u.location).split(',')[0];
+    grav = await Promise.all([...emails].slice(0, 5).map(async e => ({ email: e, url: 'https://gravatar.com/' + await sha256(e) })));
+    showFound();
+    sigDiv.textContent = '';
+    const sig = [];
+    if (u.hireable) sig.push(el('div', 'padding:4px 8px;margin:3px 0;background:#fff4d6;border-radius:6px', 'Coché « disponible pour embauche » sur GitHub'));
+    [...new Set([...emails].map(e => e.split('@')[1]).filter(isWorkDomain))].forEach(d => {
+      const name = domainName(d);
+      sig.push(link('Domaine email : ' + d, 'https://' + d));
+      const b = el('div', 'padding:4px 8px;margin:3px 0;background:#eef6ee;border-radius:6px;cursor:pointer;font-size:13px', 'Utiliser « ' + name + ' » comme entreprise');
+      b.onclick = () => { cIn.value = name; render(); };
+      sig.push(b);
+    });
+    orgs.forEach(o => sig.push(link('Organisation GitHub : ' + o.login, 'https://github.com/' + o.login)));
+    if (u.blog && !/linkedin\.com/i.test(u.blog)) sig.push(link('Site : ' + u.blog.replace(/^https?:\/\//, ''), /^https?:/.test(u.blog) ? u.blog : 'https://' + u.blog));
+    if (u.twitter_username) sig.push(link('X : @' + u.twitter_username, 'https://x.com/' + u.twitter_username));
+    socials.filter(s => !/linkedin\.com|x\.com|twitter\.com/i.test(s.url)).forEach(s => sig.push(link(s.provider + ' : ' + s.url.replace(/^https?:\/\/(www\.)?/, ''), s.url)));
+    if (sig.length) { sigDiv.appendChild(el('b', 'display:block;margin-top:8px', 'Autres signaux :')); sig.forEach(e => sigDiv.appendChild(e)); }
     render();
   } catch (e) {
     apiDiv.textContent = '';

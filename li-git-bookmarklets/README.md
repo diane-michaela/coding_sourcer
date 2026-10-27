@@ -72,6 +72,13 @@ On a GitHub profile (github.com/username), click the bookmark. It runs at once:
   (`author:<login>`) and lists the git author names and non-noreply emails, the
   same data as opening a commit with `.patch` appended to its URL. When the
   profile shows only a nickname, the most frequent full name replaces it;
+- **Gravatar links**, right under the LinkedIn block: one link per commit email
+  (`gravatar.com/<sha256 of the email>`). A Gravatar profile often lists a verified
+  LinkedIn, plus job title, company and other accounts. 404 = no Gravatar. These are
+  links, not automatic lookups: GitHub's CSP blocks calls to `api.gravatar.com`;
+- **Autres signaux**: "hireable" ticked on GitHub, work email domains (webmail like
+  gmail/free.fr skipped) with a one-click "use as company", public GitHub orgs,
+  website, X and other social accounts;
 - a big **Ouvrir LinkedIn** button (LinkedIn people search on name + company);
 - likely LinkedIn URLs (`firstlast`, `first-last`) and Google X-ray searches
   (`site:fr.linkedin.com/in` by default, then `site:linkedin.com/in`).
