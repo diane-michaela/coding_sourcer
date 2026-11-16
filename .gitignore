@@ -94,5 +94,24 @@ vlastelica.png
 pierre-richard-dupont.png
 pierre-richard-dupont.svg
 
+# Contains real account IDs (replacement list) — never publish
+Intake-Meeting-Automation/sanitize_blueprint.py
+
+# SOSU conference talk script — local-only, never pushed to GitHub
+Intake-Meeting-Automation/sosu-*
+
+# LinkedIn guest-page job scraper — local only, never published
+reversesourcing/linkedin_guest_jobs.py
+
+# Scrapolox raw Discord threads — other members' messages and pseudos, never push
+Agents/Scrapolox/conversations/
+# Scrapolox internal PhantomBuster findings (Linear tickets) — confidential, never push
+Agents/Scrapolox/internal/
+
 # Bookmarklet builds with an embedded GitHub token
 li-git-bookmarklets/*_local.*
+
+# job_reversed_search: only the public guide + bookmarklet go to GitHub
+job_reversed_search/*
+!job_reversed_search/README.md
+!job_reversed_search/bookmarklet.js
