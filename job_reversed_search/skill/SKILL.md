@@ -1,6 +1,6 @@
 ---
 name: "job-reversed-search"
-description: Reverse job search for recruiters and sourcers. Turns a job description, an intake brief or a list of skills into a Google X-ray of LinkedIn job postings, collects results from Google result pages only, delivers one CSV file of postings, each labelled Product, Staffing or Unsure, then proposes a PhantomBuster chain on the Product companies (LinkedIn Job Scraper for full job descriptions and company page URLs, LinkedIn Company Employees Export for the people, LinkedIn Profile Scraper for their profiles). Use this skill whenever someone wants to find companies hiring for a skill set or a role, map a market from job postings, see who is building with a given stack, run a "reverse" or "X-ray" job search, or asks things like "which companies in France are hiring for X", "find job posts mentioning Y and Z", "build me a company list from job ads". Do NOT use it for people or profile search (that is a LinkedIn Recruiter or people-sourcing task, not this one).
+description: Reverse job search for recruiters and sourcers. Turns a job description, an intake brief or a list of skills into a Google X-ray of LinkedIn job postings, collects results from Google result pages only, delivers one CSV file of postings, each labelled Product, Staffing or Unsure, then proposes a PhantomBuster chain on the Product companies (LinkedIn Job Scraper for full job descriptions and company page URLs, LinkedIn Company Employees Export for the people, LinkedIn Profile Scraper for their profiles). Use this skill whenever someone wants to find companies hiring for a skill set or a role, map a market from job postings, see who is building with a given stack, run a "reverse" or "X-ray" job search, or asks things like "which companies in France are hiring for X", "run it for the UK, Poland and Spain", "find job posts mentioning Y and Z", "build me a company list from job ads". Do NOT use it for people or profile search (that is a LinkedIn Recruiter or people-sourcing task, not this one).
 ---
 
 # Job Reversed Search
@@ -32,7 +32,7 @@ Then build the query with the rules in `references/boolean-rules.md`. In short:
 | Alternatives | OR, or the vertical bar `\|` once the query is over 35 characters |
 | Exact keyword or phrase | Quotes, only for multi-word phrases or a word Google would swap for a synonym. Never quote everything. |
 | Role focus | intitle: repeated per term, joined with `\|`. Never allintitle:. |
-| Country | site: on the country LinkedIn subdomain plus /jobs/view (default fr.linkedin.com/jobs/view) |
+| Country | site: on the country LinkedIn subdomain plus /jobs/view (default fr.linkedin.com/jobs/view). Several countries: one query per country, see "Several countries" below |
 | Exclusions | Minus sign (-stage, -alternance, -freelance...), **only when the user asks to exclude something**. Never add one by default. |
 | Freshness | Add tbs=qdr:m (past month) or qdr:w (past week) to the URL |
 
@@ -50,11 +50,32 @@ site:fr.linkedin.com/jobs/view Bedrock (langchain | llamaindex | langgraph | cre
 ```
 **Same, role focus:** add `(intitle:engineer | intitle:ingénieur | intitle:architect)`.
 
+### Several countries (Europe, or any list of countries)
+
+Keep the same query and change only the country subdomain. Run **one query per country**: Google stops at about 100 to 120 results per query, so one query for the whole of Europe would silently drop most countries.
+
+| Country | Subdomain | Notes |
+|---|---|---|
+| France | fr.linkedin.com | Default |
+| United Kingdom | uk.linkedin.com | Largest market; the code is UK, not GB |
+| Poland | pl.linkedin.com | |
+| Spain | es.linkedin.com | |
+| Portugal | pt.linkedin.com | Small market, few results |
+| Lithuania | lt.linkedin.com | Small market, few results |
+| Germany, Netherlands, Italy, Ireland, Belgium, Switzerland | de., nl., it., ie., be., ch.linkedin.com | Not tested yet: check page 1 before trusting it |
+
+The six first ones were tested in one run (17 Nov 2026) and all returned postings.
+
+- **Small markets** can share one query to save time: `(site:pt.linkedin.com/jobs/view | site:lt.linkedin.com/jobs/view | site:ie.linkedin.com/jobs/view)` followed by the skill groups. The site: terms eat into the 32-word budget, so shorten the groups if needed.
+- **Search by skill, not by title, across languages.** Tool names (vLLM, LoRA, Bedrock, LangGraph...) stay in English everywhere; titles do not. For a role focus, add the local title next to the English one: ingénieur (FR), ingeniero (ES), engenheiro (PT), inżynier (PL), inžinierius (LT). Most tech postings in PL, LT and PT are written in English anyway.
+- **Remote roles** ("remote within Europe") are often attached to one country only or to www.linkedin.com. If the user cares about them, add one query on `site:linkedin.com/jobs/view` with `(remote | EMEA | Europe)`; those rows get Country code `?`.
+- Show the user the full list of queries (one line per country) before running them.
+
 ## Phase B: Collect from Google result pages only
 
 Two ways, depending on the setup:
 
-1. **User runs it (default, works for anyone):** give the user the Google search URL and the bookmarklet in `scripts/bookmarklet.js`. One click on the first results page is enough: it goes through the following Google pages by itself (up to 30, about 1 second apart), stops when a page brings no new job, removes duplicates and downloads a CSV named `linkedin-jobs-<timestamp>.csv` with the columns ID, Title, Company, Role, Location, Pays, Stack, Source, URL. The user then drops that CSV in the chat.
+1. **User runs it (default, works for anyone):** give the user the Google search URL and the bookmarklet in `scripts/bookmarklet.js`. One click on the first results page is enough: it goes through the following Google pages by itself (up to 30, about 1 second apart), stops when a page brings no new job, removes duplicates and downloads a CSV named `linkedin-jobs-<country code>-<timestamp>.csv` with the columns ID, Title, Company, Role, Location, Country code, Stack, Source, URL. **Country code is the code of the LinkedIn subdomain in capitals** (FR, UK, PL, ES, PT, LT...), or `?` when the URL has none (www.linkedin.com). The user then drops that CSV in the chat. For several countries, the user runs the bookmarklet once per country search and drops all the CSVs.
    Install steps to give the user (once):
    1. Show the bookmarks bar: Cmd+Shift+B (Mac) or Ctrl+Shift+B (Windows).
    2. Right-click the bar, then Add page (Chrome, Brave) or Add favorite (Edge). Name it `LinkedIn jobs to CSV`.
@@ -63,7 +84,9 @@ Two ways, depending on the setup:
 2. **Claude runs it (when a browser tool is connected):** never rewrite the extraction logic by hand. Use the ready scripts, which hold the bookmarklet's own code, so columns and values are identical to a bookmarklet CSV.
    - **Fast mode (default).** Open the Google URL in a tab, check page 1 loaded without a CAPTCHA, then run `scripts/fast-extract.js` once in that page. It fetches the following pages in the background, so the tab stays on page 1, and returns the row count, pages read and why it stopped. Then bring the rows into Claude with `scripts/readback.js` (see below).
    - **Visible mode (only if the user wants to watch the pages load).** Use `scripts/page-extract.js`: navigate the tab page by page (&start=10, 20, ...) and run it on each page, then its FINALIZE snippet. Slower, about 3 to 5 times longer.
-   - **Bringing the rows into Claude (always).** Run `scripts/readback.js` once in the same tab: it makes a compact copy of the rows (constant parts removed) and returns the timestamp, URL prefix, row count and length. Read `window.jrsCompact` in slices of 950 characters, about 10 slices per browser call, and append each call's output to `compact.txt` in the container straight away. Copy the text exactly; never paraphrase or tidy it. Then close the tab you opened.
+   - **Bringing the rows into Claude (always).** Run `scripts/readback.js` once in the same tab: it makes a compact copy of the rows (constant parts removed), keeps it in `window.jrsCompact` and in sessionStorage under `jrs-compact`, and returns the country, timestamp, URL prefix, row count and length. Read it with `sessionStorage.getItem('jrs-compact').slice(a, b)` in slices of 950 characters, about 10 slices per browser call (browser_batch), and append each call's output to the container straight away. Copy the text exactly; never paraphrase or tidy it. Then close the tab you opened.
+   - **Several countries.** Run the countries one after the other in the same tab: navigate to the country's Google URL, check page 1, run `fast-extract.js`, which also saves that country's rows in sessionStorage under `jrs-<country code>` (jrs-uk, jrs-pl...). Then, still before moving on, set `KEY = 'jrs-<country code>'` on the first line of `readback.js`, run it, and save the slices to `<country code>.txt` (uk.txt, pl.txt...) in the container. Read each country back before starting the next one, so a CAPTCHA never costs a country already collected. Pause about 20 seconds between countries: Google blocks fast series of searches.
+   - **CAPTCHA in the middle of a multi-country run:** stop, tell the user which countries are already saved and which one is blocked, ask them to reload that page and solve the CAPTCHA in the Chrome window, then rerun the blocked country and continue with the rest.
 
 Either way:
 - The company name is in the LinkedIn URL, after `-at-` and before the job ID (for example `...-at-wecasa-4469669619` gives Wecasa). Use it when the Google title does not show the company.
@@ -77,9 +100,11 @@ Either way:
 
 Produce one CSV file, `postings.csv`, and nothing else: no company list, no Google Sheet, no Drive file, no Excel file, even if a connector is available. Encode it in UTF-8 with BOM so accents open correctly in Excel.
 
-`postings.csv` is the bookmarklet's CSV, unchanged, with one column added. When the rows came from the connected browser, build it with `scripts/build-postings.py` (compact.txt plus a types.json of company to Company type), then check the row count matches what the browser reported. Keep every bookmarklet column, in the same order, with the same values: ID, Title, Company, Role, Location, Pays, Stack, Source, URL. Do not rename, reorder, clean, merge or drop anything. The only change is a new **Company type** column inserted right after Company:
+`postings.csv` is the bookmarklet's CSV, unchanged, with one column added. When the rows came from the connected browser, build it with `scripts/build-postings.py` (compact.txt plus a types.json of company to Company type), then check the row count matches what the browser reported.
 
-ID, Title, Company, Company type, Role, Location, Pays, Stack, Source, URL.
+**Several countries:** first run `scripts/merge-countries.py --out compact.txt uk.txt pl.txt es.txt ...` (or the user's bookmarklet CSVs). It writes every URL in full, removes postings that appear in two countries (same job ID) and prints the count per country. Then run `build-postings.py` on that compact.txt as usual; the `--prefix` value is not used when every URL is full. Still one file only: `postings.csv`, all countries together, with the Country code column telling them apart. Keep every bookmarklet column, in the same order, with the same values: ID, Title, Company, Role, Location, Country code, Stack, Source, URL. Do not rename, reorder, clean, merge or drop anything. The only change is a new **Company type** column inserted right after Company:
+
+ID, Title, Company, Company type, Role, Location, Country code, Stack, Source, URL.
 
 **Company type** takes exactly one of three values:
 
@@ -89,7 +114,7 @@ ID, Title, Company, Company type, Role, Location, Pays, Stack, Source, URL.
 
 Base the label on what you already know about the company and on the job title and URL. Do not open job postings or company pages to decide. The label never removes a row: Staffing and Unsure rows stay in the file.
 
-Then a short summary: number of postings, number of companies, count per company type, the companies with the most postings, and any rows that look suspicious (odd location, volunteer or internship post, stack term probably not in the job description).
+Then a short summary: number of postings, number of companies, count per country (Country code column) when several countries were searched, count per company type, the companies with the most postings, and any rows that look suspicious (odd location, volunteer or internship post, stack term probably not in the job description).
 
 Do not invent fields Google does not show. Posting date, open or closed status, applicant count and work mode are not in Google results. Leave them out and point to Phase D.
 
@@ -122,7 +147,7 @@ If the PhantomBuster connector is available in the session, offer to set up the 
 ## Output format
 
 1. The query (with the mandatory vs alternatives line).
-2. How it was collected (pages scraped, where it stopped and why).
+2. How it was collected (pages scraped, where it stopped and why), per country when there are several.
 3. The single CSV file, `postings.csv`, presented here in Claude.
 4. The short summary.
 5. The PhantomBuster chain (Job Scraper, Company Employees Export, Profile Scraper) on the Product companies, with the company URL warning.

@@ -45,4 +45,11 @@ Example JD: "Python and Kubernetes required, Terraform or Pulumi, Datadog a plus
 
 ## Other countries
 
-Replace the subdomain: uk.linkedin.com, de.linkedin.com, es.linkedin.com, it.linkedin.com, nl.linkedin.com, be.linkedin.com, ch.linkedin.com. Check a first page of results before trusting a new subdomain.
+Replace the subdomain, one query per country. Tested and working: fr, uk, pl, es, pt, lt (.linkedin.com). Not tested yet: de, nl, it, ie, be, ch; check a first page of results before trusting them. The subdomain becomes the Country code column of the CSV in capitals (UK, PL, ES...), so countries stay apart after merging.
+
+Example, the same skill search in the UK and in Poland:
+
+- `site:uk.linkedin.com/jobs/view (quantization | vLLM | TensorRT | ONNX) (fine-tuning | LoRA | PEFT) (embeddings | retrieval | "semantic search")`
+- `site:pl.linkedin.com/jobs/view (quantization | vLLM | TensorRT | ONNX) (fine-tuning | LoRA | PEFT) (embeddings | retrieval | "semantic search")`
+
+Small markets can share one query: `(site:pt.linkedin.com/jobs/view | site:lt.linkedin.com/jobs/view) ...`, minding the 32-word limit.

@@ -5,7 +5,7 @@ Usage:
       --compact compact.txt --types types.json --out postings.csv
 
 compact.txt : the readback.js text (one posting per line, fields split by U+00A6:
-              Title, Company, Role, Location, Pays, Stack, URL tail).
+              Title, Company, Role, Location, Country code, Stack, URL tail).
 types.json  : {"Company name": "Product" | "Staffing" | "Unsure", ...}.
               Any company missing from it is written as Unsure.
 
@@ -22,7 +22,7 @@ types = json.load(open(o.types, encoding="utf-8"))
 lines = [l for l in open(o.compact, encoding="utf-8").read().split("\n") if l.strip()]
 with open(o.out, "w", encoding="utf-8-sig", newline="") as f:
     w = csv.writer(f, quoting=csv.QUOTE_ALL, lineterminator="\r\n")
-    w.writerow(["ID", "Title", "Company", "Company type", "Role", "Location", "Pays", "Stack", "Source", "URL"])
+    w.writerow(["ID", "Title", "Company", "Company type", "Role", "Location", "Country code", "Stack", "Source", "URL"])
     for i, l in enumerate(lines, 1):
         p = l.split("\u00a6")
         if len(p) != 7:

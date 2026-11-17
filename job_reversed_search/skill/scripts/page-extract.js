@@ -36,12 +36,8 @@ const locate = (title, snippet, src, bolds = [], url = '') => {
   const out = hasPlace(loc.toLowerCase(), OUT_PLACES) || hasPlace(text, OUT_PLACES);
   if (!loc) loc = fr || out || '';
   loc = loc.replace(/^./, c => c.toUpperCase());
-  let pays = '?';
-  if (hasPlace(loc.toLowerCase(), FR_PLACES) || /\b\d{5}\b/.test(loc)) pays = 'France';
-  else if (hasPlace(loc.toLowerCase(), OUT_PLACES)) pays = 'Hors France';
-  else if (fr && !out) pays = 'France';
-  else if (out && !fr) pays = 'Hors France';
-  else if (!fr && !out && (src === 'LinkedIn' || FR_HINTS.test(title))) pays = 'France';
+  const cc = (url.match(/^https?:\/\/([a-z]{2})\.linkedin\.com\//i) || [])[1];
+  const pays = cc ? cc.toUpperCase() : '?';
   return { loc, pays };
 };
 const STACK = ['bedrock', 'agentcore', 'langchain', 'langgraph', 'llamaindex', 'crewai', 'autogen', 'dspy', 'semantic kernel', 'haystack', 'rag', 'llm', 'sagemaker', 'mlflow', 'mlops', 'llmops', 'aws', 'azure', 'gcp', 'python', 'typescript', 'node.js', 'react', 'next.js', 'terraform', 'pulumi', 'ansible', 'kubernetes', 'docker', 'postgresql', 'redis', 'kafka', 'databricks', 'figma', 'storybook', 'tailwind', 'cypress', 'jest'];
@@ -111,5 +107,5 @@ return JSON.stringify({page:start/10+1,newRows:added,total:store.length,captcha,
    window.jrsCsv and returns its length. Read it back in slices of about
    950 characters (window.jrsCsv.slice(0,950), ...), batched.
 
-(() => {const esc=s=>'"'+String(s).replace(/"/g,'""')+'"';const ts=Date.now();const rows=JSON.parse(sessionStorage.getItem('jrs-rows')||'[]');const out=[['ID','Title','Company','Role','Location','Pays','Stack','Source','URL'].map(esc).join(',')];rows.forEach((r,i)=>out.push([ts+'-'+String(i+1).padStart(3,'0'),r[0],r[1],r[2],r[3],r[4],r[5],'LinkedIn',r[6]].map(esc).join(',')));window.jrsCsv=out.join('\r\n');return window.jrsCsv.length;})()
+(() => {const esc=s=>'"'+String(s).replace(/"/g,'""')+'"';const ts=Date.now();const rows=JSON.parse(sessionStorage.getItem('jrs-rows')||'[]');const out=[['ID','Title','Company','Role','Location','Country code','Stack','Source','URL'].map(esc).join(',')];rows.forEach((r,i)=>out.push([ts+'-'+String(i+1).padStart(3,'0'),r[0],r[1],r[2],r[3],r[4],r[5],'LinkedIn',r[6]].map(esc).join(',')));window.jrsCsv=out.join('\r\n');return window.jrsCsv.length;})()
    --------------------------------------------------------------------- */
