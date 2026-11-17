@@ -95,17 +95,18 @@ and doesn't send your data anywhere.
 starting from a job description, an intake brief or a list of skills:
 
 1. **Builds the query** (stack focus or role focus) and shows it to you before running it.
-2. **Reads the Google result pages** through Claude in Chrome. It never opens the job posts
-   and never works around a CAPTCHA.
-3. **Delivers one sheet** (Google Sheet or CSV), one row per post. Each company gets a type
-   (direct employer, ESN, agency, freelance platform) and a "keep for people search" label.
-4. **Proposes PhantomBuster next steps**: the LinkedIn Job Scraper for market mapping, or
-   Company URL Finder → Company Employees Export → Profile Scraper to find the people inside
-   those companies.
+   No exclusion (`-stage`, `-alternance`...) unless you ask for one.
+2. **Collects from Google only**: either you click this bookmarklet and drop its CSV in the
+   chat, or Claude in Chrome runs the same bookmarklet code for you (`skill/scripts/`). It never
+   uses a search API, never opens the job posts and never works around a CAPTCHA.
+3. **Delivers one CSV**, `postings.csv`: the bookmarklet's columns, unchanged, plus one
+   **Company type** column (Product, Staffing or Unsure). No Google Sheet, no Drive file.
+4. **Proposes a PhantomBuster chain** on the Product companies: LinkedIn Job Scraper →
+   Company Employees Export → Profile Scraper. The Employees Export needs LinkedIn company page
+   URLs: they come from the Job Scraper, or from the Company URL Finder if you skip it.
 
-Bookmarklet or skill? Use one or the other. The bookmarklet is a one-click CSV with no AI.
-The skill collects with the browser instead of a bookmarklet, and adds the company labels and
-the PhantomBuster hand-off.
+Bookmarklet or skill? The bookmarklet is a one-click CSV with no AI. The skill uses the same
+extraction code, then adds the Company type and the PhantomBuster hand-off.
 
 **Install it:** in Claude, go to *Settings → Capabilities → Skills*, then upload a zip of the
 `skill` folder. In Claude Code, copy the folder to `~/.claude/skills/job-reversed-search/`.

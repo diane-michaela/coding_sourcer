@@ -1,6 +1,6 @@
 ---
 name: "job-reversed-search"
-description: Reverse job search for recruiters and sourcers. Turns a job description, an intake brief or a list of skills into a Google X-ray of LinkedIn job postings, collects results from Google result pages only through the connected browser, delivers one single sheet of postings labelled by company type, then proposes PhantomBuster next steps (LinkedIn Job Scraper for market mapping, or Company URL Finder, Company Employees Export and Profile Scraper to get the people inside the companies). Run it ONLY when the user explicitly asks for it, by name ("job reversed search", "reverse job search", "job X-ray") or with a clear request to find companies hiring from job postings. When a conversation is about sourcing, market mapping, a job description or a hiring brief but the user has not asked for this, do not run it; suggest it in one line and wait for a yes. Not for people or profile search.
+description: Reverse job search for recruiters and sourcers. Turns a job description, an intake brief or a list of skills into a Google X-ray of LinkedIn job postings, collects results from Google result pages only, delivers one CSV file of postings, each labelled Product, Staffing or Unsure, then proposes a PhantomBuster chain on the Product companies (LinkedIn Job Scraper for full job descriptions and company page URLs, LinkedIn Company Employees Export for the people, LinkedIn Profile Scraper for their profiles). Use this skill whenever someone wants to find companies hiring for a skill set or a role, map a market from job postings, see who is building with a given stack, run a "reverse" or "X-ray" job search, or asks things like "which companies in France are hiring for X", "find job posts mentioning Y and Z", "build me a company list from job ads". Do NOT use it for people or profile search (that is a LinkedIn Recruiter or people-sourcing task, not this one).
 ---
 
 # Job Reversed Search
@@ -9,48 +9,22 @@ Find the companies that are hiring for a skill set or a role by searching Linked
 
 The value of this skill is speed and a clean hand-off. Claude builds a precise query, collects what Google already shows, and stops there. Everything that needs to open job pages one by one belongs to PhantomBuster, which does it faster, at scale and on a schedule.
 
-## When to run it, when to suggest it
-
-- **Run it** only when the user asks for it explicitly: by name ("job reversed search", "reverse job search", "job X-ray"), or with a clear request such as "find the companies hiring for this stack" or "build me a company list from job postings".
-- **Suggest it** in every other relevant situation, for example when the user shares a job description, prepares an intake, talks about market mapping or asks who is building with a technology. Add one line at the end of the normal answer, then wait:
-  > "If useful, I can run a reverse job search on this: a Google X-ray of LinkedIn job postings to list the companies hiring for it, with PhantomBuster next steps. Want me to?"
-- Suggest it once per conversation. If the user ignores it or says no, do not bring it up again.
-- Do not start Phase A, build a query or open a browser before the user says yes.
-
 ## Hard limits (read first)
 
-- **Never open job postings and never loop through job descriptions.** No fetching each posting, no guest-API loops, no keyword verification per job. Google's title and preview text are the whole input. If the user wants dates, status, applicant counts, work mode or verified keywords, that is Phase D (PhantomBuster), not Claude.
+- **Never open job postings and never loop through job descriptions.** No fetching each posting, no guest-API loops, no keyword verification per job. Google's title and preview text are the whole input. If the user wants dates, status, applicant counts, work mode or verified keywords, that is the LinkedIn Job Scraper in Phase D, not Claude.
 - **Never solve or work around a CAPTCHA.** If Google shows one, stop and ask the user to solve it in their own browser, then continue.
-- **Never use a bookmarklet or a paid search API** (Serper, SerpAPI or similar). The connected browser is the only collection method.
+- **Google only, through the bookmarklet or the connected browser.** Never use Firecrawl, Serper, SerpAPI or any other search API or scraping service, even when a key is available. If no browser is connected, give the user the bookmarklet and wait for their CSV.
+- **One CSV file only, always shown in Claude, never Google Drive.** The only output file is `postings.csv`, and it is always delivered here in Claude as a file card (present it), whatever its size. Never leave it only in the browser's Downloads folder. Do not make a separate company list. Never create a Google Sheet, a Google Drive file, an Excel file or a Claude Doc, even when a Drive or Sheets connector is connected, and do not offer to. Do not call any Google Drive or Google Sheets tool while running this skill.
 - **This skill does not search people.** LinkedIn Recruiter operators (headline:, skills:, seniority:, yoe:, functions:, etc.) mean nothing to Google. Do not use them here.
-
-## What a row is evidence of (read before every phase)
-
-In a **stack focus** search, each posting is evidence that **the company uses the stack**. The posting is not a candidate role. It is a data point for company mapping. Two rules follow from that, and they apply in every phase, in the summary and in the PhantomBuster recommendations.
-
-**1. The job title never disqualifies a row or a company.** A sales role, a product manager, a platform or backend engineer, a DevOps role or an internship that lists the stack, even as a "nice to have", shows that the company works with that stack. It usually means another team (ML, AI engineering, data) uses it daily, and those are the people the recruiter wants. Example: a Senior Backend and Platform Engineer posting that lists Bedrock AgentCore and LangGraph as a bonus is a strong signal, because the platform team works with ML engineers on that exact stack.
-- Never call a row a false positive, off-topic or noise because of its title, department or seniority.
-- Never suggest dropping rows, or lowering a company's Keep for people search value, because of the role.
-- Never present a "smaller, cleaner list" as a benefit of removing such rows.
-- Filtering by role is only valid in **role focus**, where the user asked for a specific job title and the query uses intitle:. If the user wanted role filtering, they would have asked for role focus.
-
-**2. The posting's age or status never disqualifies a row.** An old or closed posting still documents the company's stack at that date. The goal is to map which companies use the stack over time, not to find stacks that are fresh this month.
-- Never call old or closed postings stale, outdated or less relevant.
-- Never suggest dropping them, and never add a freshness filter (tbs=qdr:...) unless the user asks for one.
-- Posting date and status, once PhantomBuster returns them, are context columns for a timeline (for example, when each company started posting for this stack). They are never filters.
-
-**3. The company type never removes a row.** ESNs, staffing agencies and freelance platforms stay in the sheet. Company type and Keep for people search are labels, never filters.
-
-**The only valid reason to question a row** is that the stack terms are not really in the job description. This happens when Google loosened the AND, or matched a word from the page around the posting rather than the posting itself, for example a company named "Haystack" in LinkedIn's similar-jobs sidebar. Claude cannot check this from Google results, so it flags the doubt and leaves verification to the LinkedIn Job Scraper (Phase D). Even then, Claude does not remove the row: the user decides.
 
 ## Phase A: Build the query
 
 Ask one question if it is not already clear: **is the focus the stack or the role?**
 
-- **Stack focus** (any job that uses these tools): keywords only, no intitle. Every role counts, whatever its title (see "What a row is evidence of").
-- **Role focus** (a specific job title, whatever the stack): add intitle: terms for the title variants. This is the only mode where the job title is used to include or exclude postings.
+- **Stack focus** (any job that uses these tools): keywords only, no intitle.
+- **Role focus** (a specific job title, whatever the stack): add intitle: terms for the title variants.
 
-Then build the query with these rules:
+Then build the query with the rules in `references/boolean-rules.md`. In short:
 
 | Need | Rule |
 |---|---|
@@ -59,10 +33,12 @@ Then build the query with these rules:
 | Exact keyword or phrase | Quotes, only for multi-word phrases or a word Google would swap for a synonym. Never quote everything. |
 | Role focus | intitle: repeated per term, joined with `\|`. Never allintitle:. |
 | Country | site: on the country LinkedIn subdomain plus /jobs/view (default fr.linkedin.com/jobs/view) |
-| Noise | Minus sign, added early (-stage -alternance -freelance as needed) |
-| Freshness | Only when the user asks for it: add tbs=qdr:m (past month) or qdr:w (past week) to the URL. Never add it by default; old postings are useful for company mapping. |
+| Exclusions | Minus sign (-stage, -alternance, -freelance...), **only when the user asks to exclude something**. Never add one by default. |
+| Freshness | Add tbs=qdr:m (past month) or qdr:w (past week) to the URL |
 
 Keep the query under about 32 words: Google silently ignores what comes after.
+
+**No exclusions unless asked.** Do not add any minus-sign term on your own, not even common ones like -stage or -alternance: they can drop good postings that mention the word in passing. Add an exclusion only when the user explicitly asks to exclude something (for example "no internships", "remove freelance", "exclude -stage"). If the results show noise afterwards, point it out in the summary and suggest the exclusion, but do not rerun with it until the user says so.
 
 **Turning a JD into a query:** mandatory skills become space-separated terms. Alternative tools for the same need become one `|` group. Desirable-only skills stay out of the query (they shrink results too much) and are listed for later scoring.
 
@@ -76,65 +52,77 @@ site:fr.linkedin.com/jobs/view Bedrock (langchain | llamaindex | langgraph | cre
 
 ## Phase B: Collect from Google result pages only
 
-Claude runs the search in the connected browser (Claude in Chrome): open the Google URL, read each results page (title, URL and snippet of every LinkedIn job result), and move forward with &start=10, 20, 30 and so on. If no browser is connected, stop and ask the user to connect Claude in Chrome before going further.
+Two ways, depending on the setup:
 
+1. **User runs it (default, works for anyone):** give the user the Google search URL and the bookmarklet in `scripts/bookmarklet.js`. One click on the first results page is enough: it goes through the following Google pages by itself (up to 30, about 1 second apart), stops when a page brings no new job, removes duplicates and downloads a CSV named `linkedin-jobs-<timestamp>.csv` with the columns ID, Title, Company, Role, Location, Pays, Stack, Source, URL. The user then drops that CSV in the chat.
+   Install steps to give the user (once):
+   1. Show the bookmarks bar: Cmd+Shift+B (Mac) or Ctrl+Shift+B (Windows).
+   2. Right-click the bar, then Add page (Chrome, Brave) or Add favorite (Edge). Name it `LinkedIn jobs to CSV`.
+   3. In the URL field, paste the whole `javascript:` line found at the very bottom of `scripts/bookmarklet.js`, under READY-TO-PASTE BOOKMARKLET. It is full of `%20`, which is normal. Give this line exactly as written in the file, never rewrite or shorten it.
+   4. Open the Google search, wait for the results, click the bookmark once and wait for the "Done" message. If Google shows a CAPTCHA, solve it, then click again.
+2. **Claude runs it (when a browser tool is connected):** never rewrite the extraction logic by hand. Use the ready scripts, which hold the bookmarklet's own code, so columns and values are identical to a bookmarklet CSV.
+   - **Fast mode (default).** Open the Google URL in a tab, check page 1 loaded without a CAPTCHA, then run `scripts/fast-extract.js` once in that page. It fetches the following pages in the background, so the tab stays on page 1, and returns the row count, pages read and why it stopped. Then bring the rows into Claude with `scripts/readback.js` (see below).
+   - **Visible mode (only if the user wants to watch the pages load).** Use `scripts/page-extract.js`: navigate the tab page by page (&start=10, 20, ...) and run it on each page, then its FINALIZE snippet. Slower, about 3 to 5 times longer.
+   - **Bringing the rows into Claude (always).** Run `scripts/readback.js` once in the same tab: it makes a compact copy of the rows (constant parts removed) and returns the timestamp, URL prefix, row count and length. Read `window.jrsCompact` in slices of 950 characters, about 10 slices per browser call, and append each call's output to `compact.txt` in the container straight away. Copy the text exactly; never paraphrase or tidy it. Then close the tab you opened.
+
+Either way:
+- The company name is in the LinkedIn URL, after `-at-` and before the job ID (for example `...-at-wecasa-4469669619` gives Wecasa). Use it when the Google title does not show the company.
 - Google shows 10 results per page. The num=100 parameter no longer works.
-- Stop when Google offers no next page.
 - Stop at the notice "In order to show you the most relevant results, we have omitted some entries" (French: "omis certains résultats"). That means the search is complete.
 - Stop at a CAPTCHA and hand over to the user.
 - Remove duplicates using the job ID (the long number at the end of the posting URL).
-- Say plainly that Google sometimes loosens the AND, so in a few rows the stack terms may not really be in the job description. Verification of the stack keywords happens in Phase D. Do not use the title or the posting date to guess which rows those are.
+- Say plainly that Google sometimes loosens the AND, so a few rows may not truly match. Verification happens in Phase D.
 
 ## Phase C: Deliver
 
-Produce **one single sheet**: a Google Sheet if the user asks for it and a Drive connector is available, otherwise **one CSV file** (UTF-8 with BOM, so accents open correctly in Excel). One row per posting, with these columns in this order:
+Produce one CSV file, `postings.csv`, and nothing else: no company list, no Google Sheet, no Drive file, no Excel file, even if a connector is available. Encode it in UTF-8 with BOM so accents open correctly in Excel.
 
-Company, Company type, Keep for people search, Job title, City, Job ID, LinkedIn URL, Google snippet, Stack seen in snippet, Check, Google page.
+`postings.csv` is the bookmarklet's CSV, unchanged, with one column added. When the rows came from the connected browser, build it with `scripts/build-postings.py` (compact.txt plus a types.json of company to Company type), then check the row count matches what the browser reported. Keep every bookmarklet column, in the same order, with the same values: ID, Title, Company, Role, Location, Pays, Stack, Source, URL. Do not rename, reorder, clean, merge or drop anything. The only change is a new **Company type** column inserted right after Company:
 
-- **Never create a separate companies tab or file.** The user can rebuild per-company counts with a pivot table.
-- **Every posting stays in the file**, including ESNs, staffing agencies and freelance platforms.
-- **Stack seen in snippet:** the stack terms visible in the Google snippet, nothing else.
-- **Check:** empty unless one of the valid reasons below applies; then a short reason ending with "Job Scraper will confirm."
-- Clean the job titles of Google artefacts ("pour des postes de", trailing "...") and normalize company names so the same company is always written the same way.
+ID, Title, Company, Company type, Role, Location, Pays, Stack, Source, URL.
 
-**Company type, done fast.** Classify each company from its name and the snippet only, using what is already known: Direct employer, IT services or ESN, Staffing or recruiting agency, Freelance platform, or Unsure. Do not look anything up and do not open pages to decide. If it is not obvious in a second, write Unsure. Set Keep for people search to No for IT services or ESN, staffing or recruiting agencies and freelance platforms, Yes for direct employers, and Check for Unsure.
+**Company type** takes exactly one of three values:
 
-Keep for people search depends on the company type only. Never on the job titles seen, the number of postings, or how old the postings are.
+- **Product:** the company builds and sells its own product or runs its own service, and the person hired works on it (startups, scale-ups, software vendors, large companies with in-house tech teams).
+- **Staffing:** the hire works for someone else's client or is placed by a third party: staffing and recruitment agencies, ESN / IT consulting / SSII, freelance and job platforms, job aggregators.
+- **Unsure:** anything you cannot place with confidence. This includes rows where Google shows no company name, unknown small companies, and names you do not recognise. When in doubt, write Unsure. Never guess.
 
-Then a short summary: number of postings, number of companies, how many companies are kept for people search (Yes, Check, No), the companies with the most postings, and any rows worth a check. A row is worth a check only for one of these reasons:
-- The company or location is unclear.
-- The snippet does not show the stack terms, or the match seems to come from the page around the posting (for example a sidebar company name). Say that the Job Scraper will confirm it, and keep the row.
+Base the label on what you already know about the company and on the job title and URL. Do not open job postings or company pages to decide. The label never removes a row: Staffing and Unsure rows stay in the file.
 
-A non-engineering title, a sales or product role, an internship, an old date or the company type is never a reason to flag a row.
+Then a short summary: number of postings, number of companies, count per company type, the companies with the most postings, and any rows that look suspicious (odd location, volunteer or internship post, stack term probably not in the job description).
 
 Do not invent fields Google does not show. Posting date, open or closed status, applicant count and work mode are not in Google results. Leave them out and point to Phase D.
 
-## Phase D: Propose PhantomBuster (always)
+## Phase D: Propose the PhantomBuster chain (always)
 
-End every run by proposing these next steps and let the user choose. Do not launch anything without their go-ahead.
+End every run by proposing this chain. Always suggest running it on the **Product** companies of `postings.csv` only: Staffing people work for clients and add noise. Unsure rows join only once the user has checked them and confirmed they are Product. Do not launch anything without the user's go-ahead.
 
-**Path 1: Market mapping and role understanding**
-- **LinkedIn Job Scraper.** Input: the LinkedIn URL column of the sheet, all rows. Output: full job descriptions, posting date, status, applicants, work mode, seniority and real keyword verification. Use it to:
-  - see the full stack each company describes, beyond what the snippet showed;
-  - add posting date and status as timeline columns, to show when each company hired for this stack;
-  - confirm the stack keywords are really in each description.
-  A row whose description does not contain the stack terms can be flagged for the user to remove. Never recommend removing rows, or companies, because of the job title, department, seniority, posting age, closed status or company type.
+**Golden rule: the people phantoms take LinkedIn company page URLs, never company names.** A company name typed into them returns nothing useful. That is why the order below matters.
 
-**Path 2: Get the people inside the companies** (run in this order)
-1. **LinkedIn Company URL Finder.** Input: the Company column, filtered on Keep for people search = Yes (plus Check, if the user confirms them), with duplicate company names removed. Output: each company's LinkedIn page URL.
-2. **LinkedIn Company Employees Export.** Input: the company URLs from step 1. Output: the employee list for each company. Suggest filtering on the same keywords or titles as the query so the list stays focused.
-3. **LinkedIn Profile Scraper.** Input: the profile URLs from step 2. Output: full profiles to confirm who really works with the skill set, ready for sourcing.
+1. **[LinkedIn Job Scraper](https://phantombuster.com/automations/linkedin/6772788738377011/linkedin-job-scraper)**
+   - Input: the URL column of `postings.csv`, Product rows.
+   - Output: the full job description, posting date, whether it is still open, applicant count, work mode, a real check that the stack is in the posting, and `companyUrl` (the LinkedIn company page URL).
+   - This step replaces everything Claude must not do in Phases B and C (opening postings, verifying keywords). It also produces the company page URLs that step 2 needs.
+2. **[LinkedIn Company Employees Export](https://phantombuster.com/automations/linkedin/3295/linkedin-company-employees-export)**
+   - Input: the `companyUrl` column from step 1, Product companies only, with the position filter set to the role's titles (the intitle: variants from Phase A, or the title from the JD).
+   - It only works if the Job Scraper ran first: this phantom takes LinkedIn company page URLs, not names.
+3. **[LinkedIn Profile Scraper](https://phantombuster.com/automations/linkedin/5589386912058181/linkedin-profile-scraper)**
+   - Input: the profile URLs from step 2.
+   - Output: headline, About, skills and experience.
+   - The pitch line to give the user for this step: "their employer proved the stack for them". These people work at a company whose job postings show it uses the stack, so the stack is credible even when their own profile does not list it.
 
-Explain in one line why staffing agencies, IT services or ESN and freelance platforms are left out of Path 2: their employees are not the ones doing the work for the end client, so their people lists add noise. They stay in the sheet for market mapping.
+**Attention: where the company page URLs come from**
 
-If the PhantomBuster connector is available in the session, offer to set up the chosen phantom with the sheet as input. If not, describe the step and what to feed it.
+- **Job Scraper ran first:** use its `companyUrl` column as the input of step 2.
+- **Job Scraper skipped:** run the **LinkedIn Company URL Finder** on the Company column of `postings.csv` first (Product rows, France / fr-FR, duplicates removed). Its `linkedinUrl` column becomes the input of step 2. Tell the user to check its matches before using them: it matches on names, so homonyms and wrong pages happen.
+- **Never the LinkedIn Company Scraper for this:** it cannot find URLs from a name, it needs the URL already.
+
+If the PhantomBuster connector is available in the session, offer to set up the chosen phantom with the right column as input. If not, describe each step and the exact column to feed it.
 
 ## Output format
 
 1. The query (with the mandatory vs alternatives line).
-2. How it was collected (pages read, where it stopped and why).
-3. The single sheet link or CSV file.
+2. How it was collected (pages scraped, where it stopped and why).
+3. The single CSV file, `postings.csv`, presented here in Claude.
 4. The short summary.
-5. The PhantomBuster next steps (Path 1 and Path 2).
-
-Before sending, reread the summary and the next steps. In a stack focus run, delete any sentence that calls a row a false positive, off-topic, stale or noise because of its title or age, that presents a shrinking company list as a goal, or that suggests a second file.
+5. The PhantomBuster chain (Job Scraper, Company Employees Export, Profile Scraper) on the Product companies, with the company URL warning.
