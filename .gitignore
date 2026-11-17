@@ -115,3 +115,4 @@ li-git-bookmarklets/*_local.*
 job_reversed_search/*
 !job_reversed_search/README.md
 !job_reversed_search/bookmarklet.js
+!job_reversed_search/skill/

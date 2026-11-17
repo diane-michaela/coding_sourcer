@@ -5,9 +5,10 @@ A bookmarklet that turns a Google search of LinkedIn job posts into a CSV file.
 You write the Google search, the bookmarklet reads every results page for you and
 downloads one row per job post: company, role, location, stack seen in the snippet, URL.
 
-This folder has two things:
+This folder has three things:
 - this guide: how to write your search string, and how to create the bookmarklet;
-- `bookmarklet.js`: the code. The line to copy is at the bottom of the file.
+- `bookmarklet.js`: the code. The line to copy is at the bottom of the file;
+- [`skill/SKILL.md`](skill/SKILL.md): the same reverse search as a Claude skill (see section 4).
 
 ## 1. Write your Google search string
 
@@ -87,3 +88,26 @@ If Google shows a CAPTCHA, solve it, wait a minute, and click the bookmark again
 
 The bookmarklet only reads the Google results page you're on. It doesn't log in to LinkedIn
 and doesn't send your data anywhere.
+
+## 4. Or let Claude do it: the `job-reversed-search` skill
+
+[`skill/SKILL.md`](skill/SKILL.md) is a Claude skill that runs the same reverse search for you,
+starting from a job description, an intake brief or a list of skills:
+
+1. **Builds the query** (stack focus or role focus) and shows it to you before running it.
+2. **Reads the Google result pages** through Claude in Chrome. It never opens the job posts
+   and never works around a CAPTCHA.
+3. **Delivers one sheet** (Google Sheet or CSV), one row per post. Each company gets a type
+   (direct employer, ESN, agency, freelance platform) and a "keep for people search" label.
+4. **Proposes PhantomBuster next steps**: the LinkedIn Job Scraper for market mapping, or
+   Company URL Finder → Company Employees Export → Profile Scraper to find the people inside
+   those companies.
+
+Bookmarklet or skill? Use one or the other. The bookmarklet is a one-click CSV with no AI.
+The skill collects with the browser instead of a bookmarklet, and adds the company labels and
+the PhantomBuster hand-off.
+
+**Install it:** in Claude, go to *Settings → Capabilities → Skills*, then upload a zip of the
+`skill` folder. In Claude Code, copy the folder to `~/.claude/skills/job-reversed-search/`.
+The skill runs only when you ask for it ("job reversed search", "reverse job search",
+"job X-ray").
