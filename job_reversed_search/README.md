@@ -5,10 +5,10 @@ A bookmarklet that turns a Google search of LinkedIn job posts into a CSV file.
 You write the Google search, the bookmarklet reads every results page for you and
 downloads one row per job post: company, role, location, stack seen in the snippet, URL.
 
-This folder has three things:
+This folder has 2 things:
 - this guide: how to write your search string, and how to create the bookmarklet;
 - `bookmarklet.js`: the code. The line to copy is at the bottom of the file;
-- [`skill/SKILL.md`](skill/SKILL.md): the same reverse search as a Claude skill (see section 4).
+- Please note that skill is in a separate repository
 
 ## 1. Write your Google search string
 
@@ -91,7 +91,7 @@ and doesn't send your data anywhere.
 
 ## 4. Or let Claude do it: the `job-reversed-search` skill
 
-[`skill/SKILL.md`](skill/SKILL.md) is a Claude skill that runs the same reverse search for you,
+Skill is a Claude skill that runs the same reverse search for you,
 starting from a job description, an intake brief or a list of skills:
 
 1. **Builds the query** (stack focus or role focus) and shows it to you before running it.
@@ -108,7 +108,4 @@ starting from a job description, an intake brief or a list of skills:
 Bookmarklet or skill? The bookmarklet is a one-click CSV with no AI. The skill uses the same
 extraction code, then adds the Company type and the PhantomBuster hand-off.
 
-**Install it:** in Claude, go to *Settings → Capabilities → Skills*, then upload a zip of the
-`skill` folder. In Claude Code, copy the folder to `~/.claude/skills/job-reversed-search/`.
-The skill runs only when you ask for it ("job reversed search", "reverse job search",
-"job X-ray").
+
